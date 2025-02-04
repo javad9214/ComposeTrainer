@@ -4,68 +4,41 @@ import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
-import com.example.composetrainer.ui.navigation.Screens
+import com.example.composetrainer.ui.navigation.Routes
 import com.example.composetrainer.ui.screens.HomeScreen
 import com.example.login.ui.screens.LoginScreen
-import com.example.composetrainer.ui.theme.ComposeTrainerTheme
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            ComposeTrainerTheme {
-                MainScreen()
+            val navController = rememberNavController()
+
+            NavHost(
+                navController = navController,
+                startDestination = Routes.LOGIN
+            ) {
+                composable(Routes.LOGIN) {
+                    LoginScreen(
+                        onLoginSuccess = {
+                            navController.navigate(Routes.HOME) {
+                                popUpTo(Routes.LOGIN) { inclusive = true }
+                            }
+                        }
+                    )
+                }
+                composable(Routes.HOME) {
+                    HomeScreen()
+                }
             }
         }
     }
 }
 
-@Composable
-fun MainScreen() {
-    val navController = rememberNavController()
 
-    NavHost(navController, startDestination = Screens.Login.route) {
-        composable(Screens.Login.route) {
-            com.example.login.ui.screens.LoginScreen(onLoginSuccess = {
-                navController.navigate(Screens.Home.route) {
-                    popUpTo(Screens.Login.route) {
-                        inclusive = true
-                    }
-                }
-            })
-        }
-        composable(Screens.Home.route) {
-            HomeScreen(navController)
-        }
-    }
-}
-
-@Composable
-fun Greeting(name: String, modifier: Modifier = Modifier) {
-    Text(
-        text = "Hello $name!",
-        modifier = modifier
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun GreetingPreview() {
-    ComposeTrainerTheme {
-        Greeting("Android")
-    }
-    Greeting("Seyed Mohammad Javad")
-}
-
-@Composable
-fun Greeting(name: String) {
-    Text(text = "Hello $name!")
-}
