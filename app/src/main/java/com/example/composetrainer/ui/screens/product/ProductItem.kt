@@ -14,6 +14,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 
 @Composable
 fun ProductItem(product: Product) {
@@ -33,10 +36,19 @@ fun ProductItem(product: Product) {
                 text = "Barcode: ${product.barcode ?: "N/A"}",
                 style = MaterialTheme.typography.bodyMedium
             )
+            Text(
+                text = "Added: ${formatDate(product.date)}",
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
     }
 }
 
+fun formatDate(timestamp: Long): String {
+    val formatter = SimpleDateFormat("dd MMM yyyy, HH:mm", Locale.getDefault())
+    return formatter.format(Date(timestamp))
+}
 
 @Preview(showBackground = true)
 @Composable
@@ -49,7 +61,8 @@ fun PreviewProductItem() {
                 barcode = "123456789",
                 price = 1000,
                 image = null,
-                categoryID = 1
+                categoryID = 1,
+                date = System.currentTimeMillis()
             )
         )
     }

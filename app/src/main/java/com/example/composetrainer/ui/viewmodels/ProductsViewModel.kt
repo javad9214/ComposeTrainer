@@ -23,6 +23,8 @@ class ProductsViewModel @Inject constructor(
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
 
+    private val _sortOrder = MutableStateFlow(SortOrder.DESCENDING)
+    val sortOrder: StateFlow<SortOrder> get() = _sortOrder
 
     init {
         loadProducts()
@@ -31,7 +33,7 @@ class ProductsViewModel @Inject constructor(
     private fun loadProducts(){
         viewModelScope.launch {
             _isLoading.value = true
-            getProductsUseCase().collectLatest{ products ->
+            getProductsUseCase(SortOrder.DESCENDING).collectLatest{ products ->
                 _products.value = products
                 _isLoading.value = false
             }
@@ -43,4 +45,13 @@ class ProductsViewModel @Inject constructor(
             addProductUseCase(product)
         }
     }
+
+    fun updateSortOrder(newOrder: SortOrder) {
+        _sortOrder.value = newOrder
+    }
+}
+
+enum class SortOrder {
+    ASCENDING, // Oldest first
+    DESCENDING // Newest first (default)
 }

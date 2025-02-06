@@ -11,7 +11,8 @@ object ProductMapper {
             barcode = entity.barcode,
             price = entity.price,
             image = entity.image,
-            categoryID = entity.categoryID
+            categoryID = entity.categoryID,
+            date = entity.date
         )
     }
 
@@ -22,7 +23,8 @@ object ProductMapper {
             barcode = domain.barcode,
             price = domain.price,
             image = domain.image,
-            categoryID = domain.categoryID
+            categoryID = domain.categoryID,
+            date = domain.date
         )
     }
 }

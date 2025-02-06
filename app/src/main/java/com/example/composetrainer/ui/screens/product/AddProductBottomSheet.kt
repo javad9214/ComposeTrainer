@@ -93,7 +93,8 @@ fun AddProductBottomSheet(
                     barcode = barcode.ifBlank { null },
                     price = price.toLongOrNull(),
                     image = null, // Add image handling later
-                    categoryID = categoryID.toIntOrNull()
+                    categoryID = categoryID.toIntOrNull(),
+                    date = System.currentTimeMillis()
                 )
                 onAddProduct(newProduct)
             },
