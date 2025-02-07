@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.usecase.AddProductUseCase
+import com.example.composetrainer.domain.usecase.DeleteProductUseCase
+import com.example.composetrainer.domain.usecase.EditProductUseCase
 import com.example.composetrainer.domain.usecase.GetProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -16,7 +18,9 @@ import javax.inject.Inject
 @HiltViewModel
 class ProductsViewModel @Inject constructor(
     private val getProductsUseCase: GetProductUseCase,
-    private val addProductUseCase: AddProductUseCase
+    private val addProductUseCase: AddProductUseCase,
+    private val deleteProductUseCase: DeleteProductUseCase,
+    private val editProductUseCase: EditProductUseCase
 ) : ViewModel() {
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> get() = _products
@@ -59,7 +63,21 @@ class ProductsViewModel @Inject constructor(
 
     fun updateSearchQuery(query: String) {
         _searchQuery.value = query
-        loadProducts() // Re-fetch products when query changes
+        loadProducts()
+    }
+
+    fun deleteProduct(product: Product) {
+        viewModelScope.launch {
+            deleteProductUseCase(product)
+            loadProducts()
+        }
+    }
+
+    fun editProduct(product: Product) {
+        viewModelScope.launch {
+            editProductUseCase(product)
+            loadProducts()
+        }
     }
 }
 

@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.viewmodels.SortOrder
@@ -59,6 +60,9 @@ fun ProductScreen(
     // State for bottom sheet visibility
     val sheetState = rememberModalBottomSheetState()
     val isAddProductSheetOpen = remember { mutableStateOf(false) }
+
+
+    val selectedProductForEdit = remember { mutableStateOf<Product?>(null) }
 
     if (isAddProductSheetOpen.value) {
         ModalBottomSheet(
@@ -83,6 +87,16 @@ fun ProductScreen(
         },
         topBar = {
             Column(modifier = Modifier.fillMaxWidth()) {
+
+                TopAppBar(
+                    title = { Text("Products") },
+                    actions = {
+                        SortingDropdown(
+                            currentSortOrder = sortOrder,
+                            onSortOrderSelected = { viewModel.updateSortOrder(it) }
+                        )
+                    }
+                )
                 // SearchBar
                 TextField(
                     value = searchQuery,
@@ -108,16 +122,6 @@ fun ProductScreen(
                         unfocusedContainerColor = MaterialTheme.colorScheme.surface
                     )
                 )
-
-                TopAppBar(
-                    title = { Text("Products") },
-                    actions = {
-                        SortingDropdown(
-                            currentSortOrder = sortOrder,
-                            onSortOrderSelected = { viewModel.updateSortOrder(it) }
-                        )
-                    }
-                )
             }
         }
     ) { paddingValues ->
@@ -136,7 +140,15 @@ fun ProductScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(products) { product ->
-                    ProductItem(product = product)
+                    ProductItem(product = product,
+                        onEdit = {
+                            // Open Edit Bottom Sheet
+                            selectedProductForEdit.value = product
+                        },
+                        onDelete = {
+                            viewModel.deleteProduct(product)
+                        }
+                    )
                 }
             }
         }

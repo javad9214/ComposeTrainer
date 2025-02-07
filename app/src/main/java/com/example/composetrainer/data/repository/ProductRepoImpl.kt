@@ -26,4 +26,17 @@ class ProductRepoImpl @Inject constructor(
             }
     }
 
+    override fun searchProducts(query: String): Flow<List<Product>> {
+        return productDao.searchProducts(query)
+            .map { entities -> entities.map { ProductMapper.toDomain(it) } }
+    }
+
+    override suspend fun deleteProduct(product: Product) {
+        productDao.deleteProduct(ProductMapper.toEntity(product))
+    }
+
+    override suspend fun editProduct(product: Product) {
+        productDao.updateProduct(ProductMapper.toEntity(product))
+    }
+
 }

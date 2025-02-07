@@ -9,4 +9,9 @@ interface ProductRepository {
 
     fun getAllProducts(): Flow<List<Product>>
 
+    fun searchProducts(query: String): Flow<List<Product>>
+
+    suspend fun deleteProduct(product: Product)
+
+    suspend fun editProduct(product: Product)
 }
