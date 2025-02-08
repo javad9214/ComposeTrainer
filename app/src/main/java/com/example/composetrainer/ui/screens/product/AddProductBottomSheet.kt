@@ -108,7 +108,8 @@ fun AddProductBottomSheet(
                     price = price.toLongOrNull(),
                     image = null,
                     categoryID = categoryID.toIntOrNull(),
-                    date = initialProduct?.date ?: System.currentTimeMillis()
+                    date = initialProduct?.date ?: System.currentTimeMillis(),
+                    stock = initialProduct?.stock ?: 0
                 )
                 onSave(newProduct)
             },

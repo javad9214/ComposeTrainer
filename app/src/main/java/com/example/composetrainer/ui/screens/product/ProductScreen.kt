@@ -152,7 +152,9 @@ fun ProductScreen(
                         },
                         onDelete = {
                             viewModel.deleteProduct(product)
-                        }
+                        },
+                        onIncreaseStock = { viewModel.increaseStock(product) },
+                        onDecreaseStock = { viewModel.decreaseStock(product) }
                     )
                 }
             }

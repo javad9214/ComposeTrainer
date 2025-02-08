@@ -5,9 +5,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.usecase.AddProductUseCase
+import com.example.composetrainer.domain.usecase.DecreaseStockUseCase
 import com.example.composetrainer.domain.usecase.DeleteProductUseCase
 import com.example.composetrainer.domain.usecase.EditProductUseCase
 import com.example.composetrainer.domain.usecase.GetProductUseCase
+import com.example.composetrainer.domain.usecase.IncreaseStockUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -20,7 +22,9 @@ class ProductsViewModel @Inject constructor(
     private val getProductsUseCase: GetProductUseCase,
     private val addProductUseCase: AddProductUseCase,
     private val deleteProductUseCase: DeleteProductUseCase,
-    private val editProductUseCase: EditProductUseCase
+    private val editProductUseCase: EditProductUseCase,
+    private val increaseStockUseCase: IncreaseStockUseCase,
+    private val decreaseStockUseCase: DecreaseStockUseCase
 ) : ViewModel() {
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> get() = _products
@@ -77,6 +81,22 @@ class ProductsViewModel @Inject constructor(
         viewModelScope.launch {
             editProductUseCase(product)
             loadProducts()
+        }
+    }
+
+    // Increase stock
+    fun increaseStock(product: Product) {
+        viewModelScope.launch {
+            increaseStockUseCase(product)
+            loadProducts() // Refresh the list
+        }
+    }
+
+    // Decrease stock
+    fun decreaseStock(product: Product) {
+        viewModelScope.launch {
+            decreaseStockUseCase(product)
+            loadProducts() // Refresh the list
         }
     }
 }

@@ -12,7 +12,8 @@ data class ProductEntity (
     val price: Long?,
     val image: String?,
     val categoryID: Int?,
-    val date: Long
+    val date: Long,
+    val stock: Int
 )
 
 

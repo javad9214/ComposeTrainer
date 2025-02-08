@@ -7,5 +7,6 @@ data class Product(
     val price: Long?,
     val image: String?,
     val categoryID: Int?,
-    val date: Long
+    val date: Long,
+    val stock: Int
 )

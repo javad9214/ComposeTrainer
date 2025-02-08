@@ -11,9 +11,11 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Category
 import androidx.compose.material.icons.filled.DateRange
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Card
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -40,7 +42,9 @@ import java.util.Locale
 fun ProductItem(
     product: Product,
     onEdit: () -> Unit,
-    onDelete: () -> Unit
+    onDelete: () -> Unit,
+    onIncreaseStock: () -> Unit,
+    onDecreaseStock: () -> Unit
 ) {
 
     var showMenu by remember { mutableStateOf(false) }
@@ -96,6 +100,29 @@ fun ProductItem(
                     )
                 }
             }
+
+
+            // Stock Section
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                Text(
+                    text = "Stock: ${product.stock}",
+                    style = MaterialTheme.typography.bodyMedium
+                )
+                Row {
+                    IconButton(onClick = onDecreaseStock) {
+                        Icon(Icons.Default.Remove, contentDescription = "Decrease Stock")
+                    }
+                    IconButton(onClick = onIncreaseStock) {
+                        Icon(Icons.Default.Add, contentDescription = "Increase Stock")
+                    }
+                }
+            }
+
+
             Box(modifier = Modifier.fillMaxWidth()){
                 IconButton(
                     onClick = {showMenu = true },

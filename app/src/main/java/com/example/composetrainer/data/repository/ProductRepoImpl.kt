@@ -39,4 +39,8 @@ class ProductRepoImpl @Inject constructor(
         productDao.updateProduct(ProductMapper.toEntity(product))
     }
 
+    override suspend fun updateProduct(product: Product) {
+        productDao.updateProduct(ProductMapper.toEntity(product))
+    }
+
 }

@@ -12,7 +12,8 @@ object ProductMapper {
             price = entity.price,
             image = entity.image,
             categoryID = entity.categoryID,
-            date = entity.date
+            date = entity.date,
+            stock = entity.stock
         )
     }
 
@@ -24,7 +25,8 @@ object ProductMapper {
             price = domain.price,
             image = domain.image,
             categoryID = domain.categoryID,
-            date = domain.date
+            date = domain.date,
+            stock = domain.stock
         )
     }
 }
