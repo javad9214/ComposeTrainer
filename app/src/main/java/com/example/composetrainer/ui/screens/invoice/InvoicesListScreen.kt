@@ -1,0 +1,89 @@
+package com.example.composetrainer.ui.screens.invoice
+
+import android.widget.Toast
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.composetrainer.domain.model.Invoice
+import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InvoicesListScreen(
+    viewModel: InvoiceViewModel = hiltViewModel(),
+    onCreateNew: () -> Unit,
+    onInvoiceClick: (Long) -> Unit
+) {
+    val invoices by viewModel.invoices.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
+    val errorMessage by viewModel.errorMessage.collectAsState()
+
+    val context = LocalContext.current
+
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Sales Invoices") },
+                actions = {
+                    IconButton(onClick = onCreateNew) {
+                        Icon(Icons.Default.Add, contentDescription = "New Invoice")
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            when {
+                isLoading -> CircularProgressIndicator(modifier = Modifier.align(Alignment.Center))
+
+                errorMessage != null -> Toast.makeText(context, errorMessage, Toast.LENGTH_SHORT)
+                    .show()
+
+                invoices.isEmpty() -> TODO("EmptyInvoiceView")
+
+                else -> InvoicesLazyList(
+                    invoices = invoices,
+                    onInvoiceClick = onInvoiceClick,
+                    onDelete = viewModel::deleteInvoice
+                )
+
+            }
+        }
+
+    }
+}
+
+@Composable
+private fun InvoicesLazyList(
+    invoices: List<Invoice>,
+    onInvoiceClick: (Long) -> Unit,
+    onDelete: (Long) -> Unit
+) {
+    LazyColumn(modifier = Modifier.fillMaxSize()) {
+        items(invoices, key = { it.id }) { invoice ->
+            InvoiceItem(
+                invoice = invoice,
+                onClick = { onInvoiceClick(invoice.id) },
+                onDelete = { onDelete(invoice.id) }
+            )
+        }
+    }
+}

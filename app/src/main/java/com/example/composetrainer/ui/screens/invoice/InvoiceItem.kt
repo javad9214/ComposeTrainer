@@ -1,27 +1,65 @@
 package com.example.composetrainer.ui.screens.invoice
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.font.*
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.domain.model.Invoice
 import com.example.composetrainer.utils.DateFormatter.formatDate
 
 @Composable
-fun InvoiceItem(invoice: Invoice) {
-    Card(modifier = Modifier.fillMaxWidth()) {
+fun InvoiceItem(
+    invoice: Invoice,
+    onClick: () -> Unit,
+    onDelete: () -> Unit
+    ) {
+    Card(
+        onClick = onClick,
+        modifier = Modifier.fillMaxWidth().padding(8.dp)
+    ) {
         Column(modifier = Modifier.padding(16.dp)) {
-            Text("Invoice #${invoice.numberId}")
-            Text("Date: ${formatDate(invoice.dateTime)}")
-            Text("Total: $${invoice.totalPrice}")
-            invoice.products.forEach { product ->
-                Text("${product.quantity}x ${product.product.name}")
+            Row (
+                horizontalArrangement = Arrangement.SpaceBetween,
+                modifier = Modifier.fillMaxWidth()
+            ){
+                Text("Invoice #${invoice.numberId}", style = MaterialTheme.typography.titleMedium)
+                Text(
+                    text = formatDate(invoice.dateTime),
+                    style = MaterialTheme.typography.bodySmall
+                )
             }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text("Total: $${invoice.totalPrice}", style = MaterialTheme.typography.bodyMedium)
+            Spacer(modifier = Modifier.height(4.dp))
+            Text("Items: ${invoice.products.size}", style = MaterialTheme.typography.bodySmall)
         }
     }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InvoiceItemPreview(){
+    InvoiceItem(
+        Invoice(
+            id = 1,
+            numberId = 12345,
+            dateTime = System.currentTimeMillis(),
+            totalPrice = 1000,
+            products = emptyList()
+        ),
+        onClick = {},
+        onDelete = {}
+
+    )
 }
