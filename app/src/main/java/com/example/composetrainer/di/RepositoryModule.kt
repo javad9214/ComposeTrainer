@@ -1,6 +1,8 @@
 package com.example.composetrainer.di
 
+import com.example.composetrainer.data.repository.InvoiceRepoImpl
 import com.example.composetrainer.data.repository.ProductRepoImpl
+import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.ProductRepository
 import dagger.Module
 import dagger.Provides
@@ -17,4 +19,10 @@ object RepositoryModule {
     fun provideProductRepository(
         repoImpl: ProductRepoImpl
     ): ProductRepository = repoImpl
+
+    @Provides
+    @Singleton
+    fun provideInvoiceRepository(
+        repoImpl: InvoiceRepoImpl
+    ): InvoiceRepository = repoImpl
 }

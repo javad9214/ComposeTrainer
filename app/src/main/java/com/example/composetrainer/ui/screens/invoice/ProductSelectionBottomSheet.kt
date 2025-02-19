@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
@@ -14,6 +15,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.ArrowBack
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Remove
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -35,6 +37,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.ui.components.QuantityStepper
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -57,23 +60,10 @@ fun ProductSelectionBottomSheet(
         ) {
 
             if (selectedProduct == null) {
-                Text(
-                    text = "Select a product",
-                    style = MaterialTheme.typography.titleLarge,
-                    modifier = Modifier.padding(bottom = 16.dp)
+                ProductSelectionList(
+                    products = products,
+                    onProductSelected = { selectedProduct = it }
                 )
-
-                // Product list
-                LazyColumn(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(300.dp),
-                    verticalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    items(products) { product ->
-                        // TODO add product item
-                    }
-                }
             } else {
                 // Quantity Selection
                 Row(
@@ -152,10 +142,10 @@ fun ProductSelectionBottomSheet(
 @Composable
 private fun ProductSelectionItem(
     product: Product,
-    onclick: () -> Unit
+    onClick: () -> Unit
 ){
     Card (
-        onClick = onclick,
+        onClick = onClick,
         modifier = Modifier.fillMaxWidth()
     ) {
         Row (
@@ -179,6 +169,62 @@ private fun ProductSelectionItem(
                 text = "$${product.price ?: 0}",
                 style = MaterialTheme.typography.titleMedium
             )
+        }
+    }
+}
+
+@Composable
+private fun ProductSelectionList(
+    products: List<Product>,
+    onProductSelected: (Product) -> Unit
+) {
+    LazyColumn(modifier = Modifier.heightIn(max = 400.dp)) {
+        items(products) { product ->
+            ProductSelectionItem(
+                product = product,
+                onClick = { onProductSelected(product) }
+            )
+        }
+    }
+}
+
+@Composable
+private fun QuantitySelector(
+    product: Product,
+    maxQuantity: Int,
+    currentQuantity: Int,
+    onQuantityChange: (Int) -> Unit,
+    onConfirm: () -> Unit,
+    onBack: () -> Unit
+) {
+    Column {
+        Row(verticalAlignment = Alignment.CenterVertically) {
+            IconButton(onClick = onBack) {
+                Icon(Icons.AutoMirrored.Filled.ArrowBack, "Back")
+            }
+            Text(
+                text = product.name,
+                style = MaterialTheme.typography.titleLarge,
+                modifier = Modifier.weight(1f)
+            )
+        }
+
+        Spacer(modifier = Modifier.height(16.dp))
+
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier.fillMaxWidth()
+        ) {
+            QuantityStepper(
+                value = currentQuantity,
+                onValueChange = onQuantityChange,
+                max = maxQuantity
+            )
+
+            Button(onClick = onConfirm) {
+                Text("Add ${currentQuantity}x")
+            }
         }
     }
 }

@@ -6,7 +6,6 @@ import com.example.composetrainer.data.local.dao.ProductDao
 import com.example.composetrainer.data.local.entity.InvoiceEntity
 import com.example.composetrainer.data.local.entity.InvoiceProductCrossRef
 import com.example.composetrainer.data.local.relation.InvoiceWithProducts
-import com.example.composetrainer.data.local.relation.EntityProductWithQuantity
 import com.example.composetrainer.data.mapper.ProductMapper
 import com.example.composetrainer.domain.model.Invoice
 import com.example.composetrainer.domain.model.ProductWithQuantity

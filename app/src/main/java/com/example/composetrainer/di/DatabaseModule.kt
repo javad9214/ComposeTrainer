@@ -21,7 +21,7 @@ object DatabaseModule {
         return Room.databaseBuilder(
             context,
             AppDatabase::class.java,
-            "product_db"
+            "stock_guard_db"
         ).build()
     }
 
@@ -30,4 +30,11 @@ object DatabaseModule {
     @Singleton
     fun provideProductDao(appDatabase: AppDatabase) = appDatabase.productDao()
 
+    @Provides
+    @Singleton
+    fun provideInvoiceDao(appDatabase: AppDatabase) = appDatabase.invoiceDao()
+
+    @Provides
+    @Singleton
+    fun provideInvoiceProductDao(appDatabase: AppDatabase) = appDatabase.invoiceProductDao()
 }

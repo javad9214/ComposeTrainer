@@ -78,7 +78,6 @@ fun CreateInvoiceScreen(
                 Text("Create Invoice")
             }
         }
-
         if (showProductSelection){
             ProductSelectionBottomSheet(
                 products = products,

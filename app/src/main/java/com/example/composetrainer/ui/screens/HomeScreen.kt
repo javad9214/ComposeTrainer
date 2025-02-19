@@ -21,6 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.ui.screens.invoice.ProductSelectionBottomSheet
+import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import kotlinx.coroutines.launch
 
@@ -28,7 +29,8 @@ import kotlinx.coroutines.launch
 @Composable
 fun HomeScreen(
     onButtonClick: () -> Unit,
-    viewModel: ProductsViewModel = hiltViewModel()
+    viewModel: ProductsViewModel = hiltViewModel(),
+    invoiceViewModel: InvoiceViewModel = hiltViewModel()
 ) {
 
     val products by viewModel.products.collectAsState()
@@ -56,8 +58,10 @@ fun HomeScreen(
           ProductSelectionBottomSheet(
               products = products,
               onAddToInvoice = { product, quantity ->
-
-              }
+                    invoiceViewModel.addToCurrentInvoice(product, quantity)
+                  showBottomSheet = false
+              },
+              onDismiss = { showBottomSheet = false }
           )
         }
     }
