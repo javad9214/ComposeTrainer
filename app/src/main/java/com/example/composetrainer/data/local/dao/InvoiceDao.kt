@@ -5,7 +5,7 @@ import androidx.room.Insert
 import androidx.room.Query
 import androidx.room.Transaction
 import com.example.composetrainer.data.local.entity.InvoiceEntity
-import com.example.composetrainer.data.local.relation.InvoiceWithProducts
+import com.example.composetrainer.data.local.relation.InvoiceWithProduct
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -17,7 +17,7 @@ interface InvoiceDao {
     @Query("DELETE FROM invoices WHERE id = :invoiceId")
     suspend fun deleteInvoice(invoiceId: Long)
 
-    @Query("SELECT * FROM invoices")
+    @Query("SELECT * FROM invoices ORDER BY numberId DESC")
     fun getAllInvoices(): Flow<List<InvoiceEntity>>
 
     // Get the last invoice (used to generate the next numberId)
@@ -25,6 +25,27 @@ interface InvoiceDao {
     suspend fun getLastInvoice(): InvoiceEntity?
 
     @Transaction
-    @Query("SELECT * FROM invoices WHERE id = :invoiceId")
-    suspend fun getInvoiceWithProducts(invoiceId: Long): InvoiceWithProducts
+    @Query("""
+        SELECT i.id AS invoiceId, i.numberId, i.dateTime, p.*, ip.quantity
+        FROM invoices AS i
+        JOIN invoice_products AS ip ON i.id = ip.invoiceId
+        JOIN products AS p ON p.id = ip.productId
+        WHERE i.id = :invoiceId
+    """)
+    suspend fun getInvoiceWithProducts(invoiceId: Long): List<InvoiceWithProduct>
+
+
+
+    @Transaction
+    @Query("""
+        SELECT i.id AS invoiceId, i.numberId, i.dateTime, p.*, ip.quantity
+        FROM invoices AS i 
+        INNER JOIN invoice_products AS ip ON i.id = ip.invoiceId
+        INNER JOIN products AS p ON ip.productId = p.id
+    """)
+    fun getAllInvoiceWithProducts(): Flow<List<InvoiceWithProduct>>
+
+
+
+
 }

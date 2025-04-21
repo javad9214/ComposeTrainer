@@ -1,8 +1,5 @@
 package com.example.composetrainer.ui.viewmodels
 
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Invoice
@@ -46,7 +43,7 @@ class InvoiceViewModel @Inject constructor(
             _isLoading.value = true
             try {
                 invoiceRepository.getAllInvoices().collectLatest { invoices ->
-                    _invoices.value = invoices
+                    _invoices.value = invoices.map { it.toDomain() }
                     _isLoading.value = false
                 }
             }catch (e: Exception){
@@ -78,7 +75,7 @@ class InvoiceViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val createdInvoice = invoiceRepository.createInvoice(_currentInvoice.value)
+                invoiceRepository.createInvoice(_currentInvoice.value)
                 _currentInvoice.value = emptyList()
                 loadInvoices() // Refresh invoice list
                 _errorMessage.value = null

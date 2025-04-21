@@ -5,9 +5,8 @@ import com.example.composetrainer.data.local.dao.InvoiceProductDao
 import com.example.composetrainer.data.local.dao.ProductDao
 import com.example.composetrainer.data.local.entity.InvoiceEntity
 import com.example.composetrainer.data.local.entity.InvoiceProductCrossRef
-import com.example.composetrainer.data.local.relation.InvoiceWithProducts
 import com.example.composetrainer.data.mapper.ProductMapper
-import com.example.composetrainer.domain.model.Invoice
+import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import kotlinx.coroutines.Dispatchers
@@ -15,6 +14,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.collections.*
 
 class InvoiceRepoImpl @Inject constructor(
     private val invoiceDao: InvoiceDao,
@@ -22,7 +22,7 @@ class InvoiceRepoImpl @Inject constructor(
     private val productDao: ProductDao
 ) : InvoiceRepository {
 
-    override suspend fun createInvoice(products: List<ProductWithQuantity>): Invoice {
+    override suspend fun createInvoice(products: List<ProductWithQuantity>) {
         val nextNumberId = getNextInvoiceNumberId()
 
         val invoiceEntity = InvoiceEntity(
@@ -54,31 +54,58 @@ class InvoiceRepoImpl @Inject constructor(
             )
 
         }
-
-        return invoiceDao.getInvoiceWithProducts(invoiceId).toDomain()
     }
 
-    override fun getAllInvoices(): Flow<List<Invoice>> {
-        return invoiceDao.getAllInvoices().map { invoiceEntities ->
-            invoiceEntities.map { invoiceEntity ->
-                val invoiceWithProducts = invoiceDao.getInvoiceWithProducts(invoiceEntity.id)
-                invoiceWithProducts.toDomain()
+    override suspend fun getAllInvoices(): Flow<List<InvoiceWithProducts>> {
+        return invoiceDao.getAllInvoiceWithProducts()
+            .map { rows ->
+                rows
+                    .groupBy { Triple(it.invoiceId, it.numberId, it.dateTime) }
+                    .map { (key, groupRows) ->
+                        val (invoiceId, numberId, dateTime) = key
+                        InvoiceWithProducts(
+                            invoice = InvoiceEntity(invoiceId, numberId, dateTime),
+                            products = groupRows.map {
+                                ProductWithQuantity(ProductMapper.toDomain(it.product), it.quantity)
+                            }
+                        )
+                    }
             }
-        }
     }
+
+
+
+    override suspend fun getInvoiceWithProducts(invoiceId: Long): InvoiceWithProducts {
+        val rows = invoiceDao.getInvoiceWithProducts(invoiceId)
+
+        if (rows.isEmpty()) throw Exception("Invoice not found")
+
+        val invoice = InvoiceEntity(
+            id = rows.first().invoiceId,
+            numberId = rows.first().numberId,
+            dateTime = rows.first().dateTime
+        )
+
+        val products = rows.map {
+            ProductWithQuantity(ProductMapper.toDomain(it.product), it.quantity)
+        }
+
+        return InvoiceWithProducts(invoice, products)
+    }
+
 
     override suspend fun deleteInvoice(invoiceId: Long) {
         withContext(Dispatchers.IO) {
-            val invoiceWithProducts = invoiceDao.getInvoiceWithProducts(invoiceId)
+            val invoiceWithProducts = getInvoiceWithProducts(invoiceId)
             invoiceWithProducts.products.forEach { productWithQuantity ->
-                val product = productWithQuantity.product
                 productDao.updateProduct(
-                    product.copy(
-                        stock = product.stock + productWithQuantity.quantity
+                    ProductMapper.toEntity(
+                        productWithQuantity.product.copy(
+                            stock = productWithQuantity.product.stock + productWithQuantity.quantity
+                        )
                     )
                 )
             }
-
             invoiceDao.deleteInvoice(invoiceId)
         }
     }
@@ -89,14 +116,4 @@ class InvoiceRepoImpl @Inject constructor(
         return if (lastInvoice == null) 10000L else lastInvoice.numberId + 1
     }
 
-    private fun InvoiceWithProducts.toDomain(): Invoice {
-        val totalPrice = products.sumOf { it.product.price?.times(it.quantity) ?: 0L }
-        return Invoice(
-            id = invoice.id,
-            numberId = invoice.numberId,
-            dateTime = invoice.dateTime,
-            products = products.map { it.toDomain() },
-            totalPrice = totalPrice
-        )
-    }
 }
