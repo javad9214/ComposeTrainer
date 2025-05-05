@@ -1,6 +1,11 @@
 <resources>
     <string name="app_name">ComposeTrainer</string>
 
+    <!-- Invoice -->
+    <string name="sale_invoice">فاکتور فروش</string>
+    <string name="total">مجموع</string>
+    <string name="buyer">خریدار</string>
+    <string name="unknown">ناشناخته</string>
 
     <!-- Product Item -->
     <string name="price">قیمت</string>

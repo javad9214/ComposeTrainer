@@ -21,8 +21,8 @@ import androidx.navigation.compose.rememberNavController
 import com.example.composetrainer.ui.navigation.BottomNavItem
 import com.example.composetrainer.ui.navigation.Routes
 import com.example.composetrainer.ui.screens.product.ProductScreen
+import com.example.composetrainer.ui.screens.invoice.InvoiceScreen
 import com.example.login.ui.screens.LoginScreen
-
 
 @Composable
 fun MainScreen(navController: NavHostController) {
@@ -79,7 +79,20 @@ fun MainScreen(navController: NavHostController) {
             }
 
             composable(Routes.HOME) {
-                HomeScreen(onButtonClick = {})
+                HomeScreen(onButtonClick = {
+                    navController.navigate(Routes.INVOICE)
+                })
+            }
+
+            composable(Routes.INVOICE) {
+                InvoiceScreen(
+                    onComplete = {
+                        // Handle completion if needed
+                    },
+                    onClose = {
+                        navController.popBackStack()
+                    }
+                )
             }
         }
     }
