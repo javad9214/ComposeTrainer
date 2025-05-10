@@ -4,6 +4,7 @@
     <!-- Invoice -->
     <string name="sale_invoice">فاکتور فروش</string>
     <string name="total">مجموع</string>
+    <string name="submit">ثبت</string>
     <string name="buyer">خریدار</string>
     <string name="unknown">ناشناخته</string>
     <string name="add_product">افزودن محصول</string>

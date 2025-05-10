@@ -1,6 +1,7 @@
 package com.example.composetrainer.ui.screens
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Button
@@ -44,6 +45,15 @@ fun HomeScreen(
         contentAlignment = Alignment.Center
     ) {
         Text("Welcome to Home Screen! ")
+        Button(
+            onClick = { viewModel.addRandomProducts() },
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .padding(bottom = dimen(R.dimen.space_14))
+        ) {
+            Text("Add Random Products")
+        }
+        Spacer(modifier = Modifier.padding(dimen(R.dimen.space_4)))
         Button(
             onClick = onButtonClick,
             modifier = Modifier

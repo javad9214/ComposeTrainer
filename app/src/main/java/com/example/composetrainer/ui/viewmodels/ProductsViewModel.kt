@@ -59,6 +59,25 @@ class ProductsViewModel @Inject constructor(
         }
     }
 
+    fun addRandomProducts() {
+        viewModelScope.launch {
+            repeat(5) {
+                val randomProduct = Product(
+                    id = 0L,
+                    name = "Product " + ('A'..'Z').random() + (100..999).random(),
+                    barcode = (100000000000..999999999999).random().toString(),
+                    price = listOf(100L, 250L, 499L, 999L, 1299L).random(),
+                    image = null,
+                    categoryID = (1..5).random(),
+                    date = System.currentTimeMillis() - (0..1000000).random(),
+                    stock = (1..100).random()
+                )
+                addProductUseCase(randomProduct)
+            }
+            loadProducts()
+        }
+    }
+
     fun updateSortOrder(newOrder: SortOrder) {
         _sortOrder.value = newOrder
         loadProducts()
