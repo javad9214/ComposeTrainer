@@ -71,6 +71,7 @@ fun InvoiceScreen(
     var showProductSelection by remember { mutableStateOf(false) }
     val products by viewModel.products.collectAsState()
     val invoiceItems by viewModel.currentInvoice.collectAsState()
+    val isLoading by viewModel.isLoading.collectAsState()
 
     val view = LocalView.current
     val context = LocalContext.current
@@ -273,8 +274,15 @@ fun InvoiceScreen(
                 Spacer(modifier = Modifier.weight(1f))
 
                 Button(
-                    onClick = onComplete,
-                    modifier = Modifier.padding(start = dimen(R.dimen.space_2))
+                    onClick = {
+                        // Save invoice to database and close screen
+                        if (invoiceItems.isNotEmpty()) {
+                            viewModel.createInvoice()
+                            onComplete()
+                        }
+                    },
+                    modifier = Modifier.padding(start = dimen(R.dimen.space_2)),
+                    enabled = invoiceItems.isNotEmpty() && !isLoading
                 ) {
                     Text(
                         text = str(R.string.submit),
