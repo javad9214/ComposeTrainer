@@ -16,6 +16,8 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.shadow
@@ -53,109 +55,125 @@ fun MainScreen(navController: NavHostController) {
     val navBackStackEntry by navController.currentBackStackEntryAsState()
     val currentRoute = navBackStackEntry?.destination?.route
 
+    // Determine if bottom navigation should be visible for current route
+    val shouldShowBottomNav by remember(currentRoute) {
+        derivedStateOf {
+            when (currentRoute) {
+                Routes.HOME, Routes.PRODUCTS_LIST, Routes.INVOICES_LIST, Routes.ANALYZE -> true
+                else -> false
+            }
+        }
+    }
+
     Scaffold (
         bottomBar = {
-            Box(
-                contentAlignment = Alignment.BottomCenter
-            ) {
-                // Bottom Navigation Bar
-                NavigationBar(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(70.dp)
-                        .shadow(8.dp)
-                        .zIndex(0f),
-                    containerColor = Color.White
+            if (shouldShowBottomNav) {
+                Box(
+                    contentAlignment = Alignment.BottomCenter
                 ) {
-                    // First half of the nav items
-                    bottomNavItems.take(2).forEach { item ->
-                        NavigationBarItem(
-                            icon = {
-                                when (item.route) {
-                                    Routes.INVOICES_LIST -> Icon(
-                                        painter = painterResource(id = R.drawable.receipt_long_24px),
-                                        contentDescription = item.title
-                                    )
-                                    Routes.ANALYZE -> Icon(
-                                        painter = painterResource(id = R.drawable.monitoring_24px),
-                                        contentDescription = item.title
-                                    )
-                                    else -> Icon(
-                                        painter = painterResource(id = R.drawable.home_24px),
-                                        contentDescription = item.title
-                                    )
-                                }
-                            },
-                            selected = currentRoute == item.route,
-                            onClick = {
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
+                    // Bottom Navigation Bar
+                    NavigationBar(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(70.dp)
+                            .shadow(8.dp)
+                            .zIndex(0f),
+                        containerColor = Color.White
+                    ) {
+                        // First half of the nav items
+                        bottomNavItems.take(2).forEach { item ->
+                            NavigationBarItem(
+                                icon = {
+                                    when (item.route) {
+                                        Routes.INVOICES_LIST -> Icon(
+                                            painter = painterResource(id = R.drawable.receipt_long_24px),
+                                            contentDescription = item.title
+                                        )
+
+                                        Routes.ANALYZE -> Icon(
+                                            painter = painterResource(id = R.drawable.monitoring_24px),
+                                            contentDescription = item.title
+                                        )
+
+                                        else -> Icon(
+                                            painter = painterResource(id = R.drawable.home_24px),
+                                            contentDescription = item.title
+                                        )
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
-                                }
-                            }
-                        )
-                    }
-                    
-                    // Center space for FAB
-                    Spacer(modifier = Modifier.weight(1f))
-                    
-                    // Second half of the nav items
-                    bottomNavItems.takeLast(2).forEach { item ->
-                        NavigationBarItem(
-                            icon = {
-                                when (item.route) {
-                                    Routes.PRODUCTS_LIST -> Icon(
-                                        painter = painterResource(id = R.drawable.package_2_24px),
-                                        contentDescription = item.title
-                                    )
-                                    Routes.HOME -> Icon(
-                                        painter = painterResource(id = R.drawable.home_24px),
-                                        contentDescription = item.title
-                                    )
-                                    else -> Icon(
-                                        painter = painterResource(id = R.drawable.home_24px),
-                                        contentDescription = item.title
-                                    )
-                                }
-                            },
-                            selected = currentRoute == item.route,
-                            onClick = {
-                                navController.navigate(item.route) {
-                                    popUpTo(navController.graph.startDestinationId) {
-                                        saveState = true
+                                },
+                                selected = currentRoute == item.route,
+                                onClick = {
+                                    navController.navigate(item.route) {
+                                        popUpTo(navController.graph.startDestinationId) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
                                     }
-                                    launchSingleTop = true
-                                    restoreState = true
                                 }
-                            }
-                        )
-                    }
-                }
-                
-                // Floating Action Button
-                FloatingActionButton(
-                    onClick = {
-                        navController.navigate(Routes.INVOICE_CREATE) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
-                            }
-                            launchSingleTop = true
+                            )
                         }
-                    },
-                    modifier = Modifier
-                        .offset(y = (-32).dp)
-                        .zIndex(1f),
-                    containerColor = MaterialTheme.colorScheme.primary,
-                    elevation = FloatingActionButtonDefaults.elevation(8.dp)
-                ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.barcode_scanner_24px),
-                        contentDescription = "Scan Barcode",
-                        tint = MaterialTheme.colorScheme.onPrimary
-                    )
+
+                        // Center space for FAB
+                        Spacer(modifier = Modifier.weight(1f))
+
+                        // Second half of the nav items
+                        bottomNavItems.takeLast(2).forEach { item ->
+                            NavigationBarItem(
+                                icon = {
+                                    when (item.route) {
+                                        Routes.PRODUCTS_LIST -> Icon(
+                                            painter = painterResource(id = R.drawable.package_2_24px),
+                                            contentDescription = item.title
+                                        )
+
+                                        Routes.HOME -> Icon(
+                                            painter = painterResource(id = R.drawable.home_24px),
+                                            contentDescription = item.title
+                                        )
+
+                                        else -> Icon(
+                                            painter = painterResource(id = R.drawable.home_24px),
+                                            contentDescription = item.title
+                                        )
+                                    }
+                                },
+                                selected = currentRoute == item.route,
+                                onClick = {
+                                    navController.navigate(item.route) {
+                                        popUpTo(navController.graph.startDestinationId) {
+                                            saveState = true
+                                        }
+                                        launchSingleTop = true
+                                        restoreState = true
+                                    }
+                                }
+                            )
+                        }
+                    }
+
+                    // Floating Action Button
+                    FloatingActionButton(
+                        onClick = {
+                            navController.navigate(Routes.INVOICE_CREATE) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
+                            }
+                        },
+                        modifier = Modifier
+                            .offset(y = (-32).dp)
+                            .zIndex(1f),
+                        containerColor = MaterialTheme.colorScheme.primary,
+                        elevation = FloatingActionButtonDefaults.elevation(8.dp)
+                    ) {
+                        Icon(
+                            painter = painterResource(id = R.drawable.barcode_scanner_24px),
+                            contentDescription = "Scan Barcode",
+                            tint = MaterialTheme.colorScheme.onPrimary
+                        )
+                    }
                 }
             }
         },
