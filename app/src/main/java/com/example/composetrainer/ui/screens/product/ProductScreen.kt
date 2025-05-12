@@ -38,11 +38,15 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.viewmodels.SortOrder
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -84,9 +88,39 @@ fun ProductScreen(
         }
     }
 
+    ProductScreenContent(
+        products = products,
+        isLoading = isLoading,
+        sortOrder = sortOrder,
+        searchQuery = searchQuery,
+        onSearchQueryChange = { viewModel.updateSearchQuery(it) },
+        onSortOrderSelected = { viewModel.updateSortOrder(it) },
+        onAddProduct = { isAddProductSheetOpen.value = true },
+        onEditProduct = { selectedProductForEdit.value = it },
+        onDeleteProduct = { viewModel.deleteProduct(it) },
+        onIncreaseStock = { viewModel.increaseStock(it) },
+        onDecreaseStock = { viewModel.decreaseStock(it) }
+    )
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun ProductScreenContent(
+    products: List<Product>,
+    isLoading: Boolean,
+    sortOrder: SortOrder,
+    searchQuery: String,
+    onSearchQueryChange: (String) -> Unit,
+    onSortOrderSelected: (SortOrder) -> Unit,
+    onAddProduct: () -> Unit,
+    onEditProduct: (Product) -> Unit,
+    onDeleteProduct: (Product) -> Unit,
+    onIncreaseStock: (Product) -> Unit,
+    onDecreaseStock: (Product) -> Unit
+) {
     Scaffold(
         floatingActionButton = {
-            FloatingActionButton(onClick = { isAddProductSheetOpen.value = true }) {
+            FloatingActionButton(onClick = onAddProduct) {
                 Icon(Icons.Default.Add, contentDescription = "Add Product")
             }
         },
@@ -98,17 +132,17 @@ fun ProductScreen(
                     actions = {
                         SortingDropdown(
                             currentSortOrder = sortOrder,
-                            onSortOrderSelected = { viewModel.updateSortOrder(it) }
+                            onSortOrderSelected = onSortOrderSelected
                         )
                     }
                 )
                 // SearchBar
                 TextField(
                     value = searchQuery,
-                    onValueChange = { viewModel.updateSearchQuery(it) },
+                    onValueChange = onSearchQueryChange,
                     trailingIcon = {
                         if (searchQuery.isNotBlank()) {
-                            IconButton(onClick = { viewModel.updateSearchQuery("") }) {
+                            IconButton(onClick = { onSearchQueryChange("") }) {
                                 Icon(Icons.Default.Close, contentDescription = "Clear")
                             }
                         }
@@ -145,16 +179,12 @@ fun ProductScreen(
                 verticalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 items(products) { product ->
-                    ProductItem(product = product,
-                        onEdit = {
-                            // Open Edit Bottom Sheet
-                            selectedProductForEdit.value = product
-                        },
-                        onDelete = {
-                            viewModel.deleteProduct(product)
-                        },
-                        onIncreaseStock = { viewModel.increaseStock(product) },
-                        onDecreaseStock = { viewModel.decreaseStock(product) }
+                    ProductItem(
+                        product = product,
+                        onEdit = { onEditProduct(product) },
+                        onDelete = { onDeleteProduct(product) },
+                        onIncreaseStock = { onIncreaseStock(product) },
+                        onDecreaseStock = { onDecreaseStock(product) }
                     )
                 }
             }
@@ -207,13 +237,55 @@ fun SortingDropdown(
     }
 }
 
+@Preview(showBackground = true)
+@Composable
+fun PreviewProductsScreen() {
+    val mockProducts = listOf(
+        Product(
+            id = 1L,
+            name = "Laptop",
+            barcode = "123456789",
+            price = 999L,
+            stock = 5,
+            image = null,
+            categoryID = 1,
+            date = System.currentTimeMillis()
+        ),
+        Product(
+            id = 2L,
+            name = "Phone",
+            barcode = "987654321",
+            price = 499L,
+            stock = 10,
+            image = null,
+            categoryID = 1,
+            date = System.currentTimeMillis()
+        ),
+        Product(
+            id = 3L,
+            name = "Headphones",
+            barcode = "456789123",
+            price = 79L,
+            stock = 20,
+            image = null,
+            categoryID = 2,
+            date = System.currentTimeMillis()
+        )
+    )
 
-//@Preview(showBackground = true)
-//@Composable
-//fun PreviewProductsScreen() {
-//    ComposeTrainerTheme {
-//        ProductScreen(viewModel = hiltViewModel())
-//    }
-//}
-
-
+    ComposeTrainerTheme {
+        ProductScreenContent(
+            products = mockProducts,
+            isLoading = false,
+            sortOrder = SortOrder.DESCENDING,
+            searchQuery = "",
+            onSearchQueryChange = {},
+            onSortOrderSelected = {},
+            onAddProduct = {},
+            onEditProduct = {},
+            onDeleteProduct = {},
+            onIncreaseStock = {},
+            onDecreaseStock = {}
+        )
+    }
+}

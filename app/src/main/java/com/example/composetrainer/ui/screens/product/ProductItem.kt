@@ -38,7 +38,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.ui.theme.BHoma
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
+import com.example.composetrainer.utils.PriceValidator
+import com.example.composetrainer.utils.dimen
 import java.text.SimpleDateFormat
 import java.util.Date
 import java.util.Locale
@@ -192,21 +195,20 @@ fun ProductItem(
                 verticalAlignment = Alignment.Top,
             ) {
 
-                Text(
-                    modifier = Modifier.weight(1f),
-                    text = stringResource(id = R.string.toman),
-                    style = MaterialTheme.typography.bodyMedium,
-                    fontFamily = myFontFamily,
-                    textAlign = TextAlign.Start
+                Icon(
+                    painter = painterResource(id = R.drawable.toman),
+                    contentDescription = "Date",
+                    modifier = Modifier
+                        .size(dimen(R.dimen.size_xs))
                 )
                 Spacer(modifier = Modifier.width(8.dp))
 
                 Text(
                     modifier = Modifier.weight(6f),
                     textAlign = TextAlign.Start,
-                    text = product.price.toString(),
+                    text = PriceValidator.formatPrice(product.price.toString()),
                     style = MaterialTheme.typography.bodyMedium,
-                    fontFamily = myFontFamily
+                    fontFamily = BHoma
                 )
 
                 Spacer(modifier = Modifier.width(8.dp))
