@@ -44,6 +44,8 @@
     <dimen name="text_size_lg">18sp</dimen>
     <dimen name="text_size_xl">20sp</dimen>
     <dimen name="text_size_xxl">22sp</dimen>
+    <dimen name="text_size_3xl">24sp</dimen>
+    <dimen name="text_size_4xl">26sp</dimen>
 
     <!-- sizes -->
     <dimen name="size_xxs">8dp</dimen>
