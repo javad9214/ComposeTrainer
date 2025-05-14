@@ -39,6 +39,14 @@ val BHoma = FontFamily(
     Font(R.font.b_homa, FontWeight.Bold)
 )
 
+val BRoya = FontFamily(
+    Font(R.font.b_roya_bd, FontWeight.Bold)
+)
+
+val Kamran = FontFamily(
+    Font(R.font.kamran_b, FontWeight.Bold)
+)
+
 // Set of Material typography styles to start with
 val Typography = Typography(
     bodyLarge = TextStyle(

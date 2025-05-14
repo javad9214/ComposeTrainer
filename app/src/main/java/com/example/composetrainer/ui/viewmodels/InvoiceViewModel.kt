@@ -126,6 +126,16 @@ class InvoiceViewModel @Inject constructor(
         _currentInvoice.value = emptyList()
     }
 
+    fun updateItemQuantity(productId: Long, newQuantity: Int) {
+        _currentInvoice.value = _currentInvoice.value.map {
+            if (it.product.id == productId) {
+                it.copy(quantity = newQuantity)
+            } else {
+                it
+            }
+        }
+    }
+
     fun getNextInvoiceNumberId() {
         viewModelScope.launch {
             try {

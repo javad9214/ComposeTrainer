@@ -82,12 +82,15 @@ fun InvoiceScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .padding(horizontal = dimen(R.dimen.space_4))
+                        .padding(horizontal = dimen(R.dimen.space_2))
                 ) {
                     items(invoiceItems) { item ->
                         InvoiceProductItem(
                             productWithQuantity = item,
-                            onRemove = { viewModel.removeFromCurrentInvoice(item.product.id) }
+                            onRemove = { viewModel.removeFromCurrentInvoice(item.product.id) },
+                            onQuantityChange = { newQuantity ->
+                                viewModel.updateItemQuantity(item.product.id, newQuantity)
+                            }
                         )
                     }
                 }
