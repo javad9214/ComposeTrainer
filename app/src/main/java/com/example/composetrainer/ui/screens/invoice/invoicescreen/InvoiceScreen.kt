@@ -28,9 +28,10 @@ import androidx.core.content.ContextCompat
 import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
-import com.example.composetrainer.ui.screens.invoice.ProductSelectionBottomSheet
+import com.example.composetrainer.ui.screens.invoice.productselection.ProductSelectionBottomSheet
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.utils.DateFormatter
+import com.example.composetrainer.utils.SetStatusBarColor
 import com.example.composetrainer.utils.dimen
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -40,6 +41,9 @@ fun InvoiceScreen(
     onClose: () -> Unit,
     viewModel: InvoiceViewModel = hiltViewModel()
 ) {
+
+    SetStatusBarColor(color = Color.White)
+
     val persianDate = remember { DateFormatter.getFormattedHijriShamsiDate() }
     val currentTime = remember { DateFormatter.getCurrentTimeFormatted() }
     val nextInvoiceNumber by viewModel.nextInvoiceNumber.collectAsState()

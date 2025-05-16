@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">ComposeTrainer</string>
+    <string name="app_name">ترینر کامپوز</string>
 
     <!-- Invoice -->
     <string name="sale_invoice">فاکتور فروش</string>
@@ -15,12 +15,11 @@
     <string name="toman">تـومان</string>
 
     <!-- Product Selection -->
-    <string name="select_product">Select a Product</string>
-    <string name="stock">Stock</string>
-    <string name="available">Available</string>
-    <string name="add_to_invoice">Add to Invoice</string>
-    <string name="back">Back</string>
-    <string name="decrease">Decrease</string>
-    <string name="increase">Increase</string>
-
+    <string name="select_product">انتخاب محصول</string>
+    <string name="stock">موجودی</string>
+    <string name="available">موجود</string>
+    <string name="add_to_invoice">افزودن به فاکتور</string>
+    <string name="back">بازگشت</string>
+    <string name="decrease">کاهش</string>
+    <string name="increase">افزایش</string>
 </resources>
