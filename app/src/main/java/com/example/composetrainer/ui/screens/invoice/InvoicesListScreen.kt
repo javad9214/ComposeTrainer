@@ -21,8 +21,12 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.domain.model.Invoice
+import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.domain.model.ProductWithQuantity
+import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -83,6 +87,95 @@ private fun InvoicesLazyList(
                 invoice = invoice,
                 onClick = { onInvoiceClick(invoice.id) },
                 onDelete = { onDelete(invoice.id) }
+            )
+        }
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+fun InvoicesListScreenPreview() {
+    ComposeTrainerTheme {
+        val sampleProducts = listOf(
+            ProductWithQuantity(
+                product = Product(
+                    id = 1,
+                    name = "Smartphone",
+                    price = 699L,
+                    barcode = "123456789",
+                    categoryID = 1,
+                    date = System.currentTimeMillis(),
+                    stock = 10,
+                    image = null
+                ),
+                quantity = 2
+            ),
+            ProductWithQuantity(
+                product = Product(
+                    id = 2,
+                    name = "Laptop",
+                    price = 1299L,
+                    barcode = "987654321",
+                    categoryID = 1,
+                    date = System.currentTimeMillis(),
+                    stock = 5,
+                    image = null
+                ),
+                quantity = 1
+            )
+        )
+
+        val sampleInvoices = listOf(
+            Invoice(
+                id = 1,
+                prefix = "INV",
+                invoiceDate = "1403-02-16",
+                invoiceNumber = 10001,
+                products = sampleProducts.take(1),
+                totalPrice = 1398L
+            ),
+            Invoice(
+                id = 2,
+                prefix = "INV",
+                invoiceDate = "1403-02-17",
+                invoiceNumber = 10002,
+                products = sampleProducts,
+                totalPrice = 2697L
+            ),
+            Invoice(
+                id = 3,
+                prefix = "INV",
+                invoiceDate = "1403-02-18",
+                invoiceNumber = 10003,
+                products = sampleProducts.take(1),
+                totalPrice = 1398L
+            )
+        )
+
+        InvoicesListScreenPreviewContent(sampleInvoices)
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+fun InvoicesListScreenPreviewContent(invoices: List<Invoice>) {
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = { Text("Sales Invoices") },
+                actions = {
+                    IconButton(onClick = { }) {
+                        Icon(Icons.Default.Add, contentDescription = "New Invoice")
+                    }
+                }
+            )
+        }
+    ) { innerPadding ->
+        Box(modifier = Modifier.padding(innerPadding)) {
+            InvoicesLazyList(
+                invoices = invoices,
+                onInvoiceClick = { },
+                onDelete = { }
             )
         }
     }
