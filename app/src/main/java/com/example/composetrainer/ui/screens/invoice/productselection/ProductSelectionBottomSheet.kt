@@ -40,7 +40,9 @@ fun ProductSelectionBottomSheet(
 
     ModalBottomSheet(
         onDismissRequest = onDismiss,
-        modifier = Modifier.fillMaxWidth(),
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(max = 400.dp),
         sheetState = sheetState,
         shape = RoundedCornerShape(topStart = 24.dp, topEnd = 24.dp)
     ) {
@@ -55,8 +57,7 @@ fun ProductSelectionBottomSheet(
                 onNavClick = {
                     if (selectedProduct == null) onDismiss() else selectedProductId = null
                 },
-                navIcon = if (selectedProduct == null) Icons.Filled.Close else Icons.Filled.ArrowBack,
-                layoutDirection = layoutDirection
+                navIcon = if (selectedProduct == null) Icons.Filled.Close else Icons.Filled.ArrowBack
             )
 
             Divider(modifier = Modifier.fillMaxWidth())
@@ -95,32 +96,7 @@ fun ProductSelectionBottomSheet(
     }
 }
 
-@Composable
-private fun SheetHeader(
-    title: String,
-    onNavClick: () -> Unit,
-    navIcon: ImageVector,
-    layoutDirection: androidx.compose.ui.unit.LayoutDirection,
-) {
-    Row(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(top = 16.dp, start = 4.dp, end = 8.dp, bottom = 12.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        // Navigation Icon (Close/Back)
-        IconButton(onClick = onNavClick) {
-            Icon(navIcon, contentDescription = null)
-        }
-        Spacer(modifier = Modifier.width(8.dp))
-        Text(
-            title,
-            style = MaterialTheme.typography.titleLarge,
-            maxLines = 2,
-            modifier = Modifier.weight(1f)
-        )
-    }
-}
+
 
 @Preview
 @OptIn(ExperimentalMaterial3Api::class)

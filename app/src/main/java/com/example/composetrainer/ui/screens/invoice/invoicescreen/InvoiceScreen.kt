@@ -1,6 +1,9 @@
 package com.example.composetrainer.ui.screens.invoice.invoicescreen
 
-import android.app.Activity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.slideInVertically
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,7 +16,6 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,13 +24,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.platform.LocalView
-import androidx.core.content.ContextCompat
-import androidx.core.view.WindowCompat
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.ui.screens.invoice.productselection.ProductSelectionBottomSheet
+import com.example.composetrainer.ui.screens.invoice.productselection.AddProductToInvoice
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.utils.DateFormatter
 import com.example.composetrainer.utils.SetStatusBarColor
@@ -52,17 +51,6 @@ fun InvoiceScreen(
     val invoiceItems by viewModel.currentInvoice.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
-    val view = LocalView.current
-    val context = LocalContext.current
-    if (!view.isInEditMode) {
-        SideEffect {
-            val window = (context as Activity).window
-            window.statusBarColor = ContextCompat.getColor(context, R.color.white)
-            window.navigationBarColor = ContextCompat.getColor(context, R.color.white)
-            WindowCompat.getInsetsController(window, view).isAppearanceLightStatusBars = true
-            WindowCompat.getInsetsController(window, view).isAppearanceLightNavigationBars = true
-        }
-    }
 
     LaunchedEffect(key1 = true) {
         viewModel.getNextInvoiceNumberId()
@@ -129,13 +117,19 @@ fun InvoiceScreen(
             modifier = Modifier.align(Alignment.BottomCenter)
         )
 
-        if (showProductSelection) {
-            ProductSelectionBottomSheet(
-                products = products,
-                onAddToInvoice = { product, quantity ->
-                    viewModel.addToCurrentInvoice(product, quantity)
-                },
-                onDismiss = { showProductSelection = false }
+        AnimatedVisibility(
+            visible = showProductSelection,
+            enter = slideInVertically(
+                initialOffsetY = { fullHeight -> fullHeight },
+                animationSpec = tween(durationMillis = 600)
+            ),
+            exit = slideOutVertically(
+                targetOffsetY = { fullHeight -> fullHeight },
+                animationSpec = tween(durationMillis = 600)
+            )
+        ) {
+            AddProductToInvoice(
+                onClose = { showProductSelection = false }
             )
         }
     }

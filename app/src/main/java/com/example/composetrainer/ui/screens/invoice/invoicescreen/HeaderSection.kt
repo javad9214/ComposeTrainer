@@ -1,6 +1,5 @@
 package com.example.composetrainer.ui.screens.invoice.invoicescreen
 
-import androidx.annotation.DimenRes
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
@@ -30,10 +29,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
-import com.example.composetrainer.ui.theme.BComps
 import com.example.composetrainer.ui.theme.BHoma
 import com.example.composetrainer.ui.theme.BKoodak
-import com.example.composetrainer.ui.theme.BLotus
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.utils.dimen
