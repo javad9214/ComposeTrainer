@@ -5,6 +5,7 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +13,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -31,12 +33,15 @@ import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.utils.FarsiDateUtil
 import com.example.composetrainer.ui.components.SetStatusBarColor
 import com.example.composetrainer.utils.dimen
+import com.example.composetrainer.ui.components.BarcodeScannerView
+import com.example.composetrainer.ui.viewmodels.HomeViewModel
 
 @Composable
 fun InvoiceScreen(
     onComplete: () -> Unit,
     onClose: () -> Unit,
-    viewModel: InvoiceViewModel = hiltViewModel()
+    viewModel: InvoiceViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
     SetStatusBarColor(color = MaterialTheme.colorScheme.background)
@@ -45,9 +50,15 @@ fun InvoiceScreen(
     val currentTime = remember { FarsiDateUtil.getCurrentTimeFormatted() }
     val nextInvoiceNumber by viewModel.nextInvoiceNumber.collectAsState()
     var showProductSelection by remember { mutableStateOf(false) }
+    var showBarcodeScannerView by remember { mutableStateOf(false) }
     val products by viewModel.products.collectAsState()
     val invoiceItems by viewModel.currentInvoice.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
+
+    // Observe scanned product from HomeViewModel for barcode scanning
+    val scannedProduct by homeViewModel.scannedProduct.collectAsState()
+    val scannerIsLoading by homeViewModel.isLoading.collectAsState()
+    val scannerErrorMessage by homeViewModel.errorMessage.collectAsState()
 
     // Debug logs to check invoice items
     LaunchedEffect(Unit) {
@@ -66,6 +77,17 @@ fun InvoiceScreen(
         viewModel.getNextInvoiceNumberId()
     }
 
+    // Handle when a product is found by barcode
+    LaunchedEffect(scannedProduct) {
+        scannedProduct?.let { product ->
+            // Add product to invoice
+            viewModel.addToCurrentInvoice(product, 1)
+            Log.d("InvoiceScreen", "Added product from barcode: ${product.name}")
+            // Clear scanned product
+            homeViewModel.clearScannedProduct()
+        }
+    }
+
     val totalPrice = invoiceItems.sumOf { it.product.price?.times(it.quantity) ?: 0L }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -75,7 +97,8 @@ fun InvoiceScreen(
                 persianDate = persianDate.toString(),
                 currentTime = currentTime,
                 onAddProductClick = { showProductSelection = true },
-                onClose = onClose
+                onClose = onClose,
+                onScanBarcodeClick = { showBarcodeScannerView = true }
             )
 
             // Products list section
@@ -141,6 +164,30 @@ fun InvoiceScreen(
             AddProductToInvoice(
                 onClose = { showProductSelection = false }
             )
+        }
+
+        // Show barcode scanner when activated
+        if (showBarcodeScannerView) {
+            BarcodeScannerView(
+                onBarcodeDetected = { barcode ->
+                    showBarcodeScannerView = false
+                    Log.d("InvoiceScreen", "Barcode detected: $barcode")
+                    homeViewModel.searchProductByBarcode(barcode)
+                },
+                onClose = { showBarcodeScannerView = false }
+            )
+        }
+
+        // Show loading indicator for barcode scanning
+        if (scannerIsLoading) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
         }
     }
 }

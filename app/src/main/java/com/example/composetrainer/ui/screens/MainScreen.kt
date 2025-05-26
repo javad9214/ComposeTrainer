@@ -27,6 +27,7 @@ import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.components.BottomNavBarVersion5
 import com.example.login.ui.screens.LoginScreen
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.composetrainer.ui.viewmodels.HomeViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 
 @Composable
@@ -37,6 +38,9 @@ fun MainScreen(
 ) {
     // Create a shared InvoiceViewModel instance
     val sharedInvoiceViewModel: InvoiceViewModel = hiltViewModel()
+
+    // Create a shared HomeViewModel instance for barcode scanning
+    val sharedHomeViewModel: HomeViewModel = hiltViewModel()
 
     val bottomNavItems = listOf(
         BottomNavItem("Invoices", Routes.INVOICES_LIST),
@@ -102,7 +106,8 @@ fun MainScreen(
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = onToggleTheme,
                     navController = navController,
-                    invoiceViewModel = sharedInvoiceViewModel
+                    invoiceViewModel = sharedInvoiceViewModel,
+                    homeViewModel = sharedHomeViewModel
                 )
             }
 
@@ -125,7 +130,8 @@ fun MainScreen(
                     onClose = {
                         navController.popBackStack()
                     },
-                    viewModel = sharedInvoiceViewModel
+                    viewModel = sharedInvoiceViewModel,
+                    homeViewModel = sharedHomeViewModel
                 )
             }
 

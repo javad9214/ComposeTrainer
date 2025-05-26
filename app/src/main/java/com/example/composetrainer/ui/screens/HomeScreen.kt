@@ -42,6 +42,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.composetrainer.R
+import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.domain.usecase.GetProductByBarcodeUseCase
 import com.example.composetrainer.ui.screens.invoice.productselection.ProductSelectionBottomSheet
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.theme.Kamran
@@ -50,8 +52,10 @@ import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.components.BarcodeScannerView
 import com.example.composetrainer.ui.navigation.Screen
 import com.example.composetrainer.ui.viewmodels.HomeViewModel
+import com.example.composetrainer.utils.ProductImporter
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.str
+import kotlinx.coroutines.flow.flow
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -62,7 +66,7 @@ fun HomeScreen(
     isDarkTheme: Boolean = false,
     navController: NavController = rememberNavController(),
     viewModel: ProductsViewModel = hiltViewModel(),
-    homeViewModel: HomeViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel,
     invoiceViewModel: InvoiceViewModel = hiltViewModel()
 ) {
     val products by viewModel.products.collectAsState()
@@ -224,11 +228,6 @@ const val TAG = "HomeScreen"
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    ComposeTrainerTheme {
-        HomeScreen(
-            onButtonClick = {},
-            onToggleTheme = {},
-            isDarkTheme = false
-        )
-    }
+    // We can't provide real viewmodel in preview, so we'll skip it
+    // This preview is primarily to check the UI layout
 }

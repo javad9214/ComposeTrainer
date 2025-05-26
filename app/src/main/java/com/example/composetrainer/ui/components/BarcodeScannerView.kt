@@ -331,10 +331,19 @@ private class BarcodeScannerAnalyzer(
 ) : ImageAnalysis.Analyzer {
 
     private val scanner = BarcodeScanning.getClient()
+    private var lastAnalyzedTimestamp = 0L
+    private var lastDetectedBarcode = ""
 
     @androidx.camera.core.ExperimentalGetImage
     override fun analyze(imageProxy: ImageProxy) {
         val mediaImage = imageProxy.image
+        val currentTimestamp = System.currentTimeMillis()
+
+        // Skip analysis if less than 2 seconds have passed since last successful scan
+        if (currentTimestamp - lastAnalyzedTimestamp < 2000) {
+            imageProxy.close()
+            return
+        }
 
         if (mediaImage != null) {
             val image = InputImage.fromMediaImage(
@@ -344,9 +353,12 @@ private class BarcodeScannerAnalyzer(
 
             scanner.process(image)
                 .addOnSuccessListener { barcodes ->
-                    for (barcode in barcodes) {
-                        barcode.rawValue?.let { value ->
-                            if (value.isNotEmpty()) {
+                    if (barcodes.isNotEmpty()) {
+                        // Only process the first barcode
+                        barcodes.firstOrNull()?.rawValue?.let { value ->
+                            if (value.isNotEmpty() && (value != lastDetectedBarcode || currentTimestamp - lastAnalyzedTimestamp > 5000)) {
+                                lastDetectedBarcode = value
+                                lastAnalyzedTimestamp = currentTimestamp
                                 onBarcodeDetected(value)
                             }
                         }

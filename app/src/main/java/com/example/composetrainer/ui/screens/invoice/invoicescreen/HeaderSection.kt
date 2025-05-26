@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -44,7 +45,8 @@ fun HeaderSection(
     persianDate: String,
     currentTime: String,
     onAddProductClick: () -> Unit,
-    onClose: () -> Unit
+    onClose: () -> Unit,
+    onScanBarcodeClick: () -> Unit = {}
 ) {
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -172,19 +174,36 @@ fun HeaderSection(
             }
 
             // Add product button
-            Button(
-                onClick = onAddProductClick,
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(
                         horizontal = dimen(R.dimen.space_4),
                         vertical = dimen(R.dimen.space_2)
-                    )
+                    ),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Text(
-                    text = str(R.string.add_product),
-                    style = androidx.compose.material3.MaterialTheme.typography.titleMedium
-                )
+                // Add product button
+                Button(
+                    onClick = onAddProductClick,
+                    modifier = Modifier.weight(1f)
+                ) {
+                    Text(
+                        text = str(R.string.add_product),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
+
+                // Scan barcode button
+                Button(
+                    onClick = onScanBarcodeClick,
+                    modifier = Modifier.width(56.dp)
+                ) {
+                    Icon(
+                        painter = painterResource(id = R.drawable.barcode_scanner_24px),
+                        contentDescription = "Scan Barcode"
+                    )
+                }
             }
         }
     }
