@@ -26,6 +26,8 @@ import com.example.composetrainer.ui.screens.invoicelist.InvoiceDetailScreen
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.components.BottomNavBarVersion5
 import com.example.login.ui.screens.LoginScreen
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 
 @Composable
 fun MainScreen(
@@ -33,6 +35,8 @@ fun MainScreen(
     isDarkTheme: Boolean = false,
     onToggleTheme: () -> Unit = {}
 ) {
+    // Create a shared InvoiceViewModel instance
+    val sharedInvoiceViewModel: InvoiceViewModel = hiltViewModel()
 
     val bottomNavItems = listOf(
         BottomNavItem("Invoices", Routes.INVOICES_LIST),
@@ -96,7 +100,9 @@ fun MainScreen(
                         navController.navigate(Routes.INVOICES_LIST)
                     },
                     isDarkTheme = isDarkTheme,
-                    onToggleTheme = onToggleTheme
+                    onToggleTheme = onToggleTheme,
+                    navController = navController,
+                    invoiceViewModel = sharedInvoiceViewModel
                 )
             }
 
@@ -118,7 +124,8 @@ fun MainScreen(
                     },
                     onClose = {
                         navController.popBackStack()
-                    }
+                    },
+                    viewModel = sharedInvoiceViewModel
                 )
             }
 

@@ -1,0 +1,13 @@
+package com.example.composetrainer.ui.navigation
+
+sealed class Screen(val route: String) {
+    object Home : Screen(Routes.HOME)
+    object Products : Screen(Routes.PRODUCTS_LIST)
+    object Invoice : Screen(Routes.INVOICE_CREATE)
+    object InvoicesList : Screen(Routes.INVOICES_LIST)
+    object InvoiceDetails : Screen(Routes.INVOICE_DETAILS) {
+        fun createRoute(invoiceId: Long): String = "invoice_details/$invoiceId"
+    }
+
+    object Analyze : Screen(Routes.ANALYZE)
+}

@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.screens
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -19,6 +20,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -35,7 +37,10 @@ import android.widget.Toast
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import com.example.composetrainer.R
 import com.example.composetrainer.ui.screens.invoice.productselection.ProductSelectionBottomSheet
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
@@ -43,6 +48,7 @@ import com.example.composetrainer.ui.theme.Kamran
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.components.BarcodeScannerView
+import com.example.composetrainer.ui.navigation.Screen
 import com.example.composetrainer.ui.viewmodels.HomeViewModel
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.str
@@ -54,6 +60,7 @@ fun HomeScreen(
     onButtonClick: () -> Unit,
     onToggleTheme: () -> Unit = {},
     isDarkTheme: Boolean = false,
+    navController: NavController = rememberNavController(),
     viewModel: ProductsViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
     invoiceViewModel: InvoiceViewModel = hiltViewModel()
@@ -65,6 +72,35 @@ fun HomeScreen(
     var showBottomSheet by remember { mutableStateOf(false) }
     var showBarcodeScannerView by remember { mutableStateOf(false) }
     val context = LocalContext.current
+    
+    // Observe scanned product
+    val scannedProduct by homeViewModel.scannedProduct.collectAsState()
+    val isLoading by homeViewModel.isLoading.collectAsState()
+    val errorMessage by homeViewModel.errorMessage.collectAsState()
+    
+    // Handle navigation when product is found
+    LaunchedEffect(scannedProduct) {
+        scannedProduct?.let { product ->
+            // Add debug log to verify product is found and being added
+            Log.d(TAG, "Product found: ${product.name}, ID: ${product.id}, adding to invoice")
+
+            // Add product to current invoice
+            invoiceViewModel.addToCurrentInvoice(product, 1)
+
+            // Check if product was added to invoice
+            val currentInvoiceItems = invoiceViewModel.currentInvoice.value
+            Log.d(
+                TAG,
+                "Invoice items after adding: ${currentInvoiceItems.size}, contains product: ${currentInvoiceItems.any { it.product.id == product.id }}"
+            )
+
+            // Navigate to invoice screen
+            navController.navigate(Screen.Invoice.route)
+
+            // Clear the scanned product
+            homeViewModel.clearScannedProduct()
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -114,8 +150,7 @@ fun HomeScreen(
 
             Column(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .padding(16.dp)
+                    .padding(bottom = dimen(R.dimen.space_5))
                     .align(Alignment.BottomCenter),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
@@ -148,18 +183,43 @@ fun HomeScreen(
             
             if (showBarcodeScannerView) {
                 BarcodeScannerView(
-                    onBarcodeDetected = {
+                    onBarcodeDetected = { barcode ->
                         showBarcodeScannerView = false
-                        Toast.makeText(context, "Barcode: $it", Toast.LENGTH_LONG).show()
+                        Log.i(TAG, "Barcode detected: $barcode")
+                        // Search for product by barcode
+                        homeViewModel.searchProductByBarcode(barcode)
                     },
                     onClose = { showBarcodeScannerView = false }
                 )
             }
+            
+            // Show loading indicator
+            if (isLoading) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            
+            // Show error message if any
+            errorMessage?.let { message ->
+                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+                // Clear error message after showing
+                LaunchedEffect(message) {
+                    homeViewModel.clearScannedProduct()
+                }
+            }
         }
     }
-
+    
 
 }
+
+const val TAG = "HomeScreen"
 
 @Preview(showBackground = true)
 @Composable

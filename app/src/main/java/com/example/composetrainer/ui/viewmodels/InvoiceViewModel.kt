@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Invoice
@@ -105,6 +106,15 @@ class InvoiceViewModel @Inject constructor(
         val availableStock = product.stock ?: 0
         val safeQuantityToAdd = if (quantity > availableStock) availableStock else quantity
 
+        Log.d(
+            "InvoiceViewModel",
+            "Adding product to invoice: ${product.name}, Quantity: $safeQuantityToAdd"
+        )
+        Log.d(
+            "InvoiceViewModel",
+            "Current invoice size before adding: ${_currentInvoice.value.size}"
+        )
+
         val updatedList = if (existingItem != null) {
             val newTotalQuantity = existingItem.quantity + safeQuantityToAdd
             val finalQuantity =
@@ -119,6 +129,8 @@ class InvoiceViewModel @Inject constructor(
             _currentInvoice.value + ProductWithQuantity(product, safeQuantityToAdd)
         }
         _currentInvoice.value = updatedList
+
+        Log.d("InvoiceViewModel", "Updated invoice size: ${_currentInvoice.value.size}")
     }
 
     fun removeFromCurrentInvoice(productId: Long){

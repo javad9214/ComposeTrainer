@@ -46,4 +46,7 @@
     <string name="search_products">جستجوی محصولات...</string>
     <string name="clear_search">پاک کردن جستجو</string>
 
+    <!-- Barcode Scanner View -->
+    <string name="barcode_position">بارکد کالا درداخل قاب قرار دهید!</string>
+
 </resources>

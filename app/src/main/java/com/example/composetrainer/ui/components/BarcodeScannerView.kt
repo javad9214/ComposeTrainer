@@ -54,6 +54,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.core.content.ContextCompat
+import com.example.composetrainer.R
+import com.example.composetrainer.ui.theme.BNazanin
+import com.example.composetrainer.utils.str
 import com.google.mlkit.vision.barcode.BarcodeScanning
 import com.google.mlkit.vision.barcode.common.Barcode
 import com.google.mlkit.vision.common.InputImage
@@ -310,9 +313,10 @@ private fun BarcodeScannerOverlay() {
 
         // Instruction text
         Text(
-            text = "Position barcode within frame",
+            text = str(R.string.barcode_position),
             color = Color.White,
             fontSize = 16.sp,
+            fontFamily = BNazanin,
             fontWeight = FontWeight.Medium,
             textAlign = TextAlign.Center,
             modifier = Modifier

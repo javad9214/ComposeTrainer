@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.screens.invoice.invoicescreen
 
+import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
@@ -48,6 +49,18 @@ fun InvoiceScreen(
     val invoiceItems by viewModel.currentInvoice.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()
 
+    // Debug logs to check invoice items
+    LaunchedEffect(Unit) {
+        Log.d("InvoiceScreen", "Current invoice items on screen load: ${invoiceItems.size}")
+        invoiceItems.forEach {
+            Log.d("InvoiceScreen", "Item: ${it.product.name}, Quantity: ${it.quantity}")
+        }
+    }
+
+    // Monitor changes to invoice items
+    LaunchedEffect(invoiceItems) {
+        Log.d("InvoiceScreen", "Invoice items updated, new size: ${invoiceItems.size}")
+    }
 
     LaunchedEffect(key1 = true) {
         viewModel.getNextInvoiceNumberId()
