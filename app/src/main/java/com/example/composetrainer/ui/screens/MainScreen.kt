@@ -4,11 +4,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.LayoutDirection
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -16,19 +20,17 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.composetrainer.ui.components.BottomNavBarVersion4
+import com.example.composetrainer.ui.components.CustomNavigationBar
 import com.example.composetrainer.ui.navigation.BottomNavItem
 import com.example.composetrainer.ui.navigation.Routes
-import com.example.composetrainer.ui.screens.productlist.ProductScreen
 import com.example.composetrainer.ui.screens.invoice.invoicescreen.InvoiceScreen
-import com.example.composetrainer.ui.screens.invoicelist.InvoicesListScreen
 import com.example.composetrainer.ui.screens.invoicelist.InvoiceDetailScreen
+import com.example.composetrainer.ui.screens.invoicelist.InvoicesListScreen
+import com.example.composetrainer.ui.screens.productlist.ProductScreen
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
-import com.example.composetrainer.ui.components.BottomNavBarVersion5
-import com.example.login.ui.screens.LoginScreen
-import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.ui.viewmodels.HomeViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
+import com.example.login.ui.screens.LoginScreen
 
 @Composable
 fun MainScreen(
@@ -66,17 +68,20 @@ fun MainScreen(
     Scaffold (
         bottomBar = {
             if (shouldShowBottomNav) {
-                BottomNavBarVersion4(
-                    navController = navController,
-                    onFabClick = {
-                        navController.navigate(Routes.INVOICE_CREATE) {
-                            popUpTo(navController.graph.startDestinationId) {
-                                saveState = true
+                CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+                    CustomNavigationBar(
+                        navController = navController,
+                        currentRoute = currentRoute,
+                        onFabClick = {
+                            navController.navigate(Routes.INVOICE_CREATE) {
+                                popUpTo(navController.graph.startDestinationId) {
+                                    saveState = true
+                                }
+                                launchSingleTop = true
                             }
-                            launchSingleTop = true
                         }
-                    }
-                )
+                    )
+                }
             }
         },
     ){ innerPadding ->
