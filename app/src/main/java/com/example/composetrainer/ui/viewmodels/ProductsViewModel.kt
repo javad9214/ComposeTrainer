@@ -4,12 +4,14 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.domain.usecase.AddProductUseCase
 import com.example.composetrainer.domain.usecase.DecreaseStockUseCase
 import com.example.composetrainer.domain.usecase.DeleteProductUseCase
 import com.example.composetrainer.domain.usecase.EditProductUseCase
 import com.example.composetrainer.domain.usecase.GetProductUseCase
 import com.example.composetrainer.domain.usecase.IncreaseStockUseCase
+import com.example.composetrainer.domain.repository.InvoiceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,7 +27,8 @@ class ProductsViewModel @Inject constructor(
     private val deleteProductUseCase: DeleteProductUseCase,
     private val editProductUseCase: EditProductUseCase,
     private val increaseStockUseCase: IncreaseStockUseCase,
-    private val decreaseStockUseCase: DecreaseStockUseCase
+    private val decreaseStockUseCase: DecreaseStockUseCase,
+    private val invoiceRepository: InvoiceRepository
 ) : ViewModel() {
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> get() = _products
@@ -53,6 +56,12 @@ class ProductsViewModel @Inject constructor(
 
     private val _stockUpdateComplete = MutableStateFlow<String?>(null)
     val stockUpdateComplete: StateFlow<String?> get() = _stockUpdateComplete
+
+    private val _invoiceCreationProgress = MutableStateFlow(0)
+    val invoiceCreationProgress: StateFlow<Int> get() = _invoiceCreationProgress
+
+    private val _invoiceCreationComplete = MutableStateFlow<String?>(null)
+    val invoiceCreationComplete: StateFlow<String?> get() = _invoiceCreationComplete
 
     init {
         loadProducts()
@@ -276,8 +285,78 @@ class ProductsViewModel @Inject constructor(
         }
     }
 
+    fun createRandomInvoices() {
+        viewModelScope.launch {
+            _isLoading.value = true
+            _invoiceCreationProgress.value = 0
+            try {
+                // Get all products first
+                val allProducts = getProductsUseCase(SortOrder.DESCENDING, "").first()
+
+                if (allProducts.isEmpty()) {
+                    _invoiceCreationComplete.value = "No products available to create invoices"
+                    return@launch
+                }
+
+                Log.d(
+                    TAG,
+                    "Creating 5 random invoices with products from ${allProducts.size} available products"
+                )
+
+                // Create 5 invoices
+                repeat(5) { invoiceIndex ->
+                    // Each invoice has between 4 to 14 products
+                    val productCount = (4..14).random()
+                    val invoiceProducts = mutableListOf<ProductWithQuantity>()
+
+                    // Randomly select products for this invoice
+                    val shuffledProducts = allProducts.shuffled()
+
+                    repeat(productCount) { productIndex ->
+                        if (productIndex < shuffledProducts.size) {
+                            val product = shuffledProducts[productIndex]
+                            // Each product has quantity between 1 to 8
+                            val quantity = (1..8).random()
+                            invoiceProducts.add(ProductWithQuantity(product, quantity))
+                        }
+                    }
+
+                    // Create the invoice
+                    if (invoiceProducts.isNotEmpty()) {
+                        invoiceRepository.createInvoice(invoiceProducts)
+                        Log.d(
+                            TAG,
+                            "Created invoice ${invoiceIndex + 1} with ${invoiceProducts.size} products"
+                        )
+                    }
+
+                    // Update progress
+                    val progress = ((invoiceIndex + 1) * 100) / 5
+                    _invoiceCreationProgress.value = progress
+
+                    // Small delay to make progress visible
+                    kotlinx.coroutines.delay(200)
+                }
+
+                Log.d(TAG, "Finished creating 5 random invoices")
+                _invoiceCreationComplete.value = "Created 5 random invoices successfully"
+
+            } catch (e: Exception) {
+                Log.e(TAG, "Error creating random invoices", e)
+                _invoiceCreationComplete.value = "Error creating invoices: ${e.message}"
+            } finally {
+                _isLoading.value = false
+                _invoiceCreationProgress.value = 0
+            }
+        }
+    }
+
     fun clearStockUpdateMessage() {
         _stockUpdateComplete.value = null
+    }
+
+    fun clearInvoiceCreationMessage() {
+        _invoiceCreationComplete.value = null
     }
 }
 

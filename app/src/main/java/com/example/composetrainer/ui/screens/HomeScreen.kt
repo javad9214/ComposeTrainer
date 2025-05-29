@@ -17,16 +17,18 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.runtime.Composable
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.runtime.Composable
+import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -38,8 +40,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Text
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -92,6 +92,10 @@ fun HomeScreen(
     // Observe stock update completion
     val stockUpdateMessage by viewModel.stockUpdateComplete.collectAsState()
     val stockUpdateProgress by viewModel.stockUpdateProgress.collectAsState()
+    
+    // Observe invoice creation completion
+    val invoiceCreationMessage by viewModel.invoiceCreationComplete.collectAsState()
+    val invoiceCreationProgress by viewModel.invoiceCreationProgress.collectAsState()
 
     // Handle navigation when product is found
     LaunchedEffect(scannedProduct) {
@@ -134,6 +138,15 @@ fun HomeScreen(
             viewModel.clearStockUpdateMessage()
         }
     }
+    
+    // Show toast for invoice creation completion
+    invoiceCreationMessage?.let { message ->
+        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
+        // Clear the message after showing
+        LaunchedEffect(message) {
+            viewModel.clearInvoiceCreationMessage()
+        }
+    }
 
     Surface(
         modifier = Modifier.fillMaxSize(),
@@ -166,7 +179,7 @@ fun HomeScreen(
                 onClick = { viewModel.addRandomProducts() },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14) + 180.dp) // Add more spacing for new buttons
+                    .padding(bottom = dimen(R.dimen.space_14) + 240.dp) // Add more spacing for new buttons
             ) {
                 Text("Add Random Products")
             }
@@ -174,10 +187,10 @@ fun HomeScreen(
             // Set Random Prices button
             Button(
                 onClick = { viewModel.setRandomPricesForNullProducts() },
-                enabled = !productsLoading && priceUpdateProgress == 0 && stockUpdateProgress == 0,
+                enabled = !productsLoading && priceUpdateProgress == 0 && stockUpdateProgress == 0 && invoiceCreationProgress == 0,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14) + 120.dp) // Add spacing for new button
+                    .padding(bottom = dimen(R.dimen.space_14) + 180.dp) // Add spacing for new button
             ) {
                 if (productsLoading && priceUpdateProgress > 0) {
                     Row(
@@ -199,10 +212,10 @@ fun HomeScreen(
             // Set Random Stock button
             Button(
                 onClick = { viewModel.setRandomStockForAllProducts() },
-                enabled = !productsLoading && stockUpdateProgress == 0 && priceUpdateProgress == 0,
+                enabled = !productsLoading && stockUpdateProgress == 0 && priceUpdateProgress == 0 && invoiceCreationProgress == 0,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14) + 60.dp) // Add spacing for scan barcode button
+                    .padding(bottom = dimen(R.dimen.space_14) + 120.dp) // Add spacing for new button
             ) {
                 if (productsLoading && stockUpdateProgress > 0) {
                     Row(
@@ -218,6 +231,31 @@ fun HomeScreen(
                     }
                 } else {
                     Text("Set Random Stock")
+                }
+            }
+
+            // Create Random Invoices button
+            Button(
+                onClick = { viewModel.createRandomInvoices() },
+                enabled = !productsLoading && invoiceCreationProgress == 0 && priceUpdateProgress == 0 && stockUpdateProgress == 0,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = dimen(R.dimen.space_14) + 60.dp) // Add spacing for scan barcode button
+            ) {
+                if (productsLoading && invoiceCreationProgress > 0) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Text("Creating...")
+                    }
+                } else {
+                    Text("Create Random Invoices")
                 }
             }
             
@@ -303,6 +341,34 @@ fun HomeScreen(
                     LaunchedEffect(stockUpdateProgress) {
                         kotlinx.coroutines.delay(3000)
                         viewModel.clearStockUpdateMessage()
+                    }
+                }
+
+                // Invoice creation progress indicator
+                if (invoiceCreationProgress in 1..99) {
+                    LinearProgressIndicator(
+                        progress = invoiceCreationProgress / 100f,
+                        modifier = Modifier.fillMaxWidth(),
+                        color = MaterialTheme.colorScheme.primary
+                    )
+                    Text(
+                        "Creating invoices: $invoiceCreationProgress%",
+                        color = MaterialTheme.colorScheme.onSurface,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+                }
+
+                if (invoiceCreationProgress == 100) {
+                    Text(
+                        "✅ Invoice creation completed!",
+                        color = Color.Green,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
+
+                    // Auto-hide completion message after 3 seconds
+                    LaunchedEffect(invoiceCreationProgress) {
+                        kotlinx.coroutines.delay(3000)
+                        viewModel.clearInvoiceCreationMessage()
                     }
                 }
             }
