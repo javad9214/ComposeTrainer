@@ -28,6 +28,13 @@
     <string name="are_you_sure_to_delete_this_invoice">"آیا مطمئن هستید که می‌خواهید این فاکتور را حذف کنید؟"</string>
     <string name="delete">حذف</string>
     <string name="cancel">انصراف</string>
+    <string name="delete_selected_invoices">حذف فاکتورهای انتخاب شده</string>
+    <string name="are_you_sure_to_delete_selected_invoices">آیا مطمئن هستید که می‌خواهید فاکتورهای انتخاب شده را حذف کنید؟</string>
+    <string name="select_invoices_to_delete">فاکتورها را برای حذف انتخاب کنید</string>
+    <string name="selection_mode">حالت انتخاب</string>
+    <string name="no_invoices_selected">هیچ فاکتوری انتخاب نشده است</string>
+    <string name="selected_invoices_count">انتخاب شده: %d</string>
+    <string name="no_products_added">هنوز محصولی اضافه نشده است</string>
 
 
     <!-- Product Screen -->
@@ -61,6 +68,8 @@
     <string name="no_products_available">محصولی موجود نیست</string>
     <string name="search_products">جستجوی محصولات...</string>
     <string name="clear_search">پاک کردن جستجو</string>
+    <string name="search_product">جستجوی محصول...</string>
+    <string name="confirm">تایید</string>
 
     <!-- Create Invoice Screen -->
     <string name="invoice_creation">ایجاد فاکتور</string>

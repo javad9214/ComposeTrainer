@@ -25,23 +25,27 @@ interface InvoiceDao {
     suspend fun getLastInvoice(): InvoiceEntity?
 
     @Transaction
-    @Query("""
+    @Query(
+        """
         SELECT i.id AS invoiceId, i.invoiceNumber as numberId, i.invoiceDate AS invoiceDate, p.*, ip.quantity
         FROM invoices AS i
         JOIN invoice_products AS ip ON i.id = ip.invoiceId
         JOIN products AS p ON p.id = ip.productId
         WHERE i.id = :invoiceId
-    """)
+    """
+    )
     suspend fun getInvoiceWithProducts(invoiceId: Long): List<InvoiceWithProduct>
 
     @Transaction
-    @Query("""
+    @Query(
+        """
         SELECT i.id AS invoiceId, i.invoiceNumber as numberId, i.invoiceDate AS invoiceDate, p.*, ip.quantity
         FROM invoices AS i 
         INNER JOIN invoice_products AS ip ON i.id = ip.invoiceId
         INNER JOIN products AS p ON ip.productId = p.id
         ORDER BY i.createdAt DESC
-    """)
+    """
+    )
     fun getAllInvoiceWithProducts(): Flow<List<InvoiceWithProduct>>
 
     @Transaction
@@ -56,4 +60,63 @@ interface InvoiceDao {
     )
     fun getAllInvoiceWithProductsOldestFirst(): Flow<List<InvoiceWithProduct>>
 
+    // Analytics queries
+    @Query(
+        """
+        SELECT COALESCE(SUM(p.price * ip.quantity), 0) as totalSales
+        FROM invoices AS i
+        INNER JOIN invoice_products AS ip ON i.id = ip.invoiceId
+        INNER JOIN products AS p ON ip.productId = p.id
+        WHERE substr(i.invoiceDate, 1, 7) = :yearMonth
+    """
+    )
+    suspend fun getTotalSalesForMonth(yearMonth: String): Long
+
+    @Query(
+        """
+        SELECT COUNT(DISTINCT i.id) as invoiceCount
+        FROM invoices AS i
+        WHERE substr(i.invoiceDate, 1, 7) = :yearMonth
+    """
+    )
+    suspend fun getTotalInvoicesForMonth(yearMonth: String): Int
+
+    @Query(
+        """
+        SELECT COALESCE(SUM(ip.quantity), 0) as totalQuantity
+        FROM invoices AS i
+        INNER JOIN invoice_products AS ip ON i.id = ip.invoiceId
+        WHERE substr(i.invoiceDate, 1, 7) = :yearMonth
+    """
+    )
+    suspend fun getTotalQuantityForMonth(yearMonth: String): Int
+
+    @Query(
+        """
+        SELECT p.name, 
+               SUM(ip.quantity) as totalQuantity,
+               SUM(p.price * ip.quantity) as totalSales
+        FROM invoices AS i
+        INNER JOIN invoice_products AS ip ON i.id = ip.invoiceId
+        INNER JOIN products AS p ON ip.productId = p.id
+        WHERE substr(i.invoiceDate, 1, 7) = :yearMonth
+        GROUP BY p.id, p.name
+        ORDER BY totalQuantity DESC
+        LIMIT 3
+    """
+    )
+    suspend fun getTopSellingProductsForMonth(yearMonth: String): List<TopSellingProduct>
+
+    // Debug queries
+    @Query("SELECT * FROM invoices ORDER BY createdAt DESC LIMIT 5")
+    suspend fun getRecentInvoicesForDebug(): List<InvoiceEntity>
+
+    @Query("SELECT COUNT(*) FROM invoices")
+    suspend fun getTotalInvoiceCount(): Int
 }
+
+data class TopSellingProduct(
+    val name: String,
+    val totalQuantity: Int,
+    val totalSales: Long
+)

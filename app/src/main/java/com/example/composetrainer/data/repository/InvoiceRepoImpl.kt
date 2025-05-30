@@ -3,141 +3,155 @@ package com.example.composetrainer.data.repository
 import com.example.composetrainer.data.local.dao.InvoiceDao
 import com.example.composetrainer.data.local.dao.InvoiceProductDao
 import com.example.composetrainer.data.local.dao.ProductDao
+import com.example.composetrainer.data.local.dao.TopSellingProduct
 import com.example.composetrainer.data.local.entity.InvoiceEntity
 import com.example.composetrainer.data.local.entity.InvoiceProductCrossRef
-import com.example.composetrainer.data.mapper.ProductMapper
+import com.example.composetrainer.data.local.relation.InvoiceWithProduct
+import com.example.composetrainer.domain.model.Invoice
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.ProductWithQuantity
+import com.example.composetrainer.domain.model.TopSellingProductInfo
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.utils.FarsiDateUtil
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
-import kotlinx.coroutines.withContext
+import java.text.SimpleDateFormat
+import java.util.Date
+import java.util.Locale
 import javax.inject.Inject
-import kotlin.collections.*
 
 class InvoiceRepoImpl @Inject constructor(
-    private val invoiceDao: InvoiceDao,
+    val invoiceDao: InvoiceDao,
     private val invoiceProductDao: InvoiceProductDao,
     private val productDao: ProductDao
 ) : InvoiceRepository {
 
     override suspend fun createInvoice(products: List<ProductWithQuantity>) {
-        val nextNumberId = getNextInvoiceNumberId()
+        val invoiceNumber = getNextInvoiceNumberId()
 
-        val invoiceEntity = InvoiceEntity(
-            invoiceNumber = nextNumberId,
-            invoiceDate = FarsiDateUtil.getTodayPersianDate()
+        val invoice = InvoiceEntity(
+            invoiceNumber = invoiceNumber,
+            invoiceDate = FarsiDateUtil.getTodayPersianDate(),
+            createdAt = System.currentTimeMillis()
         )
 
-        // Insert invoice and get its generated ID
-        val invoiceId = invoiceDao.insertInvoice(invoiceEntity)
+        val invoiceId = invoiceDao.insertInvoice(invoice)
 
-        // Insert Product into invoice
         products.forEach { productWithQuantity ->
-            invoiceProductDao.insertCrossRef(
-                InvoiceProductCrossRef(
-                    invoiceId = invoiceId,
-                    productId = productWithQuantity.product.id,
-                    quantity = productWithQuantity.quantity
-                )
+            val invoiceProductCrossRef = InvoiceProductCrossRef(
+                invoiceId = invoiceId,
+                productId = productWithQuantity.product.id,
+                quantity = productWithQuantity.quantity
             )
-
-            // Update product stock
-            productDao.updateProduct(
-                ProductMapper.toEntity(
-                    productWithQuantity.product.copy(
-                        stock = productWithQuantity.product.stock - productWithQuantity.quantity
-                    )
-                )
-
-            )
-
+            invoiceProductDao.insertCrossRef(invoiceProductCrossRef)
         }
-    }
-
-    override suspend fun getAllInvoices(): Flow<List<InvoiceWithProducts>> {
-        return invoiceDao.getAllInvoiceWithProducts()
-            .map { rows ->
-                rows
-                    .groupBy { Triple(it.invoiceId, it.numberId, it.invoiceDate) }
-                    .map { (key, groupRows) ->
-                        val (invoiceId, numberId, invoiceDate) = key
-                        InvoiceWithProducts(
-                            invoice = InvoiceEntity(
-                                id = invoiceId,
-                                invoiceNumber = numberId,
-                                invoiceDate = invoiceDate
-                            ),
-                            products = groupRows.map {
-                                ProductWithQuantity(ProductMapper.toDomain(it.product), it.quantity)
-                            }
-                        )
-                    }
-            }
-    }
-
-    override suspend fun getAllInvoicesOldestFirst(): Flow<List<InvoiceWithProducts>> {
-        return invoiceDao.getAllInvoiceWithProductsOldestFirst()
-            .map { rows ->
-                rows
-                    .groupBy { Triple(it.invoiceId, it.numberId, it.invoiceDate) }
-                    .map { (key, groupRows) ->
-                        val (invoiceId, numberId, invoiceDate) = key
-                        InvoiceWithProducts(
-                            invoice = InvoiceEntity(
-                                id = invoiceId,
-                                invoiceNumber = numberId,
-                                invoiceDate = invoiceDate
-                            ),
-                            products = groupRows.map {
-                                ProductWithQuantity(ProductMapper.toDomain(it.product), it.quantity)
-                            }
-                        )
-                    }
-            }
     }
 
     override suspend fun getInvoiceWithProducts(invoiceId: Long): InvoiceWithProducts {
-        val rows = invoiceDao.getInvoiceWithProducts(invoiceId)
-
-        if (rows.isEmpty()) throw Exception("Invoice not found")
-
-        val invoice = InvoiceEntity(
-            id = rows.first().invoiceId,
-            invoiceNumber = rows.first().numberId,
-            invoiceDate = rows.first().invoiceDate
-        )
-
-        val products = rows.map {
-            ProductWithQuantity(ProductMapper.toDomain(it.product), it.quantity)
-        }
-
-        return InvoiceWithProducts(invoice, products)
+        val invoiceWithProducts = invoiceDao.getInvoiceWithProducts(invoiceId)
+        return mapToInvoiceWithProducts(invoiceWithProducts)
     }
 
+    override suspend fun getAllInvoices(): Flow<List<InvoiceWithProducts>> {
+        return invoiceDao.getAllInvoiceWithProducts().map { list ->
+            val groupedByInvoiceId = list.groupBy { it.invoiceId }
+            groupedByInvoiceId.map { (_, invoiceProducts) ->
+                mapToInvoiceWithProducts(invoiceProducts)
+            }
+        }
+    }
+
+    override suspend fun getAllInvoicesOldestFirst(): Flow<List<InvoiceWithProducts>> {
+        return invoiceDao.getAllInvoiceWithProductsOldestFirst().map { list ->
+            val groupedByInvoiceId = list.groupBy { it.invoiceId }
+            groupedByInvoiceId.map { (_, invoiceProducts) ->
+                mapToInvoiceWithProducts(invoiceProducts)
+            }
+        }
+    }
 
     override suspend fun deleteInvoice(invoiceId: Long) {
-        withContext(Dispatchers.IO) {
-            val invoiceWithProducts = getInvoiceWithProducts(invoiceId)
-            invoiceWithProducts.products.forEach { productWithQuantity ->
-                productDao.updateProduct(
-                    ProductMapper.toEntity(
-                        productWithQuantity.product.copy(
-                            stock = productWithQuantity.product.stock + productWithQuantity.quantity
-                        )
-                    )
-                )
-            }
-            invoiceDao.deleteInvoice(invoiceId)
-        }
+        invoiceDao.deleteInvoice(invoiceId)
     }
 
     override suspend fun getNextInvoiceNumberId(): Long {
-        // Get the highest existing numberId and increment
         val lastInvoice = invoiceDao.getLastInvoice()
-        return if (lastInvoice == null) 100L else lastInvoice.invoiceNumber + 1
+        return if (lastInvoice != null) {
+            lastInvoice.invoiceNumber + 1
+        } else {
+            1000 // Start from 1000 if no invoices exist
+        }
     }
 
+    // Analytics methods
+    override suspend fun getTotalSalesForMonth(yearMonth: String): Long {
+        return invoiceDao.getTotalSalesForMonth(yearMonth)
+    }
+
+    override suspend fun getTotalInvoicesForMonth(yearMonth: String): Int {
+        return invoiceDao.getTotalInvoicesForMonth(yearMonth)
+    }
+
+    override suspend fun getTotalQuantityForMonth(yearMonth: String): Int {
+        return invoiceDao.getTotalQuantityForMonth(yearMonth)
+    }
+
+    override suspend fun getTopSellingProductsForMonth(yearMonth: String): List<TopSellingProductInfo> {
+        return invoiceDao.getTopSellingProductsForMonth(yearMonth).map {
+        TopSellingProductInfo(
+                name = it.name,
+                totalQuantity = it.totalQuantity,
+                totalSales = it.totalSales
+            )
+        }
+    }
+
+    // Debug methods
+    override suspend fun getTotalInvoiceCount(): Int {
+        return invoiceDao.getTotalInvoiceCount()
+    }
+
+    override suspend fun getRecentInvoicesForDebug(): List<String> {
+        return invoiceDao.getRecentInvoicesForDebug().map { it.invoiceDate }
+    }
+
+    // Helper methods
+    private fun mapToInvoiceWithProducts(invoiceWithProducts: List<InvoiceWithProduct>): InvoiceWithProducts {
+        if (invoiceWithProducts.isEmpty()) {
+            return InvoiceWithProducts(
+                invoice = InvoiceEntity(
+                    id = 0,
+                    invoiceNumber = 0,
+                    invoiceDate = ""
+                ),
+                products = emptyList()
+            )
+        }
+
+        val first = invoiceWithProducts.first()
+        val invoice = InvoiceEntity(
+            id = first.invoiceId,
+            invoiceNumber = first.numberId,
+            invoiceDate = first.invoiceDate
+        )
+
+        val productsWithQuantity = invoiceWithProducts.map { relation ->
+            val product = relation.product
+            ProductWithQuantity(
+                product = com.example.composetrainer.domain.model.Product(
+                    id = product.id,
+                    name = product.name,
+                    barcode = product.barcode,
+                    price = product.price,
+                    image = product.image,
+                    subCategoryId = product.subcategoryId,
+                    date = product.date,
+                    stock = product.stock
+                ),
+                quantity = relation.quantity
+            )
+        }
+
+        return InvoiceWithProducts(invoice, productsWithQuantity)
+    }
 }

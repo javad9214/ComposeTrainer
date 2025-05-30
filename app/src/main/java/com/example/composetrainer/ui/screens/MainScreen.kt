@@ -173,7 +173,7 @@ fun MainScreen(
             }
 
             composable(Routes.ANALYZE) {
-                Text(text = "Analyze Screen")
+                AnalyzeScreen()
             }
         }
     }

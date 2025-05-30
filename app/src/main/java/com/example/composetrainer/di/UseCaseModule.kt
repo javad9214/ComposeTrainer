@@ -1,8 +1,10 @@
 package com.example.composetrainer.di
 
+import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.ProductRepository
-import com.example.composetrainer.domain.usecase.AddProductUseCase
-import com.example.composetrainer.domain.usecase.GetProductUseCase
+import com.example.composetrainer.domain.usecase.product.AddProductUseCase
+import com.example.composetrainer.domain.usecase.analytics.GetAnalyticsDataUseCase
+import com.example.composetrainer.domain.usecase.product.GetProductUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -24,4 +26,10 @@ object UseCaseModule {
     fun provideGetProductsUseCase(
         repository: ProductRepository
     ): GetProductUseCase = GetProductUseCase(repository)
+
+    @Provides
+    @Singleton
+    fun provideGetAnalyticsDataUseCase(
+        invoiceRepository: InvoiceRepository
+    ): GetAnalyticsDataUseCase = GetAnalyticsDataUseCase(invoiceRepository)
 }

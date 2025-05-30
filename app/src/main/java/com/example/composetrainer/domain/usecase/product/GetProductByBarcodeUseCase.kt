@@ -1,8 +1,7 @@
-package com.example.composetrainer.domain.usecase
+package com.example.composetrainer.domain.usecase.product
 
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.repository.ProductRepository
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.firstOrNull
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject

@@ -8,6 +8,7 @@ import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.ProductRepository
+import com.example.composetrainer.domain.usecase.invoice.DeleteInvoiceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class InvoiceViewModel @Inject constructor(
     private val invoiceRepository: InvoiceRepository,
-    private val productRepository: ProductRepository
+    private val productRepository: ProductRepository,
+    private val deleteInvoiceUseCase: DeleteInvoiceUseCase
 ): ViewModel() {
 
     private val _currentInvoice = MutableStateFlow<List<ProductWithQuantity>>(emptyList())
@@ -47,6 +49,15 @@ class InvoiceViewModel @Inject constructor(
 
     private val _sortNewestFirst = MutableStateFlow(true)
     val sortNewestFirst: StateFlow<Boolean> get() = _sortNewestFirst
+
+    private val _isSelectionMode = MutableStateFlow(false)
+    val isSelectionMode: StateFlow<Boolean> get() = _isSelectionMode
+
+    private val _selectedInvoices = MutableStateFlow<Set<Long>>(emptySet())
+    val selectedInvoices: StateFlow<Set<Long>> get() = _selectedInvoices
+
+    private val _showDeleteConfirmationDialog = MutableStateFlow(false)
+    val showDeleteConfirmationDialog: StateFlow<Boolean> get() = _showDeleteConfirmationDialog
 
     init {
         loadInvoices()
@@ -80,7 +91,7 @@ class InvoiceViewModel @Inject constructor(
         }
     }
 
-    fun loadProducts() {
+    private fun loadProducts() {
         viewModelScope.launch {
             try {
                 val query = _searchQuery.value
@@ -159,12 +170,29 @@ class InvoiceViewModel @Inject constructor(
         viewModelScope.launch {
             try {
                 _isLoading.value = true
-                invoiceRepository.deleteInvoice(invoiceId)
+                deleteInvoiceUseCase(invoiceId)
                 loadInvoices() // Refresh invoice list
                 _errorMessage.value = null
             }catch (e: Exception){
                 _errorMessage.value = "Failed to delete invoice: ${e.message}"
             }finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    fun deleteSelectedInvoices() {
+        viewModelScope.launch {
+            try {
+                _isLoading.value = true
+                deleteInvoiceUseCase.deleteMultiple(_selectedInvoices.value.toList())
+                _selectedInvoices.value = emptySet()
+                _isSelectionMode.value = false
+                _showDeleteConfirmationDialog.value = false
+                loadInvoices() // Refresh invoice list
+            } catch (e: Exception) {
+                _errorMessage.value = "Failed to delete selected invoices: ${e.message}"
+            } finally {
                 _isLoading.value = false
             }
         }
@@ -212,5 +240,39 @@ class InvoiceViewModel @Inject constructor(
         return _currentInvoice.value.sumOf {
             it.product.price?.times(it.quantity) ?: 0L
         }
+    }
+
+    // Selection Mode Functions
+    fun toggleSelectionMode() {
+        _isSelectionMode.value = !_isSelectionMode.value
+        if (!_isSelectionMode.value) {
+            _selectedInvoices.value = emptySet()
+        }
+    }
+
+    fun toggleInvoiceSelection(invoiceId: Long) {
+        val currentSelection = _selectedInvoices.value.toMutableSet()
+        if (currentSelection.contains(invoiceId)) {
+            currentSelection.remove(invoiceId)
+        } else {
+            currentSelection.add(invoiceId)
+        }
+        _selectedInvoices.value = currentSelection
+    }
+
+    fun isInvoiceSelected(invoiceId: Long): Boolean {
+        return _selectedInvoices.value.contains(invoiceId)
+    }
+
+    fun clearSelection() {
+        _selectedInvoices.value = emptySet()
+    }
+
+    fun showDeleteConfirmationDialog() {
+        _showDeleteConfirmationDialog.value = true
+    }
+
+    fun dismissDeleteConfirmationDialog() {
+        _showDeleteConfirmationDialog.value = false
     }
 }
