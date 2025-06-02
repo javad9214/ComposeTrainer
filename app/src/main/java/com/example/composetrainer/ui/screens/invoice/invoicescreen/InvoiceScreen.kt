@@ -17,6 +17,7 @@ import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -27,6 +28,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.ui.screens.invoice.productselection.AddProductToInvoice
@@ -46,7 +49,7 @@ fun InvoiceScreen(
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
-    val persianDate = remember { FarsiDateUtil.getTodayPersianDate()}
+    val persianDate = remember { FarsiDateUtil.getTodayPersianDate() }
     val currentTime = remember { FarsiDateUtil.getCurrentTimeFormatted() }
     val nextInvoiceNumber by viewModel.nextInvoiceNumber.collectAsState()
     var showProductSelection by remember { mutableStateOf(false) }
@@ -139,19 +142,22 @@ fun InvoiceScreen(
             }
         }
 
-        // Bottom total section
-        BottomTotalSection(
-            totalPrice = totalPrice,
-            isLoading = isLoading,
-            hasItems = invoiceItems.isNotEmpty(),
-            onSubmit = {
-                if (invoiceItems.isNotEmpty()) {
-                    viewModel.createInvoice()
-                    onComplete()
-                }
-            },
-            modifier = Modifier.align(Alignment.BottomCenter)
-        )
+        CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+            // Bottom total section
+            BottomTotalSection(
+                totalPrice = totalPrice,
+                isLoading = isLoading,
+                hasItems = invoiceItems.isNotEmpty(),
+                onSubmit = {
+                    if (invoiceItems.isNotEmpty()) {
+                        viewModel.createInvoice()
+                        onComplete()
+                    }
+                },
+                modifier = Modifier.align(Alignment.BottomCenter)
+            )
+        }
+
 
         AnimatedVisibility(
             visible = showProductSelection,

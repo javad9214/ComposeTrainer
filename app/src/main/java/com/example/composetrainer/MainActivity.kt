@@ -41,8 +41,8 @@ class MainActivity : ComponentActivity() {
             var isDarkTheme by rememberSaveable { mutableStateOf(false) }
             ComposeTrainerTheme(darkTheme = isDarkTheme) {
                 // Update system bars (status bar and navigation bar) colors
-                val systemBarsColor = if (isDarkTheme) Color.Black else Color.White
-                val systemBarsContrastColor = if (isDarkTheme) false else true
+                val systemBarsColor =  MaterialTheme.colorScheme.surface
+                val systemBarsContrastColor = !isDarkTheme
 
                 SideEffect {
                     val window = this@MainActivity.window

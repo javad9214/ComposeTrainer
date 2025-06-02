@@ -45,7 +45,7 @@ fun AnalyzeScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(Color.White)
+                .background(MaterialTheme.colorScheme.surface)
                 .padding(start = dimen(R.dimen.space_6), end = dimen(R.dimen.space_2)),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
@@ -156,7 +156,7 @@ fun MonthlySummaryCard(
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth().padding(top = dimen(R.dimen.space_4)),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
         Column(

@@ -99,4 +99,14 @@
     <!-- Barcode Scanner View -->
     <string name="barcode_position">Position barcode within frame</string>
 
+    <!-- Add Product Bottom Sheet -->
+    <string name="add_product_title">افزودن محصول</string>
+    <string name="edit_product_title">ویرایش محصول</string>
+    <string name="product_name">نام محصول</string>
+    <string name="barcode_optional">بارکد (اختیاری)</string>
+    <string name="price_optional">قیمت (اختیاری)</string>
+    <string name="category_id_optional">شناسه دسته‌بندی (اختیاری)</string>
+    <string name="add_product_button">افزودن محصول</string>
+    <string name="save_changes_button">ذخیره تغییرات</string>
+
 </resources>

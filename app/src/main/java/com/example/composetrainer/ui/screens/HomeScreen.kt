@@ -166,102 +166,8 @@ fun HomeScreen(
                 fontFamily = Kamran,
                 modifier = Modifier
                     .align(Alignment.Center)
-                    .fillMaxWidth()
             )
-            // Add Random Products button
-            Button(
-                onClick = { viewModel.addRandomProducts() },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14) + 240.dp) // Add more spacing for new buttons
-            ) {
-                Text("Add Random Products")
-            }
 
-            // Set Random Prices button
-            Button(
-                onClick = { viewModel.setRandomPricesForNullProducts() },
-                enabled = !productsLoading && priceUpdateProgress == 0 && stockUpdateProgress == 0 && invoiceCreationProgress == 0,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14) + 180.dp) // Add spacing for new button
-            ) {
-                if (productsLoading && priceUpdateProgress > 0) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Text("Updating...")
-                    }
-                } else {
-                    Text("Set Random Prices")
-                }
-            }
-
-            // Set Random Stock button
-            Button(
-                onClick = { viewModel.setRandomStockForAllProducts() },
-                enabled = !productsLoading && stockUpdateProgress == 0 && priceUpdateProgress == 0 && invoiceCreationProgress == 0,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14) + 120.dp) // Add spacing for new button
-            ) {
-                if (productsLoading && stockUpdateProgress > 0) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Text("Updating...")
-                    }
-                } else {
-                    Text("Set Random Stock")
-                }
-            }
-
-            // Create Random Invoices button
-            Button(
-                onClick = { viewModel.createRandomInvoices() },
-                enabled = !productsLoading && invoiceCreationProgress == 0 && priceUpdateProgress == 0 && stockUpdateProgress == 0,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14) + 60.dp) // Add spacing for scan barcode button
-            ) {
-                if (productsLoading && invoiceCreationProgress > 0) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Text("Creating...")
-                    }
-                } else {
-                    Text("Create Random Invoices")
-                }
-            }
-            
-            // Scan Barcode button
-            Button(
-                onClick = { showBarcodeScannerView = true },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14))
-            ) {
-                Text("Scan Barcode")
-            }
 
             Column(
                 modifier = Modifier
@@ -366,6 +272,103 @@ fun HomeScreen(
                     }
                 }
             }
+
+            // Add Random Products button
+            Button(
+                onClick = { viewModel.addRandomProducts() },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = dimen(R.dimen.space_14) + 240.dp) // Add more spacing for new buttons
+            ) {
+                Text("Add Random Products")
+            }
+
+            // Set Random Prices button
+            Button(
+                onClick = { viewModel.setRandomPricesForNullProducts() },
+                enabled = !productsLoading && priceUpdateProgress == 0 && stockUpdateProgress == 0 && invoiceCreationProgress == 0,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = dimen(R.dimen.space_14) + 180.dp) // Add spacing for new button
+            ) {
+                if (productsLoading && priceUpdateProgress > 0) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Text("Updating...")
+                    }
+                } else {
+                    Text("Set Random Prices")
+                }
+            }
+
+            // Set Random Stock button
+            Button(
+                onClick = { viewModel.setRandomStockForAllProducts() },
+                enabled = !productsLoading && stockUpdateProgress == 0 && priceUpdateProgress == 0 && invoiceCreationProgress == 0,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = dimen(R.dimen.space_14) + 120.dp) // Add spacing for new button
+            ) {
+                if (productsLoading && stockUpdateProgress > 0) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Text("Updating...")
+                    }
+                } else {
+                    Text("Set Random Stock")
+                }
+            }
+
+            // Create Random Invoices button
+            Button(
+                onClick = { viewModel.createRandomInvoices() },
+                enabled = !productsLoading && invoiceCreationProgress == 0 && priceUpdateProgress == 0 && stockUpdateProgress == 0,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = dimen(R.dimen.space_14) + 60.dp) // Add spacing for scan barcode button
+            ) {
+                if (productsLoading && invoiceCreationProgress > 0) {
+                    Row(
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    ) {
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(16.dp),
+                            strokeWidth = 2.dp,
+                            color = MaterialTheme.colorScheme.onPrimary
+                        )
+                        Text("Creating...")
+                    }
+                } else {
+                    Text("Create Random Invoices")
+                }
+            }
+            
+            // Scan Barcode button
+            Button(
+                onClick = { showBarcodeScannerView = true },
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = dimen(R.dimen.space_14))
+            ) {
+                Text("Scan Barcode")
+            }
+
+
 
             Spacer(modifier = Modifier.padding(dimen(R.dimen.space_4)))
 

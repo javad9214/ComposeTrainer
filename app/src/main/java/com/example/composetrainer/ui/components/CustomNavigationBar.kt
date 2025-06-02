@@ -69,7 +69,7 @@ fun CustomNavigationBar(
                 .height(80.dp)
                 .shadow(8.dp)
                 .zIndex(0f),
-            containerColor = Color.White
+            containerColor = MaterialTheme.colorScheme.surface
         ) {
             // First half of the nav items
             bottomNavItems.take(2).forEach { item ->
@@ -149,7 +149,7 @@ fun CustomNavigationBar(
                 },
             elevation = CardDefaults.cardElevation(0.dp),
             shape = CircleShape,
-            colors = CardDefaults.cardColors(containerColor = Color.White)
+            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface)
         ) {
             FloatingActionButton(
                 onClick = onFabClick,

@@ -94,4 +94,14 @@
     <!-- Barcode Scanner View -->
     <string name="barcode_position">Place the product barcode inside the frame!</string>
 
+    <!-- Add Product Bottom Sheet -->
+    <string name="add_product_title">Add Product</string>
+    <string name="edit_product_title">Edit Product</string>
+    <string name="product_name">Product Name</string>
+    <string name="barcode_optional">Barcode (Optional)</string>
+    <string name="price_optional">Price (Optional)</string>
+    <string name="category_id_optional">Category ID (Optional)</string>
+    <string name="add_product_button">Add Product</string>
+    <string name="save_changes_button">Save Changes</string>
+
 </resources>

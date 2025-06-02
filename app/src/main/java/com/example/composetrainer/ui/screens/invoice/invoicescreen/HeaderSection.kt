@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -37,6 +38,7 @@ import com.example.composetrainer.R
 import com.example.composetrainer.ui.theme.BHoma
 import com.example.composetrainer.ui.theme.BKoodak
 import com.example.composetrainer.ui.theme.BMitra
+import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
@@ -92,8 +94,7 @@ fun HeaderSection(
                         text = str(R.string.sale_invoice),
                         fontSize = dimenTextSize(R.dimen.text_size_xl),
                         textAlign = TextAlign.End,
-                        fontFamily = BHoma,
-                        fontWeight = FontWeight.Bold,
+                        fontFamily = Beirut_Medium,
                         modifier = Modifier.padding(end = dimen(R.dimen.space_4))
                     )
                 }
@@ -200,13 +201,13 @@ fun HeaderSection(
                     }
 
                     // Scan barcode button
-                    Button(
+                    IconButton(
                         onClick = onScanBarcodeClick,
                         modifier = Modifier.width(56.dp)
                     ) {
                         Icon(
                             painter = painterResource(id = R.drawable.barcode_scanner_24px),
-                            contentDescription = "Scan Barcode"
+                            contentDescription = "Scan Barcode",
                         )
                     }
                 }
