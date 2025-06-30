@@ -10,6 +10,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Brightness4
 import androidx.compose.material.icons.filled.Brightness7
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
@@ -150,291 +151,28 @@ fun HomeScreen(
         Box(
             modifier = Modifier.fillMaxSize(),
         ) {
+            // Settings FAB
             FloatingActionButton(
-                onClick = onToggleTheme,
+                onClick = { navController.navigate(Screen.Settings.route) },
                 modifier = Modifier
                     .align(Alignment.TopStart)
                     .padding(16.dp)
             ) {
                 Icon(
-                    imageVector = if (isDarkTheme) Icons.Filled.Brightness7 else Icons.Filled.Brightness4,
-                    contentDescription = if (isDarkTheme) "Switch to Light Mode" else "Switch to Dark Mode"
+                    imageVector = Icons.Filled.Settings,
+                    contentDescription = "Navigate to Settings"
                 )
             }
 
-
-            FloatingActionButton(
-                onClick = {
-                    throw RuntimeException("Test Crash from ACRA!")
-                },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.AcUnit,
-                    contentDescription = if (isDarkTheme) "Switch to Light Mode" else "Switch to Dark Mode"
-                )
-            }
-
+            // Welcome text
             Text(
-                str(R.string.welcomeToHomeScreen),
+                text = str(R.string.welcomeToHomeScreen),
                 fontFamily = Kamran,
-                modifier = Modifier
-                    .align(Alignment.Center)
+                style = MaterialTheme.typography.headlineMedium,
+                modifier = Modifier.align(Alignment.Center)
             )
-
-
-            Column(
-                modifier = Modifier
-                    .padding(bottom = dimen(R.dimen.space_5))
-                    .align(Alignment.BottomCenter),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Button(onClick = { homeViewModel.importProducts() }) {
-                    Text("Start Import")
-                }
-
-                if (progress in 1..99) {
-                    LinearProgressIndicator(progress = progress / 100f)
-                    Text("در حال وارد کردن: $progress%")
-                }
-
-                if (progress == 100) {
-                    Text("✅ واردسازی کامل شد!", color = Color.Green)
-                }
-
-                // Price update progress indicator
-                if (priceUpdateProgress in 1..99) {
-                    LinearProgressIndicator(
-                        progress = priceUpdateProgress / 100f,
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.secondary
-                    )
-                    Text(
-                        "Updating prices: $priceUpdateProgress%",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-
-                if (priceUpdateProgress == 100) {
-                    Text(
-                        "✅ Price update completed!",
-                        color = Color.Green,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    // Auto-hide completion message after 3 seconds
-                    LaunchedEffect(priceUpdateProgress) {
-                        kotlinx.coroutines.delay(3000)
-                        viewModel.clearPriceUpdateMessage()
-                    }
-                }
-
-                // Stock update progress indicator
-                if (stockUpdateProgress in 1..99) {
-                    LinearProgressIndicator(
-                        progress = stockUpdateProgress / 100f,
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.tertiary
-                    )
-                    Text(
-                        "Updating stock: $stockUpdateProgress%",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-
-                if (stockUpdateProgress == 100) {
-                    Text(
-                        "✅ Stock update completed!",
-                        color = Color.Green,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    // Auto-hide completion message after 3 seconds
-                    LaunchedEffect(stockUpdateProgress) {
-                        kotlinx.coroutines.delay(3000)
-                        viewModel.clearStockUpdateMessage()
-                    }
-                }
-
-                // Invoice creation progress indicator
-                if (invoiceCreationProgress in 1..99) {
-                    LinearProgressIndicator(
-                        progress = invoiceCreationProgress / 100f,
-                        modifier = Modifier.fillMaxWidth(),
-                        color = MaterialTheme.colorScheme.primary
-                    )
-                    Text(
-                        "Creating invoices: $invoiceCreationProgress%",
-                        color = MaterialTheme.colorScheme.onSurface,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-                }
-
-                if (invoiceCreationProgress == 100) {
-                    Text(
-                        "✅ Invoice creation completed!",
-                        color = Color.Green,
-                        style = MaterialTheme.typography.bodyMedium
-                    )
-
-                    // Auto-hide completion message after 3 seconds
-                    LaunchedEffect(invoiceCreationProgress) {
-                        kotlinx.coroutines.delay(3000)
-                        viewModel.clearInvoiceCreationMessage()
-                    }
-                }
-            }
-
-            // Add Random Products button
-            Button(
-                onClick = { viewModel.addRandomProducts() },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14) + 240.dp) // Add more spacing for new buttons
-            ) {
-                Text("Add Random Products")
-            }
-
-            // Set Random Prices button
-            Button(
-                onClick = { viewModel.setRandomPricesForNullProducts() },
-                enabled = !productsLoading && priceUpdateProgress == 0 && stockUpdateProgress == 0 && invoiceCreationProgress == 0,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14) + 180.dp) // Add spacing for new button
-            ) {
-                if (productsLoading && priceUpdateProgress > 0) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Text("Updating...")
-                    }
-                } else {
-                    Text("Set Random Prices")
-                }
-            }
-
-            // Set Random Stock button
-            Button(
-                onClick = { viewModel.setRandomStockForAllProducts() },
-                enabled = !productsLoading && stockUpdateProgress == 0 && priceUpdateProgress == 0 && invoiceCreationProgress == 0,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14) + 120.dp) // Add spacing for new button
-            ) {
-                if (productsLoading && stockUpdateProgress > 0) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Text("Updating...")
-                    }
-                } else {
-                    Text("Set Random Stock")
-                }
-            }
-
-            // Create Random Invoices button
-            Button(
-                onClick = { viewModel.createRandomInvoices() },
-                enabled = !productsLoading && invoiceCreationProgress == 0 && priceUpdateProgress == 0 && stockUpdateProgress == 0,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14) + 60.dp) // Add spacing for scan barcode button
-            ) {
-                if (productsLoading && invoiceCreationProgress > 0) {
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically,
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(16.dp),
-                            strokeWidth = 2.dp,
-                            color = MaterialTheme.colorScheme.onPrimary
-                        )
-                        Text("Creating...")
-                    }
-                } else {
-                    Text("Create Random Invoices")
-                }
-            }
-            
-            // Scan Barcode button
-            Button(
-                onClick = { showBarcodeScannerView = true },
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .padding(bottom = dimen(R.dimen.space_14))
-            ) {
-                Text("Scan Barcode")
-            }
-
-
-
-            Spacer(modifier = Modifier.padding(dimen(R.dimen.space_4)))
-
-            if (showBottomSheet) {
-                ProductSelectionBottomSheet(
-                    products = products,
-                    onAddToInvoice = { product, quantity ->
-                        invoiceViewModel.addToCurrentInvoice(product, quantity)
-                        showBottomSheet = false
-                    },
-                    onDismiss = { showBottomSheet = false }
-                )
-            }
-            
-            if (showBarcodeScannerView) {
-                BarcodeScannerView(
-                    onBarcodeDetected = { barcode ->
-                        showBarcodeScannerView = false
-                        Log.i(TAG, "Barcode detected: $barcode")
-                        // Search for product by barcode
-                        homeViewModel.searchProductByBarcode(barcode)
-                    },
-                    onClose = { showBarcodeScannerView = false }
-                )
-            }
-            
-            // Show loading indicator
-            if (isLoading) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    CircularProgressIndicator()
-                }
-            }
-            
-            // Show error message if any
-            errorMessage?.let { message ->
-                Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-                // Clear error message after showing
-                LaunchedEffect(message) {
-                    homeViewModel.clearScannedProduct()
-                }
-            }
         }
     }
-    
-
 }
 
 const val TAG = "HomeScreen"

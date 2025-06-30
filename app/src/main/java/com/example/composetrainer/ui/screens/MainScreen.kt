@@ -177,6 +177,19 @@ fun MainScreen(
             composable(Routes.ANALYZE) {
                 AnalyzeScreen()
             }
+
+            composable(Routes.SETTINGS) {
+                SettingScreen(
+                    onButtonClick = {
+                        navController.navigate(Routes.INVOICES_LIST)
+                    },
+                    isDarkTheme = isDarkTheme,
+                    onToggleTheme = onToggleTheme,
+                    navController = navController,
+                    invoiceViewModel = sharedInvoiceViewModel,
+                    homeViewModel = sharedHomeViewModel
+                )
+            }
         }
     }
 

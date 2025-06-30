@@ -9,4 +9,5 @@ object Routes {
     const val INVOICE_DETAILS = "invoice_details/{invoiceId}"
     const val ANALYZE = "analyze"
     const val PRODUCT_DETAILS = "product_details/{productId}"
+    const val SETTINGS = "settings"
 }
