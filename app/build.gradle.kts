@@ -107,6 +107,10 @@ dependencies {
     // ML Kit Barcode Scanning
     implementation(libs.google.mlkit.barcode.scanning)
 
+    // ACRA
+    implementation(libs.acra.http)
+    implementation(libs.acra.core)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

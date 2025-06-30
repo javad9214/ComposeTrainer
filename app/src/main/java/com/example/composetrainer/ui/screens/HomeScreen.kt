@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
+import androidx.compose.material.icons.filled.AcUnit
 import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
@@ -157,6 +158,21 @@ fun HomeScreen(
             ) {
                 Icon(
                     imageVector = if (isDarkTheme) Icons.Filled.Brightness7 else Icons.Filled.Brightness4,
+                    contentDescription = if (isDarkTheme) "Switch to Light Mode" else "Switch to Dark Mode"
+                )
+            }
+
+
+            FloatingActionButton(
+                onClick = {
+                    throw RuntimeException("Test Crash from ACRA!")
+                },
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(16.dp)
+            ) {
+                Icon(
+                    imageVector = Icons.Filled.AcUnit,
                     contentDescription = if (isDarkTheme) "Switch to Light Mode" else "Switch to Dark Mode"
                 )
             }

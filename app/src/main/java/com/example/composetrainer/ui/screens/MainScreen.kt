@@ -69,8 +69,7 @@ fun MainScreen(
     }
 
 
-    Scaffold(
-        bottomBar = {
+    Scaffold(       bottomBar = {
             if (shouldShowBottomNav) {
                 CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
                     CustomNavigationBar(
