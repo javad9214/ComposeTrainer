@@ -2,8 +2,10 @@ package com.example.composetrainer.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Receipt
@@ -23,6 +25,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
+import com.example.composetrainer.domain.model.TimeRange
 import com.example.composetrainer.domain.model.TopSellingProductInfo
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.AnalyzeViewModel
@@ -32,6 +35,7 @@ import com.example.composetrainer.utils.dimenTextSize
 import com.example.composetrainer.utils.str
 import java.text.NumberFormat
 import java.util.Locale
+import androidx.compose.foundation.ExperimentalFoundationApi
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -103,6 +107,14 @@ fun AnalyzeScreen(
                 uiState.analyticsData != null -> {
                     val analyticsData = uiState.analyticsData!!
 
+                    // Time Range Selection
+                    item {
+                        TimeRangeSelection(
+                            selectedTimeRange = uiState.selectedTimeRange,
+                            onTimeRangeChanged = { viewModel.loadProductSalesSummary(it) }
+                        )
+                    }
+
                     // Monthly Summary Card
                     item {
                         MonthlySummaryCard(
@@ -141,6 +153,39 @@ fun AnalyzeScreen(
                             }
                         }
                     }
+
+                    // Product Sales Summary
+                    uiState.productSalesSummary?.let { salesSummary ->
+                        // Header for the time range
+                        item {
+                            Text(
+                                text = "Sales Summary: ${salesSummary.timeRange.displayName}",
+                                style = MaterialTheme.typography.titleMedium,
+                                fontWeight = FontWeight.Bold,
+                                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                            )
+                        }
+
+                        // Top selling products for the selected time range
+                        if (salesSummary.products.isNotEmpty()) {
+                            items(salesSummary.products) { product ->
+                                TopSellingProductCard(product = product)
+                            }
+                        } else {
+                            item {
+                                Card(
+                                    modifier = Modifier.fillMaxWidth()
+                                ) {
+                                    Text(
+                                        text = "No sales data for ${salesSummary.timeRange.displayName}",
+                                        modifier = Modifier.padding(16.dp),
+                                        textAlign = TextAlign.Center,
+                                        style = MaterialTheme.typography.bodyLarge
+                                    )
+                                }
+                            }
+                        }
+                    }
                 }
             }
         }
@@ -156,7 +201,9 @@ fun MonthlySummaryCard(
     modifier: Modifier = Modifier
 ) {
     ElevatedCard(
-        modifier = modifier.fillMaxWidth().padding(top = dimen(R.dimen.space_4)),
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(top = dimen(R.dimen.space_4)),
         elevation = CardDefaults.elevatedCardElevation(defaultElevation = 2.dp)
     ) {
         Column(
@@ -192,6 +239,42 @@ fun MonthlySummaryCard(
                     label = stringResource(R.string.product_quantity),
                     value = formatPrice(totalQuantity.toString()),
                     modifier = Modifier.weight(1f)
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun TimeRangeSelection(
+    selectedTimeRange: TimeRange,
+    onTimeRangeChanged: (TimeRange) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .fillMaxWidth()
+            .padding(16.dp)
+    ) {
+        Text(
+            text = "Select Time Range",
+            style = MaterialTheme.typography.titleMedium,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.padding(bottom = 8.dp)
+        )
+
+        val scrollState = rememberScrollState()
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(scrollState),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            TimeRange.values().forEach { timeRange ->
+                FilterChip(
+                    selected = selectedTimeRange == timeRange,
+                    onClick = { onTimeRangeChanged(timeRange) },
+                    label = { Text(timeRange.displayName) }
                 )
             }
         }

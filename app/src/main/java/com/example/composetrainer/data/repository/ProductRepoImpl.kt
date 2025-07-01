@@ -43,4 +43,9 @@ class ProductRepoImpl @Inject constructor(
         productDao.updateProduct(ProductMapper.toEntity(product))
     }
 
+    override suspend fun getProductById(id: Long): Product? {
+        val entity = productDao.getProductById(id)
+        return entity?.let { ProductMapper.toDomain(it) }
+    }
+
 }

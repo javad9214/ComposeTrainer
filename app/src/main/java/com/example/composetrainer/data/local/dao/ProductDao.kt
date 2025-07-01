@@ -25,4 +25,7 @@ interface ProductDao {
 
     @Update
     suspend fun updateProduct(product: ProductEntity)
+
+    @Query("SELECT * FROM products WHERE id = :id LIMIT 1")
+    suspend fun getProductById(id: Long): ProductEntity?
 }

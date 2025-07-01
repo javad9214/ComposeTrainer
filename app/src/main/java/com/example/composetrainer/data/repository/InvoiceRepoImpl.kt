@@ -12,6 +12,7 @@ import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.domain.model.TopSellingProductInfo
 import com.example.composetrainer.domain.repository.InvoiceRepository
+import com.example.composetrainer.domain.usecase.sales.AddToProductSalesSummaryUseCase
 import com.example.composetrainer.utils.FarsiDateUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -23,7 +24,8 @@ import javax.inject.Inject
 class InvoiceRepoImpl @Inject constructor(
     val invoiceDao: InvoiceDao,
     private val invoiceProductDao: InvoiceProductDao,
-    private val productDao: ProductDao
+    private val productDao: ProductDao,
+    private val addToProductSalesSummaryUseCase: AddToProductSalesSummaryUseCase
 ) : InvoiceRepository {
 
     override suspend fun createInvoice(products: List<ProductWithQuantity>) {
@@ -45,6 +47,9 @@ class InvoiceRepoImpl @Inject constructor(
             )
             invoiceProductDao.insertCrossRef(invoiceProductCrossRef)
         }
+
+        // Update product sales summary
+        addToProductSalesSummaryUseCase(products)
     }
 
     override suspend fun getInvoiceWithProducts(invoiceId: Long): InvoiceWithProducts {

@@ -4,17 +4,22 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.AnalyticsData
+import com.example.composetrainer.domain.model.ProductSalesSummary
+import com.example.composetrainer.domain.model.TimeRange
 import com.example.composetrainer.domain.usecase.analytics.GetAnalyticsDataUseCase
+import com.example.composetrainer.domain.usecase.sales.GetProductSalesSummaryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @HiltViewModel
 class AnalyzeViewModel @Inject constructor(
-    private val getAnalyticsDataUseCase: GetAnalyticsDataUseCase
+    private val getAnalyticsDataUseCase: GetAnalyticsDataUseCase,
+    private val getProductSalesSummaryUseCase: GetProductSalesSummaryUseCase
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AnalyzeUiState())
@@ -22,37 +27,69 @@ class AnalyzeViewModel @Inject constructor(
 
     init {
         loadAnalyticsData()
+        loadProductSalesSummary(TimeRange.THIS_MONTH) // Default to this month
     }
 
     private fun loadAnalyticsData() {
         viewModelScope.launch {
-            _uiState.value = _uiState.value.copy(isLoading = true)
+            _uiState.update { it.copy(isLoading = true) }
             try {
                 Log.d("AnalyzeViewModel", "Loading analytics data...")
                 val analyticsData = getAnalyticsDataUseCase()
                 Log.d("AnalyzeViewModel", "Analytics data loaded: $analyticsData")
-                _uiState.value = _uiState.value.copy(
-                    analyticsData = analyticsData,
-                    isLoading = false,
-                    error = null
-                )
+                _uiState.update {
+                    it.copy(
+                        analyticsData = analyticsData,
+                        isLoading = false,
+                        error = null
+                    )
+                }
             } catch (e: Exception) {
                 Log.e("AnalyzeViewModel", "Error loading analytics data", e)
-                _uiState.value = _uiState.value.copy(
-                    isLoading = false,
-                    error = e.message
-                )
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
+            }
+        }
+    }
+
+    fun loadProductSalesSummary(timeRange: TimeRange) {
+        viewModelScope.launch {
+            _uiState.update { it.copy(isLoading = true, selectedTimeRange = timeRange) }
+            try {
+                val productSalesSummary = getProductSalesSummaryUseCase(timeRange)
+                _uiState.update {
+                    it.copy(
+                        productSalesSummary = productSalesSummary,
+                        isLoading = false,
+                        error = null
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("AnalyzeViewModel", "Error loading product sales summary", e)
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        error = e.message
+                    )
+                }
             }
         }
     }
 
     fun refresh() {
         loadAnalyticsData()
+        loadProductSalesSummary(uiState.value.selectedTimeRange)
     }
 }
 
 data class AnalyzeUiState(
     val analyticsData: AnalyticsData? = null,
+    val productSalesSummary: ProductSalesSummary? = null,
+    val selectedTimeRange: TimeRange = TimeRange.THIS_MONTH,
     val isLoading: Boolean = false,
     val error: String? = null
 )
