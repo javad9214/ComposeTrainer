@@ -7,7 +7,6 @@ import com.example.composetrainer.data.local.dao.SubcategoryDao
 import com.example.composetrainer.data.local.entity.CategoryEntity
 import com.example.composetrainer.data.local.entity.ProductEntity
 import com.example.composetrainer.data.local.entity.SubcategoryEntity
-import com.example.composetrainer.utils.loadProductJson
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
@@ -49,7 +48,9 @@ class ProductImporter @Inject constructor(
                 minStockLevel = null,
                 maxStockLevel = null,
                 tags = null,
-                lastSoldDate = null
+                lastSoldDate = null,
+                isActive = true,
+                synced = false
             )
 
             productDao.insertProduct(product)
@@ -83,7 +84,9 @@ class ProductImporter @Inject constructor(
                 minStockLevel = null,
                 maxStockLevel = null,
                 tags = null,
-                lastSoldDate = null
+                lastSoldDate = null,
+                isActive = true,
+                synced = false
             )
 
             productDao.insertProduct(product)
@@ -98,7 +101,7 @@ class ProductImporter @Inject constructor(
         return if (existing != null) {
             existing.id
         } else {
-            val id = categoryDao.insert(CategoryEntity(name = name)).toInt()
+            val id = categoryDao.insert(CategoryEntity(name = name, icon = null)).toInt()
             if (id == -1) categoryDao.getByName(name)!!.id else id
         }
     }
