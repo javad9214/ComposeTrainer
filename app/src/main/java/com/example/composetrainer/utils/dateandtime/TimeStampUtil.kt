@@ -34,48 +34,34 @@ object TimeStampUtil {
         return startOfDay.time to endOfDay.time
     }
 
-    fun getYesterdayShamsiStartEndMillis(): Pair<Long, Long> {
-        val now = PersianDate()
-        val yesterday = PersianDate()
-        yesterday.setShYear(now.shYear)
-        yesterday.setShMonth(now.shMonth)
-        yesterday.setShDay(now.shDay - 1)
-        // Handle crossing month boundary
-        if (yesterday.shDay < 1) {
-            yesterday.setShMonth(now.shMonth - 1)
-            if (yesterday.shMonth < 1) {
-                yesterday.setShMonth(12)
-                yesterday.setShYear(now.shYear - 1)
-            }
-            val prevMonthDays = PersianDate().apply {
-                setShYear(yesterday.shYear)
-                setShMonth(yesterday.shMonth)
-            }.monthDays
-            yesterday.setShDay(prevMonthDays)
-        }
+    fun getYesterdayStartEndMillis(): Pair<Long, Long> {
+        val calendar = Calendar.getInstance()
 
-        val startOfYesterday = PersianDate()
-        startOfYesterday.setShYear(yesterday.shYear)
-        startOfYesterday.setShMonth(yesterday.shMonth)
-        startOfYesterday.setShDay(yesterday.shDay)
-        startOfYesterday.setHour(0)
-        startOfYesterday.setMinute(0)
-        startOfYesterday.setSecond(0)
+        // Set the calendar to yesterday
+        calendar.add(Calendar.DAY_OF_YEAR, -1)
 
-        val endOfYesterday = PersianDate()
-        endOfYesterday.setShYear(yesterday.shYear)
-        endOfYesterday.setShMonth(yesterday.shMonth)
-        endOfYesterday.setShDay(yesterday.shDay)
-        endOfYesterday.setHour(23)
-        endOfYesterday.setMinute(59)
-        endOfYesterday.setSecond(59)
+        // Set to the start of the day (midnight)
+        calendar.set(Calendar.HOUR_OF_DAY, 0)
+        calendar.set(Calendar.MINUTE, 0)
+        calendar.set(Calendar.SECOND, 0)
+        calendar.set(Calendar.MILLISECOND, 0)
 
-        return startOfYesterday.time to endOfYesterday.time
+        val startOfYesterday = calendar.timeInMillis // Start timestamp of yesterday
+
+        // Move to the end of the day (23:59:59.999)
+        calendar.set(Calendar.HOUR_OF_DAY, 23)
+        calendar.set(Calendar.MINUTE, 59)
+        calendar.set(Calendar.SECOND, 59)
+        calendar.set(Calendar.MILLISECOND, 999)
+
+        val endOfYesterday = calendar.timeInMillis // End timestamp of yesterday
+
+        return Pair(startOfYesterday, endOfYesterday) // Return the pair of timestamps
     }
 
     // Week
 
-    fun getCurrentShamsiWeekStartEndMillis(): Pair<Long, Long> {
+    fun getCurrentWeekStartEndMillis(): Pair<Long, Long> {
         val calendar = Calendar.getInstance()
 
         // Set the calendar to the first day of the week (Saturday)
@@ -93,7 +79,7 @@ object TimeStampUtil {
         return Pair(startOfWeek, currentTime) // Return the pair of timestamps
     }
 
-    fun getLastShamsiWeekStartEndMillis(): Pair<Long, Long> {
+    fun getLastWeekStartEndMillis(): Pair<Long, Long> {
         val calendar = Calendar.getInstance()
 
         // Set the calendar to the last Saturday

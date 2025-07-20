@@ -3,11 +3,11 @@ package com.example.composetrainer.domain.usecase.analytics
 import android.util.Log
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getCurrentShamsiMonthStartEndMillis
-import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getCurrentShamsiWeekStartEndMillis
+import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getCurrentWeekStartEndMillis
 import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getLastShamsiMonthStartEndMillis
-import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getLastShamsiWeekStartEndMillis
+import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getLastWeekStartEndMillis
 import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getTodayStartEndMillis
-import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getYesterdayShamsiStartEndMillis
+import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getYesterdayStartEndMillis
 import javax.inject.Inject
 
 class GetInvoiceReportCountUseCase @Inject constructor(
@@ -21,19 +21,19 @@ class GetInvoiceReportCountUseCase @Inject constructor(
     }
 
     suspend fun getYesterdayInvoiceCount(): Int {
-        val (start, end) = getYesterdayShamsiStartEndMillis()
+        val (start, end) = getYesterdayStartEndMillis()
         Log.i(TAG, "getYesterdayInvoiceCount: start=$start, end=$end")
         return invoiceRepository.getTotalInvoicesBetweenDates(start, end)
     }
 
     suspend fun getThisWeekInvoiceCount(): Int {
-        val (start, end) = getCurrentShamsiWeekStartEndMillis()
+        val (start, end) = getCurrentWeekStartEndMillis()
         Log.i(TAG, "getThisWeekInvoiceCount: start=$start, end=$end")
         return invoiceRepository.getTotalInvoicesBetweenDates(start, end)
     }
 
     suspend fun getLastWeekInvoiceCount(): Int {
-        val (start, end) = getLastShamsiWeekStartEndMillis()
+        val (start, end) = getLastWeekStartEndMillis()
         Log.i(TAG, "getLastWeekInvoiceCount: start=$start, end=$end")
         return invoiceRepository.getTotalInvoicesBetweenDates(start, end)
     }
