@@ -1,8 +1,19 @@
 package com.example.composetrainer.ui.screens
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.horizontalScroll
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
@@ -11,14 +22,28 @@ import androidx.compose.material.icons.filled.AttachMoney
 import androidx.compose.material.icons.filled.Receipt
 import androidx.compose.material.icons.filled.Refresh
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material3.*
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.material3.ElevatedCard
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.FilterChip
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.OutlinedCard
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -33,9 +58,15 @@ import com.example.composetrainer.utils.PriceValidator.formatPrice
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
 import com.example.composetrainer.utils.str
-import java.text.NumberFormat
-import java.util.Locale
-import androidx.compose.foundation.ExperimentalFoundationApi
+
+enum class InvoiceSummaryRange(val displayName: String) {
+    TODAY("Today"),
+    YESTERDAY("Yesterday"),
+    THIS_WEEK("This Week"),
+    LAST_WEEK("Last Week"),
+    THIS_MONTH("This Month"),
+    LAST_MONTH("Last Month")
+}
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -44,6 +75,12 @@ fun AnalyzeScreen(
     viewModel: AnalyzeViewModel = hiltViewModel()
 ) {
     val uiState by viewModel.uiState.collectAsState()
+
+    // Add state for dropdown selection
+    var selectedSummaryRange by remember { mutableStateOf(InvoiceSummaryRange.THIS_MONTH) }
+
+    // Invoice count for the selected range
+    val invoiceCount = uiState.invoiceCount
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -115,12 +152,17 @@ fun AnalyzeScreen(
                         )
                     }
 
-                    // Monthly Summary Card
+                    // Monthly Summary Card with dropdown
                     item {
                         MonthlySummaryCard(
                             totalSales = analyticsData.monthlySummary.totalSales,
-                            invoiceCount = analyticsData.monthlySummary.invoiceCount,
-                            totalQuantity = analyticsData.monthlySummary.totalQuantity
+                            invoiceCount = invoiceCount,
+                            totalQuantity = analyticsData.monthlySummary.totalQuantity,
+                            selectedRange = selectedSummaryRange,
+                            onRangeSelected = {
+                                selectedSummaryRange = it
+                                viewModel.loadInvoiceCountForSummaryRange(it)
+                            }
                         )
                     }
 
@@ -198,8 +240,12 @@ fun MonthlySummaryCard(
     totalSales: Long,
     invoiceCount: Int,
     totalQuantity: Int,
+    selectedRange: InvoiceSummaryRange,
+    onRangeSelected: (InvoiceSummaryRange) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var expanded by remember { mutableStateOf(false) }
+
     ElevatedCard(
         modifier = modifier
             .fillMaxWidth()
@@ -210,11 +256,38 @@ fun MonthlySummaryCard(
             modifier = Modifier.padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            Text(
-                text = stringResource(R.string.monthly_summary),
-                style = MaterialTheme.typography.titleMedium,
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Text(
+                    text = stringResource(R.string.monthly_summary),
+                    style = MaterialTheme.typography.titleMedium,
+                    fontWeight = FontWeight.Bold
+                )
+                Spacer(modifier = Modifier.width(8.dp))
+                Box {
+                    OutlinedButton(
+                        onClick = { expanded = true },
+                        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp)
+                    ) {
+                        Text(selectedRange.displayName)
+                    }
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        InvoiceSummaryRange.values().forEach { range ->
+                            DropdownMenuItem(
+                                text = { Text(range.displayName) },
+                                onClick = {
+                                    expanded = false
+                                    onRangeSelected(range)
+                                }
+                            )
+                        }
+                    }
+                }
+            }
 
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -356,4 +429,3 @@ fun TopSellingProductCard(
         }
     }
 }
-

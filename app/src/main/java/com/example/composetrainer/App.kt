@@ -16,7 +16,7 @@ class App: Application() {
         super.attachBaseContext(base)
 
         // Initialize ACRA with the proper context
-        initAcra()
+       // initAcra()
     }
 
     override fun onCreate() {

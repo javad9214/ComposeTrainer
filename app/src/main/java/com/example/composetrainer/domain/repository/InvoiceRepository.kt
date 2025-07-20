@@ -30,6 +30,8 @@ interface InvoiceRepository {
 
     suspend fun getTopSellingProductsForMonth(yearMonth: String): List<TopSellingProductInfo>
 
+    suspend fun getTotalInvoicesBetweenDates(start: Long, end: Long): Int  
+    
     // Debug methods
     suspend fun getTotalInvoiceCount(): Int
     suspend fun getRecentInvoicesForDebug(): List<String> // Return just the dates as strings

@@ -3,17 +3,16 @@ package com.example.composetrainer.data.repository
 import com.example.composetrainer.data.local.dao.InvoiceDao
 import com.example.composetrainer.data.local.dao.InvoiceProductDao
 import com.example.composetrainer.data.local.dao.ProductDao
-import com.example.composetrainer.data.local.dao.TopSellingProduct
 import com.example.composetrainer.data.local.entity.InvoiceEntity
 import com.example.composetrainer.data.local.entity.InvoiceProductCrossRef
 import com.example.composetrainer.data.local.relation.InvoiceWithProduct
-import com.example.composetrainer.domain.model.Invoice
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.domain.model.TopSellingProductInfo
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.usecase.sales.AddToProductSalesSummaryUseCase
-import com.example.composetrainer.utils.FarsiDateUtil
+import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
+import com.example.composetrainer.utils.dateandtime.TimeStampUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.text.SimpleDateFormat
@@ -33,7 +32,7 @@ class InvoiceRepoImpl @Inject constructor(
 
         val invoice = InvoiceEntity(
             invoiceNumber = invoiceNumber,
-            invoiceDate = FarsiDateUtil.getTodayAsTimestamp(),
+            invoiceDate = TimeStampUtil.getTodayAsTimestamp(),
             createdAt = System.currentTimeMillis()
         )
 
@@ -111,6 +110,10 @@ class InvoiceRepoImpl @Inject constructor(
                 totalSales = it.totalSales
             )
         }
+    }
+
+    override suspend fun getTotalInvoicesBetweenDates(start: Long, end: Long): Int {
+        return invoiceDao.getTotalInvoicesBetweenDates(start, end)
     }
 
     // Debug methods

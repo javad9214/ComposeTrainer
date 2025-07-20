@@ -107,6 +107,14 @@ interface InvoiceDao {
     )
     suspend fun getTopSellingProductsForMonth(yearMonth: String): List<TopSellingProduct>
 
+    @Query(
+        """
+    SELECT COUNT(*) FROM invoices
+    WHERE invoiceDate BETWEEN :startDate AND :endDate
+    """
+    )
+    suspend fun getTotalInvoicesBetweenDates(startDate: Long, endDate: Long): Int
+
     // Debug queries
     @Query("SELECT * FROM invoices ORDER BY createdAt DESC LIMIT 5")
     suspend fun getRecentInvoicesForDebug(): List<InvoiceEntity>

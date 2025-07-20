@@ -3,7 +3,7 @@ package com.example.composetrainer.data.repository
 import com.example.composetrainer.data.local.dao.ProductSalesSummaryDao
 import com.example.composetrainer.data.local.entity.ProductSalesSummaryEntity
 import com.example.composetrainer.domain.repository.ProductSalesSummaryRepository
-import com.example.composetrainer.utils.getStartOfCurrentHour
+import com.example.composetrainer.utils.dateandtime.getStartOfCurrentHour
 import javax.inject.Inject
 
 class ProductSalesSummaryRepoImpl @Inject constructor(

@@ -26,7 +26,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
@@ -34,8 +33,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.ui.screens.invoice.productselection.AddProductToInvoice
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
-import com.example.composetrainer.utils.FarsiDateUtil
-import com.example.composetrainer.ui.components.SetStatusBarColor
+import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.ui.components.BarcodeScannerView
 import com.example.composetrainer.ui.viewmodels.HomeViewModel
