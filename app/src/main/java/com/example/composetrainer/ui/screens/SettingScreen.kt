@@ -327,6 +327,17 @@ fun SettingScreen(
                 }
             }
 
+            // Set Random Cost Prices button
+            Button(
+                onClick = { viewModel.setRandomCostPrice() },
+                enabled = !productsLoading && priceUpdateProgress == 0 && stockUpdateProgress == 0 && invoiceCreationProgress == 0,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = dimen(R.dimen.space_14) + 180.dp) // Add spacing for new button
+            ){
+                Text("Set Random Cost Prices")
+            }
+
             // Set Random Stock button
             Button(
                 onClick = { viewModel.setRandomStockForAllProducts() },

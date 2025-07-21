@@ -9,8 +9,8 @@ data class ProductEntity (
     val id: Long = 0L,
     val name: String,
     val barcode: String?,
-    val price: Long?,
-    val costPrice: Long?,
+    val price: Long?, // Selling price of the product
+    val costPrice: Long?, // Cost price for Buying of the product
     val description: String?,
     val image: String?,
     val subcategoryId: Int?,

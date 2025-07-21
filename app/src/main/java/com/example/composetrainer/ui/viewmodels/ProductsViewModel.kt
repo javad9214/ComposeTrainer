@@ -3,6 +3,7 @@ package com.example.composetrainer.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.domain.usecase.product.AddProductUseCase
@@ -185,6 +186,33 @@ class ProductsViewModel @Inject constructor(
                 editProductUseCase(it)
                 _selectedProduct.value = it
                 loadProducts() // Refresh the list if it's visible
+            }
+        }
+    }
+
+    fun setRandomCostPrice(){
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                // Get all products
+                val allProducts = getProductsUseCase(SortOrder.DESCENDING, "").first()
+
+                // Update each product with a random cost price between 1000 and 500000
+                allProducts.forEach { product ->
+                    val randomCostPrice = (product.price ?: 0L) - (10..1000).random()
+                    val updatedProduct = product.copy(costPrice = randomCostPrice)
+                    editProductUseCase(updatedProduct)
+                    Log.d(TAG, "Updated product ${product.name} with cost price $randomCostPrice")
+                }
+
+                // Refresh the products list
+                loadProducts()
+
+                Log.d(TAG, "Finished updating cost prices for ${allProducts.size} products")
+            } catch (e: Exception) {
+                Log.e(TAG, "Error updating cost prices", e)
+            } finally {
+                _isLoading.value = false
             }
         }
     }

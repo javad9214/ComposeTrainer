@@ -15,6 +15,7 @@ data class InvoiceEntity(
     val customerId: Long? = null,   // e.g., "C005" — optional for future
 
     val totalAmount: Long? = null,
+    val totalProfit: Long? = null,
     val totalDiscount: Long = 0,
 
     val status: String? = null,

@@ -15,7 +15,7 @@ android {
 
     defaultConfig {
         applicationId = "com.example.composetrainer"
-        minSdk = 25
+        minSdk = 26
         targetSdk = 35
         versionCode = 5
         versionName = "0.3.4"

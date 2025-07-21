@@ -4,14 +4,13 @@ import com.example.composetrainer.data.local.dao.InvoiceDao
 import com.example.composetrainer.data.local.dao.InvoiceProductDao
 import com.example.composetrainer.data.local.dao.ProductDao
 import com.example.composetrainer.data.local.entity.InvoiceEntity
-import com.example.composetrainer.data.local.entity.InvoiceProductCrossRef
+import com.example.composetrainer.data.local.entity.InvoiceProductCrossRefEntity
 import com.example.composetrainer.data.local.relation.InvoiceWithProduct
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.domain.model.TopSellingProductInfo
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.usecase.sales.AddToProductSalesSummaryUseCase
-import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
 import com.example.composetrainer.utils.dateandtime.TimeStampUtil
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -27,7 +26,7 @@ class InvoiceRepoImpl @Inject constructor(
     private val addToProductSalesSummaryUseCase: AddToProductSalesSummaryUseCase
 ) : InvoiceRepository {
 
-    override suspend fun createInvoice(products: List<ProductWithQuantity>) {
+    override suspend fun createInvoiceold(products: List<ProductWithQuantity>) {
         val invoiceNumber = getNextInvoiceNumberId()
 
         val invoice = InvoiceEntity(
@@ -40,17 +39,22 @@ class InvoiceRepoImpl @Inject constructor(
 
         products.forEach { productWithQuantity ->
             val product = productWithQuantity.product
-            val invoiceProductCrossRef = InvoiceProductCrossRef(
+            val invoiceProductCrossRefEntity = InvoiceProductCrossRefEntity(
                 invoiceId = invoiceId,
                 productId = productWithQuantity.product.id,
                 quantity = productWithQuantity.quantity,
-                priceAtSale = product.price ?: 0L
+                priceAtSale = product.price ?: 0L,
+                costPriceAtTransaction = product.costPrice ?: 0L
             )
-            invoiceProductDao.insertCrossRef(invoiceProductCrossRef)
+            invoiceProductDao.insertCrossRef(invoiceProductCrossRefEntity)
         }
 
         // Update product sales summary
         addToProductSalesSummaryUseCase(products)
+    }
+
+    override suspend fun createInvoice(products: List<ProductWithQuantity>) {
+
     }
 
     override suspend fun getInvoiceWithProducts(invoiceId: Long): InvoiceWithProducts {

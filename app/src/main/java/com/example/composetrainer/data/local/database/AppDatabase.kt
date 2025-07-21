@@ -16,7 +16,7 @@ import com.example.composetrainer.data.local.entity.CategoryEntity
 import com.example.composetrainer.data.local.entity.CustomerEntity
 import com.example.composetrainer.data.local.entity.CustomerInvoiceSummaryEntity
 import com.example.composetrainer.data.local.entity.InvoiceEntity
-import com.example.composetrainer.data.local.entity.InvoiceProductCrossRef
+import com.example.composetrainer.data.local.entity.InvoiceProductCrossRefEntity
 import com.example.composetrainer.data.local.entity.ProductEntity
 import com.example.composetrainer.data.local.entity.ProductSalesSummaryEntity
 import com.example.composetrainer.data.local.entity.StockMovementEntity
@@ -25,9 +25,10 @@ import com.example.composetrainer.data.local.entity.SupplierEntity
 
 
 @Database(
-    entities = [ProductEntity::class,
+    entities = [
+        ProductEntity::class,
         InvoiceEntity::class,
-        InvoiceProductCrossRef::class,
+        InvoiceProductCrossRefEntity::class,
         CategoryEntity::class,
         SubcategoryEntity::class,
         ProductSalesSummaryEntity::class,
