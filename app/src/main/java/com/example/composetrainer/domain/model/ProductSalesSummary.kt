@@ -3,6 +3,7 @@ package com.example.composetrainer.domain.model
 import android.os.Build
 import androidx.annotation.RequiresApi
 import com.example.composetrainer.data.local.entity.ProductSalesSummaryEntity
+import com.example.composetrainer.domain.model.type.Money
 import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -197,26 +198,22 @@ enum class SalesPerformance {
 }
 
 // Mapping Extension Functions
-@RequiresApi(Build.VERSION_CODES.UPSIDE_DOWN_CAKE)
 fun ProductSalesSummaryEntity.toDomain(): ProductSalesSummary {
     return ProductSalesSummary(
         id = ProductSalesSummaryId(id),
         productId = ProductId(productId),
-        date = LocalDate.ofInstant(
-            Instant.ofEpochMilli(date),
-            ZoneId.systemDefault()
-        ),
+        date = Instant.ofEpochMilli(date)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDate(),
         totalSold = SalesQuantity(totalSold),
         totalRevenue = Money(totalRevenue),
         totalCost = Money(totalCost),
-        createdAt = LocalDateTime.ofInstant(
-            Instant.ofEpochMilli(createdAt),
-            ZoneId.systemDefault()
-        ),
-        updatedAt = LocalDateTime.ofInstant(
-            Instant.ofEpochMilli(updatedAt),
-            ZoneId.systemDefault()
-        ),
+        createdAt = Instant.ofEpochMilli(createdAt)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime(),
+        updatedAt = Instant.ofEpochMilli(updatedAt)
+            .atZone(ZoneId.systemDefault())
+            .toLocalDateTime(),
         synced = synced
     )
 }

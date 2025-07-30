@@ -41,7 +41,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.Product
-import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.utils.PriceValidator

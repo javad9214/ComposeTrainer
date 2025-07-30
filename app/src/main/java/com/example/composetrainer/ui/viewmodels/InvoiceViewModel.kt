@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Invoice
 import com.example.composetrainer.domain.model.Product
-import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.ProductRepository
 import com.example.composetrainer.domain.usecase.invoice.DeleteInvoiceUseCase

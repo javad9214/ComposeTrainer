@@ -3,12 +3,8 @@ package com.example.composetrainer.data.repository
 import com.example.composetrainer.data.local.dao.InvoiceDao
 import com.example.composetrainer.data.local.dao.InvoiceProductDao
 import com.example.composetrainer.data.local.dao.ProductDao
-import com.example.composetrainer.data.local.entity.InvoiceEntity
 import com.example.composetrainer.data.local.relation.InvoiceWithProductsRelation
-import com.example.composetrainer.domain.model.InvoiceProduct
-import com.example.composetrainer.domain.model.InvoiceProductFactory
 import com.example.composetrainer.domain.model.InvoiceWithProducts
-import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.domain.model.TopSellingProductInfo
 import com.example.composetrainer.domain.model.toDomain
 import com.example.composetrainer.domain.repository.InvoiceRepository
@@ -39,7 +35,7 @@ class InvoiceRepoImpl @Inject constructor(
 
     override suspend fun getAllInvoices(): Flow<List<InvoiceWithProducts>> {
         return invoiceDao.getAllInvoiceWithProducts().map { list ->
-            val groupedByInvoiceId = list.groupBy { it.invoiceId }
+            val groupedByInvoiceId = list.groupBy { it.invoice.id }
             groupedByInvoiceId.map { (_, invoiceProducts) ->
                 mapToInvoiceWithProducts(invoiceProducts)
             }
@@ -48,7 +44,7 @@ class InvoiceRepoImpl @Inject constructor(
 
     override suspend fun getAllInvoicesOldestFirst(): Flow<List<InvoiceWithProducts>> {
         return invoiceDao.getAllInvoiceWithProductsOldestFirst().map { list ->
-            val groupedByInvoiceId = list.groupBy { it.invoiceId }
+            val groupedByInvoiceId = list.groupBy { it.invoice.id }
             groupedByInvoiceId.map { (_, invoiceProducts) ->
                 mapToInvoiceWithProducts(invoiceProducts)
             }
@@ -132,7 +128,25 @@ class InvoiceRepoImpl @Inject constructor(
 
         return InvoiceWithProducts(
             invoice = invoice,
-            products = products
+            invoiceProducts = products
+        )
+    }
+
+    // Overloaded function for single InvoiceWithProductsRelation
+    private fun mapToInvoiceWithProducts(
+        invoiceWithProductsRelation: InvoiceWithProductsRelation
+    ): InvoiceWithProducts {
+        val invoiceEntity = invoiceWithProductsRelation.invoice
+
+        // Map InvoiceEntity to Invoice domain model
+        val invoice = invoiceEntity.toDomain()
+
+        // Map single ProductEntity to InvoiceProduct domain model
+        val products = invoiceWithProductsRelation.invoiceProducts.map { it.toDomain() }
+
+        return InvoiceWithProducts(
+            invoice = invoice,
+            invoiceProducts = products
         )
     }
 
@@ -149,12 +163,17 @@ class InvoiceRepoImpl @Inject constructor(
         return mapToInvoiceWithProducts(this)
     }
 
+    // Extension function for single relation
+    private fun InvoiceWithProductsRelation.toInvoiceWithProducts(): InvoiceWithProducts {
+        return mapToInvoiceWithProducts(this)
+    }
+
     // Group multiple invoices if needed
     private fun mapToMultipleInvoicesWithProducts(
         invoiceWithProductsRelations: List<InvoiceWithProductsRelation>
     ): List<InvoiceWithProducts> {
         return invoiceWithProductsRelations
-            .groupBy { it.invoiceId }
+            .groupBy { it.invoice.id }
             .map { (_, relations) ->
                 mapToInvoiceWithProducts(relations)
             }

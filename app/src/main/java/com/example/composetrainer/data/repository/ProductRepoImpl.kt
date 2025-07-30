@@ -2,6 +2,8 @@ package com.example.composetrainer.data.repository
 
 import com.example.composetrainer.data.local.dao.ProductDao
 import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.domain.model.toDomain
+import com.example.composetrainer.domain.model.toEntity
 import com.example.composetrainer.domain.repository.ProductRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -12,7 +14,7 @@ class ProductRepoImpl @Inject constructor(
 ): ProductRepository {
 
     override suspend fun addProduct(product: Product) {
-        val entity = ProductMapper.toEntity(product)
+        val entity = product.toEntity()
         productDao.insertProduct(entity)
     }
 
@@ -20,31 +22,31 @@ class ProductRepoImpl @Inject constructor(
         return productDao.getAllProducts()
             .map { entityList ->
                 entityList.map {
-                    entity -> ProductMapper.toDomain(entity)
+                    entity -> entity.toDomain()
                 }
             }
     }
 
     override fun searchProducts(query: String): Flow<List<Product>> {
         return productDao.searchProducts(query)
-            .map { entities -> entities.map { ProductMapper.toDomain(it) } }
+            .map { entities -> entities.map { it.toDomain() } }
     }
 
     override suspend fun deleteProduct(product: Product) {
-        productDao.deleteProduct(ProductMapper.toEntity(product))
+        productDao.deleteProduct(product.toEntity())
     }
 
     override suspend fun editProduct(product: Product) {
-        productDao.updateProduct(ProductMapper.toEntity(product))
+        productDao.updateProduct(product.toEntity())
     }
 
     override suspend fun updateProduct(product: Product) {
-        productDao.updateProduct(ProductMapper.toEntity(product))
+        productDao.updateProduct(product.toEntity())
     }
 
     override suspend fun getProductById(id: Long): Product? {
         val entity = productDao.getProductById(id)
-        return entity?.let { ProductMapper.toDomain(it) }
+        return entity?.toDomain()
     }
 
 }

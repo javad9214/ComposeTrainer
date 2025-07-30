@@ -25,37 +25,17 @@ interface InvoiceDao {
     suspend fun getLastInvoice(): InvoiceEntity?
 
     @Transaction
-    @Query(
-        """
-        SELECT i.id AS invoiceId,i.*, ip.*
-        FROM invoices AS i
-        JOIN invoice_products AS ip ON i.id = ip.invoiceId
-        WHERE i.id = :invoiceId
-    """
-    )
-    fun getInvoiceWithProducts(invoiceId: Long): Flow<List<InvoiceWithProductsRelation>>
+    @Query("SELECT * FROM invoices WHERE id = :invoiceId")
+    fun getInvoiceWithProducts(invoiceId: Long): Flow<InvoiceWithProductsRelation>
 
     @Transaction
-    @Query(
-        """
-        SELECT i.id AS invoiceId,i.*, ip.quantity
-        FROM invoices AS i 
-        INNER JOIN invoice_products AS ip ON i.id = ip.invoiceId
-        ORDER BY i.createdAt DESC
-    """
-    )
+    @Query("SELECT * FROM invoices ORDER BY createdAt DESC")
     fun getAllInvoiceWithProducts(): Flow<List<InvoiceWithProductsRelation>>
 
     @Transaction
-    @Query(
-        """
-        SELECT i.id AS invoiceId,i.*, ip.quantity
-        FROM invoices AS i 
-        INNER JOIN invoice_products AS ip ON i.id = ip.invoiceId
-        ORDER BY i.createdAt ASC
-    """
-    )
+    @Query("SELECT * FROM invoices ORDER BY createdAt ASC")
     fun getAllInvoiceWithProductsOldestFirst(): Flow<List<InvoiceWithProductsRelation>>
+
 
     // Analytics queries
     @Query(

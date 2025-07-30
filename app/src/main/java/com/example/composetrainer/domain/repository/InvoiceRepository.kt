@@ -4,7 +4,6 @@ package com.example.composetrainer.domain.repository
 
 import com.example.composetrainer.domain.model.InvoiceProduct
 import com.example.composetrainer.domain.model.InvoiceWithProducts
-import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.domain.model.TopSellingProductInfo
 import kotlinx.coroutines.flow.Flow
 

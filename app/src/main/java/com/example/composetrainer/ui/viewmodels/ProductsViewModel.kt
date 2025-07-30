@@ -5,7 +5,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.composetrainer.domain.model.Product
-import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.domain.usecase.product.AddProductUseCase
 import com.example.composetrainer.domain.usecase.product.DecreaseStockUseCase
 import com.example.composetrainer.domain.usecase.product.DeleteProductUseCase

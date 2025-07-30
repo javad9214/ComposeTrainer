@@ -1,12 +1,12 @@
 package com.example.composetrainer.domain.model
 
 import com.example.composetrainer.data.local.entity.ProductEntity
+import com.example.composetrainer.domain.model.type.Money
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.math.BigDecimal
-import java.math.RoundingMode
 
 // Domain Model
 data class Product(

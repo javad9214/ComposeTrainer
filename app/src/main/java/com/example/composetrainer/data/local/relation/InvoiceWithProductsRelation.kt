@@ -1,12 +1,17 @@
 package com.example.composetrainer.data.local.relation
 
 import androidx.room.Embedded
+import androidx.room.Relation
 import com.example.composetrainer.data.local.entity.InvoiceEntity
 import com.example.composetrainer.data.local.entity.InvoiceProductCrossRefEntity
 
 data class InvoiceWithProductsRelation (
-    val invoiceId: Long,
     @Embedded val invoice: InvoiceEntity,
-    @Embedded val invoiceProducts: List<InvoiceProductCrossRefEntity>,
+    @Relation(
+        parentColumn = "id",
+        entityColumn = "invoiceId",
+        entity = InvoiceProductCrossRefEntity::class
+    )
+    val invoiceProducts: List<InvoiceProductCrossRefEntity>
 
 )

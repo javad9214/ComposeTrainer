@@ -43,7 +43,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.Invoice
 import com.example.composetrainer.domain.model.Product
-import com.example.composetrainer.domain.model.ProductWithQuantity
 import com.example.composetrainer.ui.theme.BComps
 import com.example.composetrainer.ui.theme.BHoma
 import com.example.composetrainer.ui.theme.Beirut_Medium

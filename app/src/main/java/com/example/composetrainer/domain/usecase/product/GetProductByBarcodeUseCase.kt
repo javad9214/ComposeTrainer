@@ -14,7 +14,7 @@ class GetProductByBarcodeUseCase @Inject constructor(
         return productRepository.searchProducts(barcode)
             .map { products ->
             // Filter for exact barcode match and return the first match, or null if none found
-                products.firstOrNull { it.barcode == barcode }
+                products.firstOrNull { it.barcode?.value == barcode }
             }
             .firstOrNull()
     }

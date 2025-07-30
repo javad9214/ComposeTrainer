@@ -8,22 +8,22 @@ import java.time.LocalDateTime
 // Domain Model
 data class InvoiceWithProducts(
     val invoice: Invoice,
-    val products: List<InvoiceProduct>
+    val invoiceProducts: List<InvoiceProduct>
 ) {
     // Computed properties for convenience
     val invoiceId: InvoiceId get() = invoice.id
-    val totalProductsCount: Int get() = products.size
-    val totalQuantity: Int get() = products.sumOf { it.quantity.value }
+    val totalProductsCount: Int get() = invoiceProducts.size
+    val totalQuantity: Int get() = invoiceProducts.sumOf { it.quantity.value }
 
     // Validation
-    fun isValid(): Boolean = products.all { it.invoiceId == invoice.id }
+    fun isValid(): Boolean = invoiceProducts.all { it.invoiceId == invoice.id }
 
     companion object {
         // Factory method for creating empty InvoiceWithProducts
         fun empty(invoice: Invoice): InvoiceWithProducts {
             return InvoiceWithProducts(
                 invoice = invoice,
-                products = emptyList()
+                invoiceProducts = emptyList()
             )
         }
 
@@ -58,7 +58,7 @@ data class InvoiceWithProducts(
 
             return InvoiceWithProducts(
                 invoice = defaultInvoice,
-                products = emptyList()
+                invoiceProducts = emptyList()
             )
         }
 
@@ -72,7 +72,7 @@ data class InvoiceWithProducts(
 
             return InvoiceWithProducts(
                 invoice = invoice,
-                products = validProducts
+                invoiceProducts = validProducts
             ).syncInvoiceTotals() // Automatically sync totals
         }
 
@@ -121,7 +121,7 @@ data class InvoiceWithProducts(
 
             return InvoiceWithProducts(
                 invoice = invoice,
-                products = validProducts
+                invoiceProducts = validProducts
             )
         }
     }
@@ -132,14 +132,14 @@ data class InvoiceWithProducts(
 fun Invoice.withProducts(products: List<InvoiceProduct>): InvoiceWithProducts {
     return InvoiceWithProducts(
         invoice = this,
-        products = products.filter { it.invoiceId == this.id }
+        invoiceProducts = products.filter { it.invoiceId == this.id }
     )
 }
 
 fun Invoice.withoutProducts(): InvoiceWithProducts {
     return InvoiceWithProducts(
         invoice = this,
-        products = emptyList()
+        invoiceProducts = emptyList()
     )
 }
 
@@ -148,11 +148,11 @@ fun InvoiceWithProducts.addProduct(product: InvoiceProduct): InvoiceWithProducts
     require(product.invoiceId == this.invoiceId) {
         "Product invoiceId must match invoice id"
     }
-    return this.copy(products = products + product)
+    return this.copy(invoiceProducts = invoiceProducts + product)
 }
 
 fun InvoiceWithProducts.removeProduct(productId: ProductId): InvoiceWithProducts {
-    return this.copy(products = products.filterNot { it.productId == productId })
+    return this.copy(invoiceProducts = invoiceProducts.filterNot { it.productId == productId })
 }
 
 fun InvoiceWithProducts.updateProduct(
@@ -160,7 +160,7 @@ fun InvoiceWithProducts.updateProduct(
     updater: (InvoiceProduct) -> InvoiceProduct
 ): InvoiceWithProducts {
     return this.copy(
-        products = products.map { product ->
+        invoiceProducts = invoiceProducts.map { product ->
             if (product.productId == productId) {
                 updater(product).also { updated ->
                     require(updated.invoiceId == this.invoiceId) {
@@ -175,20 +175,20 @@ fun InvoiceWithProducts.updateProduct(
 }
 
 fun InvoiceWithProducts.getProduct(productId: ProductId): InvoiceProduct? {
-    return products.find { it.productId == productId }
+    return invoiceProducts.find { it.productId == productId }
 }
 
 fun InvoiceWithProducts.hasProduct(productId: ProductId): Boolean {
-    return products.any { it.productId == productId }
+    return invoiceProducts.any { it.productId == productId }
 }
 
 // Calculation extension functions
 fun InvoiceWithProducts.calculateTotalAmount(): Money {
-    return products.fold(Money(0)) { acc, product -> acc + product.total }
+    return invoiceProducts.fold(Money(0)) { acc, product -> acc + product.total }
 }
 
 fun InvoiceWithProducts.calculateTotalProfit(): Money {
-    return products.fold(Money(0)) { acc, product ->
+    return invoiceProducts.fold(Money(0)) { acc, product ->
         val profitPerUnit = product.priceAtSale - product.costPriceAtTransaction
         val totalProfit = Money(profitPerUnit.amount * product.quantity.value)
         acc + totalProfit
@@ -196,11 +196,11 @@ fun InvoiceWithProducts.calculateTotalProfit(): Money {
 }
 
 fun InvoiceWithProducts.calculateTotalDiscount(): Money {
-    return products.fold(Money(0)) { acc, product -> acc + product.discount }
+    return invoiceProducts.fold(Money(0)) { acc, product -> acc + product.discount }
 }
 
 fun InvoiceWithProducts.calculateTotalCost(): Money {
-    return products.fold(Money(0)) { acc, product ->
+    return invoiceProducts.fold(Money(0)) { acc, product ->
         val totalCost = Money(product.costPriceAtTransaction.amount * product.quantity.value)
         acc + totalCost
     }
@@ -225,7 +225,7 @@ fun InvoiceWithProducts.syncInvoiceTotals(): InvoiceWithProducts {
 // Mapping functions for different use cases
 fun InvoiceWithProducts.toInvoiceOnly(): Invoice = invoice
 
-fun InvoiceWithProducts.toProductsOnly(): List<InvoiceProduct> = products
+fun InvoiceWithProducts.toProductsOnly(): List<InvoiceProduct> = invoiceProducts
 
 fun InvoiceWithProducts.toInvoiceSummary(): InvoiceSummary {
     return InvoiceSummary(
@@ -235,7 +235,7 @@ fun InvoiceWithProducts.toInvoiceSummary(): InvoiceSummary {
         customerName = null, // You might need to join with customer data
         totalAmount = invoice.totalAmount ?: calculateTotalAmount(),
         status = invoice.status,
-        productsCount = products.size
+        productsCount = invoiceProducts.size
     )
 }
 
