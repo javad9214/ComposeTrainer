@@ -8,7 +8,12 @@ import java.time.LocalDateTime
 // Domain Model
 data class InvoiceWithProducts(
     val invoice: Invoice,
-    val invoiceProducts: List<InvoiceProduct>
+    val invoiceProducts: List<InvoiceProduct>,
+    /**
+     * The list of all Product domain models corresponding to invoiceProducts in this invoice.
+     * This field should be non-null and empty if there are no products.
+     */
+    val products: List<Product>
 ) {
     // Computed properties for convenience
     val invoiceId: InvoiceId get() = invoice.id
@@ -23,7 +28,8 @@ data class InvoiceWithProducts(
         fun empty(invoice: Invoice): InvoiceWithProducts {
             return InvoiceWithProducts(
                 invoice = invoice,
-                invoiceProducts = emptyList()
+                invoiceProducts = emptyList(),
+                products = emptyList()
             )
         }
 
@@ -58,21 +64,26 @@ data class InvoiceWithProducts(
 
             return InvoiceWithProducts(
                 invoice = defaultInvoice,
-                invoiceProducts = emptyList()
+                invoiceProducts = emptyList(),
+                products = emptyList()
             )
         }
 
         // Factory method for creating from existing data
         fun create(
             invoice: Invoice,
-            products: List<InvoiceProduct>
+            products: List<InvoiceProduct>,
+            allProducts: List<Product> = emptyList() // newly added for product mapping
         ): InvoiceWithProducts {
             // Filter products to ensure they belong to this invoice
             val validProducts = products.filter { it.invoiceId == invoice.id }
-
+            // Derive matching full Product objects
+            val invoiceProductIds = validProducts.map { it.productId }.toSet()
+            val validDomainProducts = allProducts.filter { it.id in invoiceProductIds }
             return InvoiceWithProducts(
                 invoice = invoice,
-                invoiceProducts = validProducts
+                invoiceProducts = validProducts,
+                products = validDomainProducts
             ).syncInvoiceTotals() // Automatically sync totals
         }
 
@@ -83,6 +94,7 @@ data class InvoiceWithProducts(
             invoiceNumber: InvoiceNumber,
             invoiceDate: LocalDateTime,
             products: List<InvoiceProduct>,
+            domainProducts: List<Product> = emptyList(), // NEW
             invoiceType: InvoiceType? = null,
             customerId: CustomerId? = null,
             status: InvoiceStatus? = null,
@@ -119,9 +131,13 @@ data class InvoiceWithProducts(
                 updatedAt = now
             )
 
+            val invoiceProductIds = validProducts.map { it.productId }.toSet()
+            val onlyProducts = domainProducts.filter { it.id in invoiceProductIds }
+
             return InvoiceWithProducts(
                 invoice = invoice,
-                invoiceProducts = validProducts
+                invoiceProducts = validProducts,
+                products = onlyProducts
             )
         }
     }
@@ -129,35 +145,54 @@ data class InvoiceWithProducts(
 }
 
 // Extension functions for Invoice
-fun Invoice.withProducts(products: List<InvoiceProduct>): InvoiceWithProducts {
+fun Invoice.withProducts(
+    products: List<InvoiceProduct>,
+    fullProducts: List<Product> = emptyList()
+): InvoiceWithProducts {
+    val invoiceProductIds = products.map { it.productId }.toSet()
+    val domainProducts = fullProducts.filter { it.id in invoiceProductIds }
     return InvoiceWithProducts(
         invoice = this,
-        invoiceProducts = products.filter { it.invoiceId == this.id }
+        invoiceProducts = products.filter { it.invoiceId == this.id },
+        products = domainProducts
     )
 }
 
 fun Invoice.withoutProducts(): InvoiceWithProducts {
     return InvoiceWithProducts(
         invoice = this,
-        invoiceProducts = emptyList()
+        invoiceProducts = emptyList(),
+        products = emptyList()
     )
 }
 
 // Extension functions for InvoiceWithProducts
-fun InvoiceWithProducts.addProduct(product: InvoiceProduct): InvoiceWithProducts {
+fun InvoiceWithProducts.addProduct(
+    product: InvoiceProduct,
+    domainProduct: Product?
+): InvoiceWithProducts {
     require(product.invoiceId == this.invoiceId) {
         "Product invoiceId must match invoice id"
     }
-    return this.copy(invoiceProducts = invoiceProducts + product)
+    val updatedDomainProducts =
+        if (domainProduct != null && !products.any { it.id == domainProduct.id }) products + domainProduct else products
+    return this.copy(
+        invoiceProducts = invoiceProducts + product,
+        products = updatedDomainProducts
+    )
 }
 
 fun InvoiceWithProducts.removeProduct(productId: ProductId): InvoiceWithProducts {
-    return this.copy(invoiceProducts = invoiceProducts.filterNot { it.productId == productId })
+    return this.copy(
+        invoiceProducts = invoiceProducts.filterNot { it.productId == productId },
+        products = products.filterNot { it.id == productId }
+    )
 }
 
 fun InvoiceWithProducts.updateProduct(
     productId: ProductId,
-    updater: (InvoiceProduct) -> InvoiceProduct
+    updater: (InvoiceProduct) -> InvoiceProduct,
+    domainProductUpdater: ((Product) -> Product)? = null // Optional domain product update
 ): InvoiceWithProducts {
     return this.copy(
         invoiceProducts = invoiceProducts.map { product ->
@@ -170,6 +205,9 @@ fun InvoiceWithProducts.updateProduct(
             } else {
                 product
             }
+        },
+        products = products.map {
+            if (it.id == productId && domainProductUpdater != null) domainProductUpdater(it) else it
         }
     )
 }
