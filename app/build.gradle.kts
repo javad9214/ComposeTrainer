@@ -11,14 +11,14 @@ plugins {
 
 android {
     namespace = "com.example.composetrainer"
-    compileSdk = 35
+    compileSdk = 36
 
     defaultConfig {
         applicationId = "com.example.composetrainer"
         minSdk = 26
-        targetSdk = 35
-        versionCode = 5
-        versionName = "0.3.4"
+        targetSdk = 36
+        versionCode = 6
+        versionName = "0.3.8"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {

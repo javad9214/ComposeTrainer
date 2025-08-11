@@ -9,10 +9,6 @@ import java.time.LocalDateTime
 data class InvoiceWithProducts(
     val invoice: Invoice,
     val invoiceProducts: List<InvoiceProduct>,
-    /**
-     * The list of all Product domain models corresponding to invoiceProducts in this invoice.
-     * This field should be non-null and empty if there are no products.
-     */
     val products: List<Product>
 ) {
     // Computed properties for convenience
@@ -35,9 +31,9 @@ data class InvoiceWithProducts(
 
         // Factory method for creating with default invoice values
         fun createDefault(
-            invoiceId: InvoiceId,
-            prefix: InvoicePrefix,
-            invoiceNumber: InvoiceNumber,
+            invoiceId: InvoiceId = InvoiceId(0),
+            prefix: InvoicePrefix = InvoicePrefix("INV"),
+            invoiceNumber: InvoiceNumber = InvoiceNumber(0),
             customerId: CustomerId? = null,
             invoiceType: InvoiceType? = null,
             paymentMethod: PaymentMethod? = null,
@@ -89,12 +85,12 @@ data class InvoiceWithProducts(
 
         // Factory method for creating with auto-calculated totals
         fun createWithCalculatedTotals(
-            invoiceId: InvoiceId,
-            prefix: InvoicePrefix,
+            invoiceId: InvoiceId = InvoiceId(0),
+            prefix: InvoicePrefix = InvoicePrefix("INV"),
             invoiceNumber: InvoiceNumber,
-            invoiceDate: LocalDateTime,
-            products: List<InvoiceProduct>,
-            domainProducts: List<Product> = emptyList(), // NEW
+            invoiceDate: LocalDateTime = LocalDateTime.now(),
+            invoiceProducts: List<InvoiceProduct>,
+            domainProducts: List<Product> = emptyList(),
             invoiceType: InvoiceType? = null,
             customerId: CustomerId? = null,
             status: InvoiceStatus? = null,
@@ -102,7 +98,7 @@ data class InvoiceWithProducts(
             notes: Note? = null
         ): InvoiceWithProducts {
             val now = LocalDateTime.now()
-            val validProducts = products.filter { it.invoiceId == invoiceId }
+            val validProducts = invoiceProducts.filter { it.invoiceId == invoiceId }
 
             // Calculate totals from products
             val totalAmount = validProducts.fold(Money(0)) { acc, product -> acc + product.total }

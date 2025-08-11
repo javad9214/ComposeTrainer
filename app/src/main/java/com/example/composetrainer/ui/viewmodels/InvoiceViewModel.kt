@@ -4,10 +4,15 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Invoice
+import com.example.composetrainer.domain.model.InvoiceNumber
+import com.example.composetrainer.domain.model.InvoiceProduct
+import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.ProductRepository
 import com.example.composetrainer.domain.usecase.invoice.DeleteInvoiceUseCase
+import com.example.composetrainer.domain.usecase.invoice.GetInvoiceNumberUseCase
+import com.example.composetrainer.domain.usecase.invoice.InsertInvoiceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -19,11 +24,16 @@ import javax.inject.Inject
 class InvoiceViewModel @Inject constructor(
     private val invoiceRepository: InvoiceRepository,
     private val productRepository: ProductRepository,
-    private val deleteInvoiceUseCase: DeleteInvoiceUseCase
+    private val deleteInvoiceUseCase: DeleteInvoiceUseCase,
+    private val insertInvoiceUseCase: InsertInvoiceUseCase,
+    private val getInvoiceNumberUseCase: GetInvoiceNumberUseCase
 ): ViewModel() {
 
-    private val _currentInvoice = MutableStateFlow<List<ProductWithQuantity>>(emptyList())
-    val currentInvoice: StateFlow<List<ProductWithQuantity>> get() = _currentInvoice
+    private val _currentInvoice = MutableStateFlow<List<InvoiceProduct>>(emptyList())
+    val currentInvoice: StateFlow<List<InvoiceProduct>> get() = _currentInvoice
+
+    private val _selectedProducts = MutableStateFlow<List<Product>>(emptyList())
+    val selectedProducts: StateFlow<List<Product>> get() = _selectedProducts
 
     private val _invoices = MutableStateFlow<List<Invoice>>(emptyList())
     val invoices: StateFlow<List<Invoice>> get() = _invoices
@@ -151,7 +161,14 @@ class InvoiceViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                invoiceRepository.createInvoice(_currentInvoice.value)
+                val invoiceNumber = getInvoiceNumberUseCase.invoke()
+                val invoiceWithProducts = InvoiceWithProducts.createWithCalculatedTotals(
+                        invoiceNumber = InvoiceNumber(invoiceNumber),
+                        domainProducts = _products.value,
+                        invoiceProducts = _currentInvoice.value
+                )
+
+                insertInvoiceUseCase.invoke(invoiceWithProducts)
                 _currentInvoice.value = emptyList()
                 loadInvoices() // Refresh invoice list
                 _errorMessage.value = null

@@ -2,6 +2,7 @@ package com.example.composetrainer.domain.repository
 
 
 
+import com.example.composetrainer.domain.model.Invoice
 import com.example.composetrainer.domain.model.InvoiceProduct
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.TopSellingProductInfo
@@ -9,28 +10,24 @@ import kotlinx.coroutines.flow.Flow
 
 interface InvoiceRepository {
 
-    /**
-     * Create a new invoice using the given product quantities.
-     * The resulting InvoiceWithProducts will include the full product info as well.
-     */
-    suspend fun createInvoice(products: List<InvoiceProduct>)
+    suspend fun createInvoice(invoice : Invoice)
 
     /**
      * Get a single invoice and its products by invoice ID. The returned InvoiceWithProducts
      * includes both itemized invoice products and the corresponding full product details (products property).
      */
-    suspend fun getInvoiceWithProducts(invoiceId: Long): Flow<InvoiceWithProducts>
+    fun getInvoiceWithProducts(invoiceId: Long): Flow<InvoiceWithProducts>
 
     /**
      * Get all invoices, each including both invoice product lines and the corresponding
      * full Product domain objects for each product in the invoice (products property).
      */
-    suspend fun getAllInvoices(): Flow<List<InvoiceWithProducts>>
+    fun getAllInvoices(): Flow<List<InvoiceWithProducts>>
 
     /**
      * Like getAllInvoices, but returns invoices sorted with oldest first. Each invoice includes full item and product details.
      */
-    suspend fun getAllInvoicesOldestFirst(): Flow<List<InvoiceWithProducts>>
+    fun getAllInvoicesOldestFirst(): Flow<List<InvoiceWithProducts>>
 
     suspend fun deleteInvoice(invoiceId: Long)
 
