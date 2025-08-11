@@ -13,7 +13,7 @@ interface InvoiceRepository {
      * Create a new invoice using the given product quantities.
      * The resulting InvoiceWithProducts will include the full product info as well.
      */
-    suspend fun createInvoice(products: List<ProductWithQuantity>)
+    suspend fun createInvoice(products: List<InvoiceProduct>)
 
     /**
      * Get a single invoice and its products by invoice ID. The returned InvoiceWithProducts

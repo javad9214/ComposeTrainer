@@ -4,6 +4,7 @@ import com.example.composetrainer.data.local.dao.InvoiceDao
 import com.example.composetrainer.data.local.dao.InvoiceProductDao
 import com.example.composetrainer.data.local.dao.ProductDao
 import com.example.composetrainer.data.local.relation.InvoiceWithProductsRelation
+import com.example.composetrainer.domain.model.InvoiceProduct
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.TopSellingProductInfo
 import com.example.composetrainer.domain.model.toDomain
@@ -23,7 +24,7 @@ class InvoiceRepoImpl @Inject constructor(
     private val addToProductSalesSummaryUseCase: AddToProductSalesSummaryUseCase
 ) : InvoiceRepository {
 
-    override suspend fun createInvoice(products: List<ProductWithQuantity>) {
+    override suspend fun createInvoice(products: List<InvoiceProduct>) {
 
     }
 
