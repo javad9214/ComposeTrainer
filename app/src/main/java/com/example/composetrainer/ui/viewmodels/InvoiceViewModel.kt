@@ -10,6 +10,7 @@ import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.ProductRepository
+import com.example.composetrainer.domain.usecase.invoice.CheckProductStockUseCase
 import com.example.composetrainer.domain.usecase.invoice.DeleteInvoiceUseCase
 import com.example.composetrainer.domain.usecase.invoice.GetInvoiceNumberUseCase
 import com.example.composetrainer.domain.usecase.invoice.InsertInvoiceUseCase
@@ -26,7 +27,8 @@ class InvoiceViewModel @Inject constructor(
     private val productRepository: ProductRepository,
     private val deleteInvoiceUseCase: DeleteInvoiceUseCase,
     private val insertInvoiceUseCase: InsertInvoiceUseCase,
-    private val getInvoiceNumberUseCase: GetInvoiceNumberUseCase
+    private val getInvoiceNumberUseCase: GetInvoiceNumberUseCase,
+    private val checkProductStockUseCase: CheckProductStockUseCase
 ): ViewModel() {
 
     private val _currentInvoice = MutableStateFlow<List<InvoiceProduct>>(emptyList())
@@ -84,12 +86,12 @@ class InvoiceViewModel @Inject constructor(
             try {
                 if (_sortNewestFirst.value) {
                     invoiceRepository.getAllInvoices().collectLatest { invoices ->
-                        _invoices.value = invoices.map { it.toDomain() }
+                        _invoices.value = invoices.map { it.invoice }
                         _isLoading.value = false
                     }
                 } else {
                     invoiceRepository.getAllInvoicesOldestFirst().collectLatest { invoices ->
-                        _invoices.value = invoices.map { it.toDomain() }
+                        _invoices.value = invoices.map { it.invoice }
                         _isLoading.value = false
                     }
                 }
@@ -122,18 +124,9 @@ class InvoiceViewModel @Inject constructor(
     }
 
     fun addToCurrentInvoice(product: Product, quantity: Int){
-        val existingItem = _currentInvoice.value.find { it.product.id == product.id }
-        val availableStock = product.stock ?: 0
+        val existingItem = _currentInvoice.value.find { it.productId == product.id }
+        val availableStock = product.stock
         val safeQuantityToAdd = if (quantity > availableStock) availableStock else quantity
-
-        Log.d(
-            "InvoiceViewModel",
-            "Adding product to invoice: ${product.name}, Quantity: $safeQuantityToAdd"
-        )
-        Log.d(
-            "InvoiceViewModel",
-            "Current invoice size before adding: ${_currentInvoice.value.size}"
-        )
 
         val updatedList = if (existingItem != null) {
             val newTotalQuantity = existingItem.quantity + safeQuantityToAdd
@@ -141,7 +134,7 @@ class InvoiceViewModel @Inject constructor(
                 if (newTotalQuantity > availableStock) availableStock else newTotalQuantity
 
             _currentInvoice.value.map {
-                if (it.product.id == product.id) {
+                if (it.productId == product.id) {
                     it.copy(quantity = finalQuantity)
                 } else it
             }
@@ -150,7 +143,6 @@ class InvoiceViewModel @Inject constructor(
         }
         _currentInvoice.value = updatedList
 
-        Log.d("InvoiceViewModel", "Updated invoice size: ${_currentInvoice.value.size}")
     }
 
     fun removeFromCurrentInvoice(productId: Long){
