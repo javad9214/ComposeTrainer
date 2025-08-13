@@ -40,15 +40,14 @@ import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.ui.components.BottomSheetDragHandle
 import com.example.composetrainer.ui.theme.BHoma
-import com.example.composetrainer.ui.theme.Kamran
-import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
+import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.str
 
 @Composable
 fun AddProductToInvoice(
     onClose: () -> Unit = {},
-    viewModel: InvoiceViewModel = hiltViewModel()
+    viewModel: InvoiceListViewModel = hiltViewModel()
 ) {
     val products by viewModel.products.collectAsState()
     val filteredProducts by viewModel.filteredProducts.collectAsState()

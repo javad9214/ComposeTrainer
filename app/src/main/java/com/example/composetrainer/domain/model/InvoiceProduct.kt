@@ -158,22 +158,22 @@ fun InvoiceProduct.toEntity(): InvoiceProductCrossRefEntity {
 // Factory for creating invoice products
 object InvoiceProductFactory {
     fun create(
-        invoiceId: Long,
-        productId: Long,
-        quantity: Int,
-        priceAtSale: Long,
-        costPriceAtTransaction: Long,
+        invoiceId: InvoiceId,
+        productId: ProductId,
+        quantity: Quantity,
+        priceAtSale: Money,
+        costPriceAtTransaction: Money,
         discount: Long = 0L
     ): InvoiceProduct {
-        val netUnitPrice = priceAtSale - discount
-        val calculatedTotal = netUnitPrice * quantity
+        val netUnitPrice = priceAtSale.amount - discount
+        val calculatedTotal = netUnitPrice * quantity.value
 
         return InvoiceProduct(
-            invoiceId = InvoiceId(invoiceId),
-            productId = ProductId(productId),
-            quantity = Quantity(quantity),
-            priceAtSale = Money(priceAtSale),
-            costPriceAtTransaction = Money(costPriceAtTransaction),
+            invoiceId = invoiceId,
+            productId = productId,
+            quantity = quantity,
+            priceAtSale = priceAtSale ,
+            costPriceAtTransaction = costPriceAtTransaction,
             discount = Money(discount),
             total = Money(calculatedTotal)
         )
@@ -195,11 +195,11 @@ object InvoiceProductFactory {
         }
 
         return create(
-            invoiceId = invoiceId,
-            productId = productId,
-            quantity = quantity,
-            priceAtSale = priceAtSale,
-            costPriceAtTransaction = costPriceAtTransaction,
+            invoiceId = InvoiceId(invoiceId),
+            productId = ProductId(productId),
+            quantity = Quantity(quantity),
+            priceAtSale = Money(priceAtSale),
+            costPriceAtTransaction = Money(costPriceAtTransaction),
             discount = discount
         )
     }

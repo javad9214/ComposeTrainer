@@ -46,7 +46,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.composetrainer.R
 import com.example.composetrainer.ui.screens.invoice.productselection.ProductSelectionBottomSheet
 import com.example.composetrainer.ui.theme.Kamran
-import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
+import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.viewmodels.HomeViewModel
 import com.example.composetrainer.ui.components.BarcodeScannerView
@@ -64,7 +64,7 @@ fun SettingScreen(
     navController: NavController = rememberNavController(),
     viewModel: ProductsViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel,
-    invoiceViewModel: InvoiceViewModel = hiltViewModel()
+    invoiceListViewModel: InvoiceListViewModel = hiltViewModel()
 ) {
     val products by viewModel.products.collectAsState()
     val progress by homeViewModel.progress.collectAsState()
@@ -102,10 +102,10 @@ fun SettingScreen(
             )
 
             // Add product to current invoice
-            invoiceViewModel.addToCurrentInvoice(product, 1)
+            invoiceListViewModel.addToCurrentInvoice(product, 1)
 
             // Check if product was added to invoice
-            val currentInvoiceItems = invoiceViewModel.currentInvoice.value
+            val currentInvoiceItems = invoiceListViewModel.currentInvoice.value
             Log.d(
                 SETTING_SCREEN_TAG,
                 "Invoice items after adding: ${currentInvoiceItems.size}, contains product: ${currentInvoiceItems.any { it.product.id == product.id }}"
@@ -406,7 +406,7 @@ fun SettingScreen(
                 ProductSelectionBottomSheet(
                     products = products,
                     onAddToInvoice = { product, quantity ->
-                        invoiceViewModel.addToCurrentInvoice(product, quantity)
+                        invoiceListViewModel.addToCurrentInvoice(product, quantity)
                         showBottomSheet = false
                     },
                     onDismiss = { showBottomSheet = false }

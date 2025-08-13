@@ -21,9 +21,9 @@ data class InvoiceWithProducts(
 
     companion object {
         // Factory method for creating empty InvoiceWithProducts
-        fun empty(invoice: Invoice): InvoiceWithProducts {
+        fun empty(): InvoiceWithProducts {
             return InvoiceWithProducts(
-                invoice = invoice,
+                invoice = InvoiceFactory.createDraft(),
                 invoiceProducts = emptyList(),
                 products = emptyList()
             )

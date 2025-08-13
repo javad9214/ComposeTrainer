@@ -232,7 +232,6 @@ fun Invoice.toEntity(): InvoiceEntity {
 // Factory for creating new invoices
 object InvoiceFactory {
     fun createDraft(
-        invoiceNumber: Long,
         customerId: Long? = null,
         invoiceType: InvoiceType = InvoiceType.SALE,
         prefix: String = "INV"
@@ -241,7 +240,7 @@ object InvoiceFactory {
         return Invoice(
             id = InvoiceId(0), // Will be set by database
             prefix = InvoicePrefix(prefix),
-            invoiceNumber = InvoiceNumber(invoiceNumber),
+            invoiceNumber = InvoiceNumber(0), //Must Be Set Later
             invoiceDate = now,
             invoiceType = invoiceType,
             customerId = customerId?.let { CustomerId(it) },

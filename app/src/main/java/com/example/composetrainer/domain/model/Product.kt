@@ -13,8 +13,8 @@ data class Product(
     val id: ProductId,
     val name: ProductName,
     val barcode: Barcode?,
-    val price: Money?, // Selling price
-    val costPrice: Money?, // Cost price for buying
+    val price: Money, // Selling price
+    val costPrice: Money, // Cost price for buying
     val description: ProductDescription?,
     val image: ProductImage?,
     val subcategoryId: SubcategoryId?,
@@ -308,8 +308,8 @@ fun ProductEntity.toDomain(): Product {
         id = ProductId(id),
         name = ProductName(name),
         barcode = barcode?.let { Barcode(it) },
-        price = price?.let { Money(it) },
-        costPrice = costPrice?.let { Money(it) },
+        price = price?.let { Money(it) } ?: Money(0),
+        costPrice = costPrice?.let { Money(it) } ?: Money(0),
         description = description?.let { ProductDescription(it) },
         image = image?.let { ProductImage(it) },
         subcategoryId = subcategoryId?.let { SubcategoryId(it) },

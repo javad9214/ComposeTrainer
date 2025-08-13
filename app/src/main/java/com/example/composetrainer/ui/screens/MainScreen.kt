@@ -1,10 +1,7 @@
 package com.example.composetrainer.ui.screens
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
@@ -32,7 +29,7 @@ import com.example.composetrainer.ui.screens.productlist.ProductDetailsScreen
 import com.example.composetrainer.ui.screens.productlist.ProductScreen
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.viewmodels.HomeViewModel
-import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
+import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.login.ui.screens.LoginScreen
 
 @Composable
@@ -42,7 +39,7 @@ fun MainScreen(
     onToggleTheme: () -> Unit = {}
 ) {
     // Create a shared InvoiceViewModel instance
-    val sharedInvoiceViewModel: InvoiceViewModel = hiltViewModel()
+    val sharedInvoiceListViewModel: InvoiceListViewModel = hiltViewModel()
 
     // Create a shared HomeViewModel instance for barcode scanning
     val sharedHomeViewModel: HomeViewModel = hiltViewModel()
@@ -115,7 +112,7 @@ fun MainScreen(
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = onToggleTheme,
                     navController = navController,
-                    invoiceViewModel = sharedInvoiceViewModel,
+                    invoiceListViewModel = sharedInvoiceListViewModel,
                     homeViewModel = sharedHomeViewModel
                 )
             }
@@ -144,7 +141,7 @@ fun MainScreen(
                     onClose = {
                         navController.popBackStack()
                     },
-                    viewModel = sharedInvoiceViewModel,
+                    viewModel = sharedInvoiceListViewModel,
                     homeViewModel = sharedHomeViewModel
                 )
             }
@@ -186,7 +183,7 @@ fun MainScreen(
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = onToggleTheme,
                     navController = navController,
-                    invoiceViewModel = sharedInvoiceViewModel,
+                    invoiceListViewModel = sharedInvoiceListViewModel,
                     homeViewModel = sharedHomeViewModel
                 )
             }

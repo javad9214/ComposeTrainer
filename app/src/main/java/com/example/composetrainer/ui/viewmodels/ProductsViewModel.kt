@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.lifecycle.viewmodel.compose.viewModel
 import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.domain.model.ProductId
+import com.example.composetrainer.domain.model.ProductName
 import com.example.composetrainer.domain.usecase.product.AddProductUseCase
 import com.example.composetrainer.domain.usecase.product.DecreaseStockUseCase
 import com.example.composetrainer.domain.usecase.product.DeleteProductUseCase
@@ -88,8 +90,8 @@ class ProductsViewModel @Inject constructor(
         viewModelScope.launch {
             repeat(5) {
                 val randomProduct = Product(
-                    id = 0L,
-                    name = "Product " + ('A'..'Z').random() + (100..999).random(),
+                    id = ProductId(0L),
+                    name = ProductName("Product " + ('A'..'Z').random() + (100..999).random()),
                     barcode = (100000000000..999999999999).random().toString(),
                     price = listOf(100L, 250L, 499L, 999L, 1299L).random(),
                     image = null,

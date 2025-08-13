@@ -1,25 +1,17 @@
 package com.example.composetrainer.ui.screens
 
 import android.util.Log
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Brightness4
-import androidx.compose.material.icons.filled.Brightness7
 import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material3.Button
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.LinearProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.material3.Text
 import androidx.compose.runtime.collectAsState
@@ -36,23 +28,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import android.widget.Toast
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
-import androidx.compose.material.icons.filled.AcUnit
-import androidx.compose.ui.graphics.Color
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.composetrainer.R
-import com.example.composetrainer.ui.screens.invoice.productselection.ProductSelectionBottomSheet
 import com.example.composetrainer.ui.theme.Kamran
-import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
+import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.viewmodels.HomeViewModel
-import com.example.composetrainer.ui.components.BarcodeScannerView
 import com.example.composetrainer.ui.navigation.Screen
-import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.str
 
 
@@ -65,7 +49,7 @@ fun HomeScreen(
     navController: NavController = rememberNavController(),
     viewModel: ProductsViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel,
-    invoiceViewModel: InvoiceViewModel = hiltViewModel()
+    invoiceListViewModel: InvoiceListViewModel = hiltViewModel()
 ) {
     val products by viewModel.products.collectAsState()
     val progress by homeViewModel.progress.collectAsState()
@@ -100,10 +84,10 @@ fun HomeScreen(
             Log.d(TAG, "Product found: ${product.name}, ID: ${product.id}, adding to invoice")
 
             // Add product to current invoice
-            invoiceViewModel.addToCurrentInvoice(product, 1)
+            invoiceListViewModel.addToCurrentInvoice(product, 1)
 
             // Check if product was added to invoice
-            val currentInvoiceItems = invoiceViewModel.currentInvoice.value
+            val currentInvoiceItems = invoiceListViewModel.currentInvoice.value
             Log.d(
                 TAG,
                 "Invoice items after adding: ${currentInvoiceItems.size}, contains product: ${currentInvoiceItems.any { it.product.id == product.id }}"

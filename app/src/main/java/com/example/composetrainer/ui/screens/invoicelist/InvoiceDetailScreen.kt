@@ -3,7 +3,6 @@ package com.example.composetrainer.ui.screens.invoicelist
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.ArrowBack
 import androidx.compose.material.icons.filled.Delete
@@ -26,11 +25,10 @@ import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.Invoice
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.ui.theme.BHoma
-import com.example.composetrainer.ui.theme.BKoodak
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.ui.theme.Beirut_Medium
-import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
+import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.utils.PriceValidator.formatPrice
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
@@ -43,7 +41,7 @@ fun InvoiceDetailScreen(
     invoiceId: Long,
     onNavigateBack: () -> Unit,
     onEditInvoice: (Long) -> Unit,
-    viewModel: InvoiceViewModel = hiltViewModel()
+    viewModel: InvoiceListViewModel = hiltViewModel()
 ) {
     val invoices by viewModel.invoices.collectAsState()
     val isLoading by viewModel.isLoading.collectAsState()

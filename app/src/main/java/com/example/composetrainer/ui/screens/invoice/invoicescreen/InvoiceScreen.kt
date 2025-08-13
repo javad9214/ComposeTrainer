@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -32,7 +31,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.ui.screens.invoice.productselection.AddProductToInvoice
-import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
+import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.ui.components.BarcodeScannerView
@@ -43,7 +42,7 @@ import com.example.composetrainer.utils.BarcodeSoundPlayer
 fun InvoiceScreen(
     onComplete: () -> Unit,
     onClose: () -> Unit,
-    viewModel: InvoiceViewModel = hiltViewModel(),
+    viewModel: InvoiceListViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
@@ -148,7 +147,7 @@ fun InvoiceScreen(
                 hasItems = invoiceItems.isNotEmpty(),
                 onSubmit = {
                     if (invoiceItems.isNotEmpty()) {
-                        viewModel.createInvoice()
+                        viewModel.saveInvoice()
                         onComplete()
                     }
                 },
