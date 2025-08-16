@@ -4,16 +4,18 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Barcode
-import com.example.composetrainer.domain.model.InvoiceProduct
 import com.example.composetrainer.domain.model.InvoiceProductFactory
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.ProductFactory
 import com.example.composetrainer.domain.model.ProductName
+import com.example.composetrainer.domain.model.Quantity
 import com.example.composetrainer.domain.model.StockQuantity
+import com.example.composetrainer.domain.model.autoCreateInvoice
 import com.example.composetrainer.domain.model.type.Money
 import com.example.composetrainer.domain.usecase.invoice.InitInvoiceWithProductsUseCase
 import com.example.composetrainer.domain.usecase.invoice.InsertInvoiceUseCase
 import com.example.composetrainer.domain.usecase.product.AddProductUseCase
+import com.example.composetrainer.domain.usecase.product.EditProductUseCase
 import com.example.composetrainer.domain.usecase.product.GetProductUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -27,7 +29,8 @@ class SettingViewModel @Inject constructor(
     private val insertInvoiceUseCase: InsertInvoiceUseCase,
     private val getProductsUseCase: GetProductUseCase,
     private val addProductUseCase: AddProductUseCase,
-    private val initInvoiceWithProductsUseCase: InitInvoiceWithProductsUseCase
+    private val initInvoiceWithProductsUseCase: InitInvoiceWithProductsUseCase,
+    private val editProductUseCase: EditProductUseCase
 ) : ViewModel() {
 
     private val _isLoading = MutableStateFlow(false)
@@ -73,7 +76,7 @@ class SettingViewModel @Inject constructor(
             _isLoading.value = true
             _invoiceCreationProgress.value = 0
             try {
-                val invoiceWithProducts: InvoiceWithProducts =
+                var invoiceWithProducts: InvoiceWithProducts =
                     initInvoiceWithProductsUseCase.invoke()
                 // Get all products first
                 val allProducts = getProductsUseCase(SortOrder.DESCENDING, "").first()
@@ -92,7 +95,6 @@ class SettingViewModel @Inject constructor(
                 repeat(5) { invoiceIndex ->
                     // Each invoice has between 4 to 14 products
                     val productCount = (4..14).random()
-                    val invoiceProducts = mutableListOf<InvoiceProduct>()
 
                     // Randomly select products for this invoice
                     val shuffledProducts = allProducts.shuffled()
@@ -102,21 +104,30 @@ class SettingViewModel @Inject constructor(
                             val product = shuffledProducts[productIndex]
                             // Each product has quantity between 1 to 8
                             val quantity = (1..8).random()
-                            invoiceProducts.add(
-                                InvoiceProduct(
-                                    invoiceId = invoiceWithProducts.invoiceId,
-                                    productId = product.productId,
-                                )
+                            val invoiceProduct = InvoiceProductFactory.create(
+                                invoiceId = invoiceWithProducts.invoiceId,
+                                productId = product.id,
+                                quantity = Quantity(quantity),
+                                priceAtSale = product.price,
+                                costPriceAtTransaction = product.costPrice,
+                                discount = (0..10).random().toLong()
                             )
+                            invoiceWithProducts =
+                                invoiceWithProducts.copy(products = invoiceWithProducts.products + product)
+
+                            invoiceWithProducts =
+                                invoiceWithProducts.copy(invoiceProducts = invoiceWithProducts.invoiceProducts + invoiceProduct)
                         }
                     }
 
+                    invoiceWithProducts = invoiceWithProducts.autoCreateInvoice()
+
                     // Create the invoice
-                    if (invoiceProducts.isNotEmpty()) {
-                        insertInvoiceUseCase.invoke(invoiceProducts)
+                    if (invoiceWithProducts.isValid()) {
+                        insertInvoiceUseCase.invoke(invoiceWithProducts)
                         Log.d(
                             TAG,
-                            "Created invoice ${invoiceIndex + 1} with ${invoiceProducts.size} products"
+                            "Created invoice ${invoiceIndex + 1} with ${invoiceWithProducts.products.size} products"
                         )
                     }
 
@@ -150,14 +161,12 @@ class SettingViewModel @Inject constructor(
 
                 // Update each product with a random cost price between 1000 and 500000
                 allProducts.forEach { product ->
-                    val randomCostPrice = (product.price ?: 0L) - (10..1000).random()
-                    val updatedProduct = product.copy(costPrice = randomCostPrice)
+                    val randomCostPrice = (product.price.amount ?: 0L) - (10..1000).random()
+                    val updatedProduct = product.copy(costPrice = Money(randomCostPrice))
                     editProductUseCase(updatedProduct)
                     Log.d(TAG, "Updated product ${product.name} with cost price $randomCostPrice")
                 }
 
-                // Refresh the products list
-                loadProducts()
 
                 Log.d(TAG, "Finished updating cost prices for ${allProducts.size} products")
             } catch (e: Exception) {
@@ -203,8 +212,6 @@ class SettingViewModel @Inject constructor(
                     }
                 }
 
-                // Refresh the products list
-                loadProducts()
 
                 Log.d(TAG, "Finished updating prices for ${productsWithNullPrices.size} products")
 
@@ -257,8 +264,6 @@ class SettingViewModel @Inject constructor(
                     }
                 }
 
-                // Refresh the products list
-                loadProducts()
 
                 Log.d(TAG, "Finished updating stock for ${allProducts.size} products")
 

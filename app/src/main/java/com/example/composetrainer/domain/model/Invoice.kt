@@ -258,8 +258,9 @@ object InvoiceFactory {
     }
 
     fun createComplete(
+        invoiceId: InvoiceId,
         invoiceNumber: Long,
-        customerId: Long,
+        customerId: Long = 0L,
         totalAmount: Long,
         totalProfit: Long? = null,
         discount: Long = 0L,
@@ -269,7 +270,7 @@ object InvoiceFactory {
     ): Invoice {
         val now = LocalDateTime.now()
         return Invoice(
-            id = InvoiceId(0),
+            id = invoiceId,
             prefix = InvoicePrefix(prefix),
             invoiceNumber = InvoiceNumber(invoiceNumber),
             invoiceDate = now,

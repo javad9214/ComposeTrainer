@@ -216,6 +216,143 @@ fun InvoiceWithProducts.hasProduct(productId: ProductId): Boolean {
     return invoiceProducts.any { it.productId == productId }
 }
 
+// Extension function to auto-create Invoice from invoiceProducts data and update InvoiceWithProducts
+fun InvoiceWithProducts.autoCreateInvoice(): InvoiceWithProducts {
+    // Extract invoiceId and invoiceNumber from invoiceProducts
+    val extractedInvoiceId = invoiceProducts.firstOrNull()?.invoiceId
+        ?: throw IllegalStateException("Cannot create invoice: no invoice products available")
+
+    // For invoice number, we'll use the invoiceId value as invoice number
+    // You can modify this logic based on your business requirements
+    val extractedInvoiceNumber = InvoiceNumber(extractedInvoiceId.value)
+
+    val now = LocalDateTime.now()
+
+    // Calculate totals from invoice products
+    val calculatedTotalAmount = invoiceProducts.fold(Money(0)) { acc, product ->
+        acc + product.total
+    }
+
+    val calculatedTotalProfit = invoiceProducts.fold(Money(0)) { acc, product ->
+        val profitPerUnit = product.priceAtSale - product.costPriceAtTransaction
+        val totalProfit = Money(profitPerUnit.amount * product.quantity.value)
+        acc + totalProfit
+    }
+
+    val calculatedTotalDiscount = invoiceProducts.fold(Money(0)) { acc, product ->
+        acc + product.discount
+    }
+
+    // Create new invoice with extracted and calculated data
+    val newInvoice = Invoice(
+        id = extractedInvoiceId,
+        prefix = InvoicePrefix("INV"), // Default prefix, you can make this configurable
+        invoiceNumber = extractedInvoiceNumber,
+        invoiceDate = now,
+        invoiceType = InvoiceType.SALE, // Default type, you can make this configurable
+        customerId = null, // Will need to be set separately if needed
+        totalAmount = if (invoiceProducts.isNotEmpty()) calculatedTotalAmount else null,
+        totalProfit = if (invoiceProducts.isNotEmpty()) calculatedTotalProfit else null,
+        totalDiscount = calculatedTotalDiscount,
+        status = InvoiceStatus.DRAFT, // Default status
+        paymentMethod = null, // Will need to be set separately if needed
+        notes = null,
+        synced = false,
+        createdAt = now,
+        updatedAt = now
+    )
+
+    // Return updated InvoiceWithProducts with the new invoice
+    return this.copy(
+        invoice = newInvoice
+    )
+}
+
+// Alternative version with configurable parameters
+fun InvoiceWithProducts.autoCreateInvoice(
+    prefix: InvoicePrefix = InvoicePrefix("INV"),
+    invoiceType: InvoiceType = InvoiceType.SALE,
+    customerId: CustomerId? = null,
+    status: InvoiceStatus = InvoiceStatus.DRAFT,
+    paymentMethod: PaymentMethod? = null,
+    notes: Note? = null
+): InvoiceWithProducts {
+    // Extract invoiceId from invoiceProducts
+    val extractedInvoiceId = invoiceProducts.firstOrNull()?.invoiceId
+        ?: throw IllegalStateException("Cannot create invoice: no invoice products available")
+
+    // Use invoiceId value as invoice number (you can modify this logic)
+    val extractedInvoiceNumber = InvoiceNumber(extractedInvoiceId.value)
+
+    val now = LocalDateTime.now()
+
+    // Calculate totals from invoice products
+    val calculatedTotalAmount = invoiceProducts.fold(Money(0)) { acc, product ->
+        acc + product.total
+    }
+
+    val calculatedTotalProfit = invoiceProducts.fold(Money(0)) { acc, product ->
+        val profitPerUnit = product.priceAtSale - product.costPriceAtTransaction
+        val totalProfit = Money(profitPerUnit.amount * product.quantity.value)
+        acc + totalProfit
+    }
+
+    val calculatedTotalDiscount = invoiceProducts.fold(Money(0)) { acc, product ->
+        acc + product.discount
+    }
+
+    // Create new invoice with extracted and calculated data
+    val newInvoice = Invoice(
+        id = extractedInvoiceId,
+        prefix = prefix,
+        invoiceNumber = extractedInvoiceNumber,
+        invoiceDate = now,
+        invoiceType = invoiceType,
+        customerId = customerId,
+        totalAmount = if (invoiceProducts.isNotEmpty()) calculatedTotalAmount else null,
+        totalProfit = if (invoiceProducts.isNotEmpty()) calculatedTotalProfit else null,
+        totalDiscount = calculatedTotalDiscount,
+        status = status,
+        paymentMethod = paymentMethod,
+        notes = notes,
+        synced = false,
+        createdAt = now,
+        updatedAt = now
+    )
+
+    // Return updated InvoiceWithProducts with the new invoice
+    return this.copy(
+        invoice = newInvoice
+    )
+}
+
+// Alternative version that uses the existing invoice as a template but recalculates totals
+fun InvoiceWithProducts.autoCreateInvoiceFromTemplate(): Invoice {
+    val now = LocalDateTime.now()
+
+    // Calculate totals from invoice products
+    val calculatedTotalAmount = invoiceProducts.fold(Money(0)) { acc, product ->
+        acc + product.total
+    }
+
+    val calculatedTotalProfit = invoiceProducts.fold(Money(0)) { acc, product ->
+        val profitPerUnit = product.priceAtSale - product.costPriceAtTransaction
+        val totalProfit = Money(profitPerUnit.amount * product.quantity.value)
+        acc + totalProfit
+    }
+
+    val calculatedTotalDiscount = invoiceProducts.fold(Money(0)) { acc, product ->
+        acc + product.discount
+    }
+
+    return invoice.copy(
+        totalAmount = if (invoiceProducts.isNotEmpty()) calculatedTotalAmount else null,
+        totalProfit = if (invoiceProducts.isNotEmpty()) calculatedTotalProfit else null,
+        totalDiscount = calculatedTotalDiscount,
+        updatedAt = now
+    )
+}
+
 // Calculation extension functions
 fun InvoiceWithProducts.calculateTotalAmount(): Money {
     return invoiceProducts.fold(Money(0)) { acc, product -> acc + product.total }
