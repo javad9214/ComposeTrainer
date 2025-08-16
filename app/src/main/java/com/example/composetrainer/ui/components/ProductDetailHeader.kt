@@ -52,7 +52,7 @@ fun ProductDetailHeader(
             Spacer(Modifier.width(8.dp))
             Column(modifier = Modifier.weight(1f)) {
                 Text(
-                    text = product.name,
+                    text = product.name.value,
                     style = MaterialTheme.typography.titleLarge,
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     maxLines = 1,

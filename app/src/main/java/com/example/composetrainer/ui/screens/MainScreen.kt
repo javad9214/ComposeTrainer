@@ -141,7 +141,7 @@ fun MainScreen(
                     onClose = {
                         navController.popBackStack()
                     },
-                    viewModel = sharedInvoiceListViewModel,
+                    invoiceListViewModel = sharedInvoiceListViewModel,
                     homeViewModel = sharedHomeViewModel
                 )
             }

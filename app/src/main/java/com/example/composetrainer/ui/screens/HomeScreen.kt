@@ -28,7 +28,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import android.widget.Toast
-import androidx.compose.foundation.layout.size
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.composetrainer.R
@@ -37,6 +36,7 @@ import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.viewmodels.HomeViewModel
 import com.example.composetrainer.ui.navigation.Screen
+import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.utils.str
 
 
@@ -47,11 +47,13 @@ fun HomeScreen(
     onToggleTheme: () -> Unit = {},
     isDarkTheme: Boolean = false,
     navController: NavController = rememberNavController(),
-    viewModel: ProductsViewModel = hiltViewModel(),
+    productViewModel: ProductsViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel,
-    invoiceListViewModel: InvoiceListViewModel = hiltViewModel()
+    invoiceListViewModel: InvoiceListViewModel = hiltViewModel(),
+    invoiceViewModel: InvoiceViewModel = hiltViewModel()
+
 ) {
-    val products by viewModel.products.collectAsState()
+    val products by productViewModel.products.collectAsState()
     val progress by homeViewModel.progress.collectAsState()
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -65,17 +67,17 @@ fun HomeScreen(
     val errorMessage by homeViewModel.errorMessage.collectAsState()
 
     // Observe price update completion
-    val priceUpdateMessage by viewModel.priceUpdateComplete.collectAsState()
-    val priceUpdateProgress by viewModel.priceUpdateProgress.collectAsState()
-    val productsLoading by viewModel.isLoading.collectAsState()
+    val priceUpdateMessage by productViewModel.priceUpdateComplete.collectAsState()
+    val priceUpdateProgress by productViewModel.priceUpdateProgress.collectAsState()
+    val productsLoading by productViewModel.isLoading.collectAsState()
 
     // Observe stock update completion
-    val stockUpdateMessage by viewModel.stockUpdateComplete.collectAsState()
-    val stockUpdateProgress by viewModel.stockUpdateProgress.collectAsState()
+    val stockUpdateMessage by productViewModel.stockUpdateComplete.collectAsState()
+    val stockUpdateProgress by productViewModel.stockUpdateProgress.collectAsState()
     
     // Observe invoice creation completion
-    val invoiceCreationMessage by viewModel.invoiceCreationComplete.collectAsState()
-    val invoiceCreationProgress by viewModel.invoiceCreationProgress.collectAsState()
+    val invoiceCreationMessage by productViewModel.invoiceCreationComplete.collectAsState()
+    val invoiceCreationProgress by productViewModel.invoiceCreationProgress.collectAsState()
 
     // Handle navigation when product is found
     LaunchedEffect(scannedProduct) {
@@ -84,47 +86,16 @@ fun HomeScreen(
             Log.d(TAG, "Product found: ${product.name}, ID: ${product.id}, adding to invoice")
 
             // Add product to current invoice
-            invoiceListViewModel.addToCurrentInvoice(product, 1)
+            invoiceViewModel.addToCurrentInvoice(product, 1)
 
             // Check if product was added to invoice
-            val currentInvoiceItems = invoiceListViewModel.currentInvoice.value
-            Log.d(
-                TAG,
-                "Invoice items after adding: ${currentInvoiceItems.size}, contains product: ${currentInvoiceItems.any { it.product.id == product.id }}"
-            )
+            val currentInvoiceItems = invoiceViewModel.currentInvoice.value
 
             // Navigate to invoice screen
             navController.navigate(Screen.Invoice.route)
 
             // Clear the scanned product
             homeViewModel.clearScannedProduct()
-        }
-    }
-
-    // Show toast for price update completion
-    priceUpdateMessage?.let { message ->
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-        // Clear the message after showing
-        LaunchedEffect(message) {
-            viewModel.clearPriceUpdateMessage()
-        }
-    }
-
-    // Show toast for stock update completion
-    stockUpdateMessage?.let { message ->
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-        // Clear the message after showing
-        LaunchedEffect(message) {
-            viewModel.clearStockUpdateMessage()
-        }
-    }
-    
-    // Show toast for invoice creation completion
-    invoiceCreationMessage?.let { message ->
-        Toast.makeText(context, message, Toast.LENGTH_LONG).show()
-        // Clear the message after showing
-        LaunchedEffect(message) {
-            viewModel.clearInvoiceCreationMessage()
         }
     }
 

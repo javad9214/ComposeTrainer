@@ -30,30 +30,32 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
+import com.example.composetrainer.domain.model.calculateTotalAmount
 import com.example.composetrainer.ui.screens.invoice.productselection.AddProductToInvoice
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.ui.components.BarcodeScannerView
 import com.example.composetrainer.ui.viewmodels.HomeViewModel
+import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.utils.BarcodeSoundPlayer
 
 @Composable
 fun InvoiceScreen(
     onComplete: () -> Unit,
     onClose: () -> Unit,
-    viewModel: InvoiceListViewModel = hiltViewModel(),
+    invoiceListViewModel: InvoiceListViewModel = hiltViewModel(),
+    invoiceViewModel: InvoiceViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
     val persianDate = remember { FarsiDateUtil.getTodayPersianDate() }
     val currentTime = remember { FarsiDateUtil.getCurrentTimeFormatted() }
-    val nextInvoiceNumber by viewModel.nextInvoiceNumber.collectAsState()
     var showProductSelection by remember { mutableStateOf(false) }
     var showBarcodeScannerView by remember { mutableStateOf(false) }
-    val products by viewModel.products.collectAsState()
-    val invoiceItems by viewModel.currentInvoice.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
+    val products by invoiceListViewModel.products.collectAsState()
+    val currentInvoice by invoiceViewModel.currentInvoice.collectAsState()
+    val isLoading by invoiceListViewModel.isLoading.collectAsState()
 
     // Observe scanned product from HomeViewModel for barcode scanning
     val scannedProduct by homeViewModel.scannedProduct.collectAsState()
@@ -63,41 +65,24 @@ fun InvoiceScreen(
     // Context for MediaPlayer
     val context = LocalContext.current
 
-    // Debug logs to check invoice items
-    LaunchedEffect(Unit) {
-        Log.d("InvoiceScreen", "Current invoice items on screen load: ${invoiceItems.size}")
-        invoiceItems.forEach {
-            Log.d("InvoiceScreen", "Item: ${it.product.name}, Quantity: ${it.quantity}")
-        }
-    }
-
-    // Monitor changes to invoice items
-    LaunchedEffect(invoiceItems) {
-        Log.d("InvoiceScreen", "Invoice items updated, new size: ${invoiceItems.size}")
-    }
-
-    LaunchedEffect(key1 = true) {
-        viewModel.getNextInvoiceNumberId()
-    }
-
     // Handle when a product is found by barcode
     LaunchedEffect(scannedProduct) {
         scannedProduct?.let { product ->
             // Add product to invoice
-            viewModel.addToCurrentInvoice(product, 1)
+            invoiceViewModel.addToCurrentInvoice(product, 1)
             Log.d("InvoiceScreen", "Added product from barcode: ${product.name}")
             // Clear scanned product
             homeViewModel.clearScannedProduct()
         }
     }
 
-    val totalPrice = invoiceItems.sumOf { it.product.price?.times(it.quantity) ?: 0L }
+    val totalPrice = currentInvoice.calculateTotalAmount()
 
     Box(modifier = Modifier.fillMaxSize()) {
         Column(modifier = Modifier.fillMaxSize()) {
             HeaderSection(
-                invoiceNumber = nextInvoiceNumber?.toInt(),
-                persianDate = persianDate.toString(),
+                invoiceNumber = currentInvoice.invoice.invoiceNumber.value.toString(),
+                persianDate = persianDate,
                 currentTime = currentTime,
                 onAddProductClick = { showProductSelection = true },
                 onClose = onClose,
@@ -105,19 +90,20 @@ fun InvoiceScreen(
             )
 
             // Products list section
-            if (invoiceItems.isNotEmpty()) {
+            if (currentInvoice.isValid()) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
                         .padding(horizontal = dimen(R.dimen.space_2))
                 ) {
-                    items(invoiceItems) { item ->
+                    items(currentInvoice.totalProductsCount) { item ->
                         InvoiceProductItem(
-                            productWithQuantity = item,
-                            onRemove = { viewModel.removeFromCurrentInvoice(item.product.id) },
+                            productWithQuantity = currentInvoice.invoiceProducts[item],
+                            product = currentInvoice.products[item],
+                            onRemove = { invoiceViewModel.removeFromCurrentInvoice(currentInvoice.products[item].id.value) },
                             onQuantityChange = { newQuantity ->
-                                viewModel.updateItemQuantity(item.product.id, newQuantity)
+                                invoiceViewModel.updateItemQuantity(currentInvoice.products[item].id.value, newQuantity)
                             }
                         )
                     }
@@ -142,12 +128,12 @@ fun InvoiceScreen(
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
             // Bottom total section
             BottomTotalSection(
-                totalPrice = totalPrice,
+                totalPrice = totalPrice.amount,
                 isLoading = isLoading,
-                hasItems = invoiceItems.isNotEmpty(),
+                hasItems = currentInvoice.products.isEmpty(),
                 onSubmit = {
-                    if (invoiceItems.isNotEmpty()) {
-                        viewModel.saveInvoice()
+                    if (currentInvoice.isValid()) {
+                        invoiceViewModel.saveInvoice()
                         onComplete()
                     }
                 },

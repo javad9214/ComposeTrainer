@@ -40,6 +40,8 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.composetrainer.R
+import com.example.composetrainer.domain.model.InvoiceProduct
+import com.example.composetrainer.domain.model.InvoiceProductFactory
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
@@ -48,7 +50,8 @@ import com.example.composetrainer.utils.dimen
 
 @Composable
 fun InvoiceProductItem(
-    productWithQuantity: ProductWithQuantity,
+    productWithQuantity: InvoiceProduct,
+    product: Product,
     onRemove: () -> Unit,
     onQuantityChange: (Int) -> Unit
 ) {
@@ -74,7 +77,7 @@ fun InvoiceProductItem(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Text(
-                        text = productWithQuantity.product.name,
+                        text = product.name.value,
                         style = MaterialTheme.typography.titleMedium.copy(
                             fontWeight = FontWeight.Bold,
                             fontSize = 16.sp
@@ -114,7 +117,7 @@ fun InvoiceProductItem(
                     )
                     
                     Text(
-                        text = "${productWithQuantity.product.price ?: 0}",
+                        text = product.price.toString(),
                         style = MaterialTheme.typography.bodyMedium.copy(
                             fontWeight = FontWeight.Medium,
                             color = MaterialTheme.colorScheme.onSurface
@@ -125,11 +128,9 @@ fun InvoiceProductItem(
 
                     // Available stock indicator
                     Text(
-                        text = "موجودی: ${productWithQuantity.product.stock ?: 0}",
+                        text = "موجودی: ${product.stock}",
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = if ((productWithQuantity.quantity) >= (productWithQuantity.product.stock
-                                    ?: 0)
-                            )
+                            color = if ((productWithQuantity.quantity.value) >= product.stock.value)
                                 MaterialTheme.colorScheme.error
                             else
                                 MaterialTheme.colorScheme.onSurfaceVariant
@@ -158,7 +159,7 @@ fun InvoiceProductItem(
                     ) {
                         FilledTonalIconButton(
                             onClick = {
-                                val newQuantity = productWithQuantity.quantity - 1
+                                val newQuantity = productWithQuantity.quantity.value - 1
                                 if (newQuantity > 0) {
                                     onQuantityChange(newQuantity)
                                 }
@@ -182,8 +183,7 @@ fun InvoiceProductItem(
                             contentAlignment = Alignment.Center
                         ) {
                             val isNearingLimit =
-                                productWithQuantity.quantity >= (productWithQuantity.product.stock
-                                    ?: 0)
+                                productWithQuantity.quantity.value >= product.stock.value
 
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
@@ -201,8 +201,8 @@ fun InvoiceProductItem(
                         
                         FilledTonalIconButton(
                             onClick = {
-                                val newQuantity = productWithQuantity.quantity + 1
-                                val stock = productWithQuantity.product.stock ?: 0
+                                val newQuantity = productWithQuantity.quantity.value + 1
+                                val stock = product.stock.value
                                 if (newQuantity <= stock) {
                                     onQuantityChange(newQuantity)
                                 }
@@ -219,8 +219,7 @@ fun InvoiceProductItem(
                                     alpha = 0.12f
                                 )
                             ),
-                            enabled = productWithQuantity.quantity < (productWithQuantity.product.stock
-                                ?: 0)
+                            enabled = productWithQuantity.quantity.value < product.stock.value
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.Add,
@@ -241,7 +240,7 @@ fun InvoiceProductItem(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.height(dimen(R.dimen.size_sm))
                         ) {
-                            val itemTotal = productWithQuantity.product.price?.times(productWithQuantity.quantity) ?: 0
+                            val itemTotal = productWithQuantity.calculateTotal()
                             Text(
                                 text = PriceValidator.formatPrice(itemTotal.toString()),
                                 modifier = Modifier
@@ -265,42 +264,5 @@ fun InvoiceProductItem(
                 }
             }
         }
-    }
-}
-
-@Preview(
-    name = "Invoice Product Item",
-    showBackground = true,
-    backgroundColor = 0xFFF5F5F5
-)
-@Composable
-fun InvoiceProductItemPreview() {
-    ComposeTrainerTheme {
-        InvoiceProductItem(
-            productWithQuantity = ProductWithQuantity(
-                product = Product(
-                    id = 1,
-                    name = "محصول نمونه",
-                    barcode = "123456789",
-                    price = 25000,
-                    image = null,
-                    subCategoryId = null,
-                    date = System.currentTimeMillis(),
-                    stock = 10,
-                    costPrice = null,
-                    description = null,
-                    supplierId = null,
-                    unit = null,
-                    minStockLevel = null,
-                    maxStockLevel = null,
-                    isActive = true,
-                    tags = null,
-                    lastSoldDate = null
-                ),
-                quantity = 3
-            ),
-            onRemove = { },
-            onQuantityChange = { }
-        )
     }
 }

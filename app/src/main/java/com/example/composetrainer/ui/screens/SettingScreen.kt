@@ -51,6 +51,8 @@ import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.viewmodels.HomeViewModel
 import com.example.composetrainer.ui.components.BarcodeScannerView
 import com.example.composetrainer.ui.navigation.Screen
+import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
+import com.example.composetrainer.ui.viewmodels.SettingViewModel
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.str
 
@@ -62,11 +64,13 @@ fun SettingScreen(
     onToggleTheme: () -> Unit = {},
     isDarkTheme: Boolean = false,
     navController: NavController = rememberNavController(),
-    viewModel: ProductsViewModel = hiltViewModel(),
+    settingViewModel: SettingViewModel = hiltViewModel(),
+    productsViewModel: ProductsViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel,
-    invoiceListViewModel: InvoiceListViewModel = hiltViewModel()
+    invoiceListViewModel: InvoiceListViewModel = hiltViewModel(),
+    invoiceViewModel: InvoiceViewModel = hiltViewModel(),
 ) {
-    val products by viewModel.products.collectAsState()
+    val products by productsViewModel.products.collectAsState()
     val progress by homeViewModel.progress.collectAsState()
     val sheetState = rememberModalBottomSheetState()
     val scope = rememberCoroutineScope()
@@ -80,17 +84,17 @@ fun SettingScreen(
     val errorMessage by homeViewModel.errorMessage.collectAsState()
 
     // Observe price update completion
-    val priceUpdateMessage by viewModel.priceUpdateComplete.collectAsState()
-    val priceUpdateProgress by viewModel.priceUpdateProgress.collectAsState()
-    val productsLoading by viewModel.isLoading.collectAsState()
+    val priceUpdateMessage by settingViewModel.priceUpdateComplete.collectAsState()
+    val priceUpdateProgress by settingViewModel.priceUpdateProgress.collectAsState()
+    val productsLoading by settingViewModel.isLoading.collectAsState()
 
     // Observe stock update completion
-    val stockUpdateMessage by viewModel.stockUpdateComplete.collectAsState()
-    val stockUpdateProgress by viewModel.stockUpdateProgress.collectAsState()
+    val stockUpdateMessage by settingViewModel.stockUpdateComplete.collectAsState()
+    val stockUpdateProgress by settingViewModel.stockUpdateProgress.collectAsState()
 
     // Observe invoice creation completion
-    val invoiceCreationMessage by viewModel.invoiceCreationComplete.collectAsState()
-    val invoiceCreationProgress by viewModel.invoiceCreationProgress.collectAsState()
+    val invoiceCreationMessage by settingViewModel.invoiceCreationComplete.collectAsState()
+    val invoiceCreationProgress by settingViewModel.invoiceCreationProgress.collectAsState()
 
     // Handle navigation when product is found
     LaunchedEffect(scannedProduct) {
@@ -102,14 +106,11 @@ fun SettingScreen(
             )
 
             // Add product to current invoice
-            invoiceListViewModel.addToCurrentInvoice(product, 1)
+            invoiceViewModel.addToCurrentInvoice(product, 1)
 
             // Check if product was added to invoice
-            val currentInvoiceItems = invoiceListViewModel.currentInvoice.value
-            Log.d(
-                SETTING_SCREEN_TAG,
-                "Invoice items after adding: ${currentInvoiceItems.size}, contains product: ${currentInvoiceItems.any { it.product.id == product.id }}"
-            )
+            val currentInvoiceItems = invoiceViewModel.currentInvoice.value
+
 
             // Navigate to invoice screen
             navController.navigate(Screen.Invoice.route)
@@ -124,7 +125,7 @@ fun SettingScreen(
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         // Clear the message after showing
         LaunchedEffect(message) {
-            viewModel.clearPriceUpdateMessage()
+            settingViewModel.clearPriceUpdateMessage()
         }
     }
 
@@ -133,7 +134,7 @@ fun SettingScreen(
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         // Clear the message after showing
         LaunchedEffect(message) {
-            viewModel.clearStockUpdateMessage()
+            settingViewModel.clearStockUpdateMessage()
         }
     }
 
@@ -142,7 +143,7 @@ fun SettingScreen(
         Toast.makeText(context, message, Toast.LENGTH_LONG).show()
         // Clear the message after showing
         LaunchedEffect(message) {
-            viewModel.clearInvoiceCreationMessage()
+            settingViewModel.clearInvoiceCreationMessage()
         }
     }
 
@@ -231,7 +232,7 @@ fun SettingScreen(
                     // Auto-hide completion message after 3 seconds
                     LaunchedEffect(priceUpdateProgress) {
                         kotlinx.coroutines.delay(3000)
-                        viewModel.clearPriceUpdateMessage()
+                        settingViewModel.clearPriceUpdateMessage()
                     }
                 }
 
@@ -259,7 +260,7 @@ fun SettingScreen(
                     // Auto-hide completion message after 3 seconds
                     LaunchedEffect(stockUpdateProgress) {
                         kotlinx.coroutines.delay(3000)
-                        viewModel.clearStockUpdateMessage()
+                        settingViewModel.clearStockUpdateMessage()
                     }
                 }
 
@@ -287,14 +288,14 @@ fun SettingScreen(
                     // Auto-hide completion message after 3 seconds
                     LaunchedEffect(invoiceCreationProgress) {
                         kotlinx.coroutines.delay(3000)
-                        viewModel.clearInvoiceCreationMessage()
+                        settingViewModel.clearInvoiceCreationMessage()
                     }
                 }
             }
 
             // Add Random Products button
             Button(
-                onClick = { viewModel.addRandomProducts() },
+                onClick = { settingViewModel.addRandomProducts() },
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .padding(bottom = dimen(R.dimen.space_14) + 240.dp) // Add more spacing for new buttons
@@ -304,7 +305,7 @@ fun SettingScreen(
 
             // Set Random Prices button
             Button(
-                onClick = { viewModel.setRandomPricesForNullProducts() },
+                onClick = { settingViewModel.setRandomPricesForNullProducts() },
                 enabled = !productsLoading && priceUpdateProgress == 0 && stockUpdateProgress == 0 && invoiceCreationProgress == 0,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -329,7 +330,7 @@ fun SettingScreen(
 
             // Set Random Cost Prices button
             Button(
-                onClick = { viewModel.setRandomCostPrice() },
+                onClick = { settingViewModel.setRandomCostPrice() },
                 enabled = !productsLoading && priceUpdateProgress == 0 && stockUpdateProgress == 0 && invoiceCreationProgress == 0,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -340,7 +341,7 @@ fun SettingScreen(
 
             // Set Random Stock button
             Button(
-                onClick = { viewModel.setRandomStockForAllProducts() },
+                onClick = { settingViewModel.setRandomStockForAllProducts() },
                 enabled = !productsLoading && stockUpdateProgress == 0 && priceUpdateProgress == 0 && invoiceCreationProgress == 0,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -365,7 +366,7 @@ fun SettingScreen(
 
             // Create Random Invoices button
             Button(
-                onClick = { viewModel.createRandomInvoices() },
+                onClick = { settingViewModel.createRandomInvoices() },
                 enabled = !productsLoading && invoiceCreationProgress == 0 && priceUpdateProgress == 0 && stockUpdateProgress == 0,
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
@@ -406,7 +407,7 @@ fun SettingScreen(
                 ProductSelectionBottomSheet(
                     products = products,
                     onAddToInvoice = { product, quantity ->
-                        invoiceListViewModel.addToCurrentInvoice(product, quantity)
+                        invoiceViewModel.addToCurrentInvoice(product, quantity)
                         showBottomSheet = false
                     },
                     onDismiss = { showBottomSheet = false }

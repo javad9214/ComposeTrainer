@@ -16,10 +16,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.domain.model.InvoiceProduct
+import com.example.composetrainer.domain.model.Product
 
 @Composable
 fun EditableProductItem(
     item: InvoiceProduct,
+    productItem: Product,
     onRemove: () -> Unit
 ) {
     Card(modifier = Modifier.padding(4.dp)) {
@@ -30,11 +32,11 @@ fun EditableProductItem(
                 .padding(16.dp)
         ) {
             Column(modifier = Modifier.weight(1f)) {
-                Text(item.product.name.value, style = MaterialTheme.typography.titleMedium)
+                Text(productItem.name.value, style = MaterialTheme.typography.titleMedium)
                 Text("Qty: ${item.quantity}", style = MaterialTheme.typography.bodySmall)
             }
             Text(
-                text = "$${item.product.price?.times(item.quantity) ?: 0}",
+                text = item.calculateTotal().amount.toString(),
                 style = MaterialTheme.typography.titleMedium
             )
             IconButton(onClick = onRemove) {

@@ -46,7 +46,7 @@ import com.example.composetrainer.utils.str
 
 @Composable
 fun HeaderSection(
-    invoiceNumber: Int?,
+    invoiceNumber: String,
     persianDate: String,
     currentTime: String,
     onAddProductClick: () -> Unit,
