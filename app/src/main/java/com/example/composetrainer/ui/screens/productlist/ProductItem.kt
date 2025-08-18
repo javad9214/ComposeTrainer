@@ -116,7 +116,7 @@ fun ProductItem(
                     Text(
                         modifier = Modifier.fillMaxWidth(),
                         textAlign = TextAlign.End,
-                        text = product.name,
+                        text = product.name.value,
                         style = MaterialTheme.typography.titleMedium,
                         fontFamily = myFontFamily
                     )
@@ -133,7 +133,7 @@ fun ProductItem(
                     // Category ID
                     Row(verticalAlignment = Alignment.CenterVertically) {
                         Text(
-                            text = "${product.subCategoryId ?: "N/A"}",
+                            text = "${product.subcategoryId ?: "N/A"}",
                             fontSize = dimenTextSize(R.dimen.text_size_md),
                             fontFamily = BHoma
                         )
@@ -151,8 +151,14 @@ fun ProductItem(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.End
                     ) {
-                        Text(
-                            text = product.barcode ?: "N/A",
+                        product.barcode?.value?.let {
+                            Text(
+                                text = it,
+                                fontSize = dimenTextSize(R.dimen.text_size_md),
+                                fontFamily = BHoma
+                            )
+                        } ?: Text(
+                            text = "N/A",
                             fontSize = dimenTextSize(R.dimen.text_size_md),
                             fontFamily = BHoma
                         )
@@ -237,37 +243,5 @@ fun ProductItem(
 
             }
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewProductItem() {
-    ComposeTrainerTheme {
-        ProductItem(
-            product = Product(
-                id = 1,
-                name = "Sample Product",
-                barcode = "123456789",
-                price = 1000,
-                costPrice = null,
-                description = null,
-                image = null,
-                subCategoryId = 1,
-                supplierId = null,
-                unit = null,
-                date = System.currentTimeMillis(),
-                stock = 10,
-                minStockLevel = null,
-                maxStockLevel = null,
-                isActive = true,
-                tags = null,
-                lastSoldDate = null
-            ),
-            onEdit = {},
-            onDelete = {},
-            onIncreaseStock = {},
-            onDecreaseStock = {}
-        )
     }
 }

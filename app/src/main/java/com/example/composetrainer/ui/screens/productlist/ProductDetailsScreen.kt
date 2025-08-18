@@ -174,7 +174,7 @@ fun ProductDetailsContent(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = product.name,
+                    text = product.name.value,
                     fontSize = 18.sp,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
@@ -199,10 +199,12 @@ fun ProductDetailsContent(
                         tint = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                     Spacer(modifier = Modifier.width(8.dp))
-                    Text(
-                        text = product.barcode ?: "N/A",
-                        fontSize = 18.sp
-                    )
+                    product.barcode?.value?.let {
+                        Text(
+                            text = it,
+                            fontSize = 18.sp
+                        )
+                    }
                 }
 
                 Spacer(modifier = Modifier.height(16.dp))
@@ -306,7 +308,7 @@ fun ProductDetailsContent(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Category ${product.subCategoryId ?: "N/A"}",
+                    text = "Category ${product.subcategoryId ?: "N/A"}",
                     fontSize = 18.sp,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
@@ -321,7 +323,7 @@ fun ProductDetailsContent(
                     color = MaterialTheme.colorScheme.primary
                 )
                 Text(
-                    text = "Subcategory ${product.subCategoryId ?: "N/A"}",
+                    text = "Subcategory ${product.subcategoryId ?: "N/A"}",
                     fontSize = 18.sp,
                     modifier = Modifier.padding(vertical = 4.dp)
                 )
@@ -345,8 +347,8 @@ fun ProductDetailsContent(
             Button(
                 onClick = {
                     val updatedProduct = product.copy(
-                        stock = stockValue.toIntOrNull() ?: product.stock,
-                        price = priceValue.toLongOrNull() ?: product.price
+                        stock = product.stock,
+                        price = product.price,
                     )
                     onSave(updatedProduct)
                 },

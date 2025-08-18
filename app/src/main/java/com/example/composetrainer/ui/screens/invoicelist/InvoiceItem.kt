@@ -30,6 +30,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.Invoice
+import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.ui.theme.BRoya
 import com.example.composetrainer.utils.PriceValidator
@@ -40,14 +41,16 @@ import com.example.composetrainer.utils.str
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun InvoiceItem(
-    invoice: Invoice,
+    invoiceWithProducts: InvoiceWithProducts,
     onClick: () -> Unit,
     onDelete: () -> Unit,
     onLongClick: () -> Unit = {},
     isSelected: Boolean = false,
     isSelectionMode: Boolean = false,
-    formattedDate: String = invoice.invoiceDate
 ) {
+    val invoice = invoiceWithProducts.invoice
+    val formattedDate: String = invoice.invoiceDate.toString()
+
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -138,7 +141,7 @@ fun InvoiceItem(
                             )
 
                             Text(
-                                text = PriceValidator.formatPrice(invoice.totalPrice.toString()),
+                                text = PriceValidator.formatPrice(invoice.totalAmount.toString()),
                                 style = MaterialTheme.typography.bodyLarge,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colorScheme.primary
@@ -147,7 +150,7 @@ fun InvoiceItem(
 
                         Row(verticalAlignment = Alignment.Bottom) {
                             Text(
-                                text = "${str(R.string.items)} : ${invoice.products.size}",
+                                text = "${str(R.string.items)} : ${invoiceWithProducts.totalProductsCount}",
                                 style = MaterialTheme.typography.bodyMedium,
                                 fontFamily = BRoya,
                                 fontSize = dimenTextSize(R.dimen.text_size_md),
@@ -168,40 +171,4 @@ fun InvoiceItem(
             }
         }
     }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun InvoiceItemPreview() {
-    InvoiceItem(
-        invoice = Invoice(
-            id = 1,
-            invoiceNumber = 12345,
-            invoiceDate = "1403-02-16",
-            prefix = "INV",
-            totalPrice = 1000,
-            products = emptyList()
-        ),
-        onClick = {},
-        onDelete = {}
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun InvoiceItemSelectedPreview() {
-    InvoiceItem(
-        invoice = Invoice(
-            id = 1,
-            invoiceNumber = 12345,
-            invoiceDate = "1403-02-16",
-            prefix = "INV",
-            totalPrice = 1000,
-            products = emptyList()
-        ),
-        onClick = {},
-        onDelete = {},
-        isSelected = true,
-        isSelectionMode = true
-    )
 }

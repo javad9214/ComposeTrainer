@@ -53,7 +53,11 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import com.example.composetrainer.R
+import com.example.composetrainer.domain.model.Barcode
 import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.domain.model.ProductFactory
+import com.example.composetrainer.domain.model.ProductName
+import com.example.composetrainer.domain.model.type.Money
 import com.example.composetrainer.ui.components.BarcodeScannerView
 import com.example.composetrainer.ui.navigation.Screen
 import com.example.composetrainer.ui.theme.BMitra
@@ -98,24 +102,12 @@ fun ProductScreen(
             AddProductBottomSheet(
                 initialProduct = selectedProductForEdit.value?.copy()
                     ?: if (lastScannedBarcode.isNotEmpty())
-                        Product(
-                            id = 0,
-                            name = "",
-                            barcode = lastScannedBarcode,
-                            price = null,
-                            stock = 0,
-                            image = null,
-                            subCategoryId = null,
-                            date = System.currentTimeMillis(),
-                            costPrice = null,
-                            description = null,
-                            supplierId = null,
-                            unit = null,
-                            minStockLevel = null,
-                            maxStockLevel = null,
-                            isActive = true,
-                            tags = null,
-                            lastSoldDate = null
+                        ProductFactory.createBasic(
+                            name = ProductName(""),
+                            barcode = Barcode(lastScannedBarcode),
+                            price = 0,
+                            costPrice = 0,
+                            initialStock = 0
                         )
                     else
                         null,
@@ -147,7 +139,7 @@ fun ProductScreen(
                 lastScannedBarcode = barcode
 
                 // Check if a product with this barcode exists
-                val productExists = products.any { it.barcode == barcode }
+                val productExists = products.any { it.barcode?.value == barcode }
 
                 if (productExists) {
                     // Set the search query to the scanned barcode
@@ -308,7 +300,7 @@ fun ProductScreenContent(
                         onIncreaseStock = { onIncreaseStock(product) },
                         onDecreaseStock = { onDecreaseStock(product) },
                         onProductClick = {
-                            navController?.navigate(Screen.ProductDetails.createRoute(product.id))
+                            navController?.navigate(Screen.ProductDetails.createRoute(product.id.value))
                         }
                     )
                 }
@@ -369,86 +361,5 @@ fun SortingDropdown(
                 }
             )
         }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun PreviewProductsScreen() {
-    val mockProducts = listOf(
-        Product(
-            id = 1L,
-            name = "Laptop",
-            barcode = "123456789",
-            price = 999L,
-            stock = 5,
-            image = null,
-            subCategoryId = 1,
-            date = System.currentTimeMillis(),
-            costPrice = null,
-            description = null,
-            supplierId = null,
-            unit = null,
-            minStockLevel = null,
-            maxStockLevel = null,
-            isActive = true,
-            tags = null,
-            lastSoldDate = null
-        ),
-        Product(
-            id = 2L,
-            name = "Phone",
-            barcode = "987654321",
-            price = 499L,
-            stock = 10,
-            image = null,
-            subCategoryId = 1,
-            date = System.currentTimeMillis(),
-            costPrice = null,
-            description = null,
-            supplierId = null,
-            unit = null,
-            minStockLevel = null,
-            maxStockLevel = null,
-            isActive = true,
-            tags = null,
-            lastSoldDate = null
-        ),
-        Product(
-            id = 3L,
-            name = "Headphones",
-            barcode = "456789123",
-            price = 79L,
-            stock = 20,
-            image = null,
-            subCategoryId = 2,
-            date = System.currentTimeMillis(),
-            costPrice = null,
-            description = null,
-            supplierId = null,
-            unit = null,
-            minStockLevel = null,
-            maxStockLevel = null,
-            isActive = true,
-            tags = null,
-            lastSoldDate = null
-        )
-    )
-
-    ComposeTrainerTheme {
-        ProductScreenContent(
-            products = mockProducts,
-            isLoading = false,
-            sortOrder = SortOrder.DESCENDING,
-            searchQuery = "",
-            onSearchQueryChange = {},
-            onSortOrderSelected = {},
-            onAddProduct = {},
-            onEditProduct = {},
-            onDeleteProduct = {},
-            onIncreaseStock = {},
-            onDecreaseStock = {},
-            navController = null
-        )
     }
 }

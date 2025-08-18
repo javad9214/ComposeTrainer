@@ -40,6 +40,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.Invoice
+import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.ui.theme.BComps
 import com.example.composetrainer.ui.theme.BHoma
@@ -53,17 +54,17 @@ import com.example.composetrainer.utils.str
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InvoicesListScreen(
-    viewModel: InvoiceListViewModel = hiltViewModel(),
+    invoiceListViewModel: InvoiceListViewModel = hiltViewModel(),
     onCreateNew: () -> Unit,
     onInvoiceClick: (Long) -> Unit
 ) {
-    val invoices by viewModel.invoices.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val errorMessage by viewModel.errorMessage.collectAsState()
-    val sortNewestFirst by viewModel.sortNewestFirst.collectAsState()
-    val isSelectionMode by viewModel.isSelectionMode.collectAsState()
-    val selectedInvoices by viewModel.selectedInvoices.collectAsState()
-    val showDeleteConfirmationDialog by viewModel.showDeleteConfirmationDialog.collectAsState()
+    val invoices by invoiceListViewModel.invoices.collectAsState()
+    val isLoading by invoiceListViewModel.isLoading.collectAsState()
+    val errorMessage by invoiceListViewModel.errorMessage.collectAsState()
+    val sortNewestFirst by invoiceListViewModel.sortNewestFirst.collectAsState()
+    val isSelectionMode by invoiceListViewModel.isSelectionMode.collectAsState()
+    val selectedInvoices by invoiceListViewModel.selectedInvoices.collectAsState()
+    val showDeleteConfirmationDialog by invoiceListViewModel.showDeleteConfirmationDialog.collectAsState()
 
     val context = LocalContext.current
 
@@ -96,7 +97,7 @@ fun InvoicesListScreen(
                         IconButton(
                             onClick = {
                                 if (selectedInvoices.isNotEmpty()) {
-                                    viewModel.showDeleteConfirmationDialog()
+                                    invoiceListViewModel.showDeleteConfirmationDialog()
                                 }
                             },
                             enabled = selectedInvoices.isNotEmpty()
@@ -110,7 +111,7 @@ fun InvoicesListScreen(
                         }
 
                         // Cancel selection mode
-                        IconButton(onClick = { viewModel.toggleSelectionMode() }) {
+                        IconButton(onClick = { invoiceListViewModel.toggleSelectionMode() }) {
                             Icon(
                                 Icons.Default.Close,
                                 contentDescription = str(R.string.cancel)
@@ -127,7 +128,7 @@ fun InvoicesListScreen(
                     Row {
                         // Long press hint
                         if (invoices.isNotEmpty()) {
-                            IconButton(onClick = { viewModel.toggleSelectionMode() }) {
+                            IconButton(onClick = { invoiceListViewModel.toggleSelectionMode() }) {
                                 Icon(
                                     Icons.Default.Delete,
                                     contentDescription = str(R.string.selection_mode)
@@ -135,7 +136,7 @@ fun InvoicesListScreen(
                             }
                         }
 
-                        IconButton(onClick = { viewModel.toggleSortOrder() }) {
+                        IconButton(onClick = { invoiceListViewModel.toggleSortOrder() }) {
                             Icon(
                                 Icons.Default.Sort,
                                 contentDescription = if (sortNewestFirst)
@@ -170,19 +171,19 @@ fun InvoicesListScreen(
                     }
 
                     else -> InvoicesLazyList(
-                        invoices = invoices,
+                        invoiceWithProductsList = invoices,
                         onInvoiceClick = {
                             if (isSelectionMode) {
-                                viewModel.toggleInvoiceSelection(it)
+                                invoiceListViewModel.toggleInvoiceSelection(it)
                             } else {
                                 onInvoiceClick(it)
                             }
                         },
-                        onDelete = viewModel::deleteInvoice,
+                        onDelete = invoiceListViewModel::deleteInvoice,
                         onLongClick = {
                             if (!isSelectionMode) {
-                                viewModel.toggleSelectionMode()
-                                viewModel.toggleInvoiceSelection(it)
+                                invoiceListViewModel.toggleSelectionMode()
+                                invoiceListViewModel.toggleInvoiceSelection(it)
                             }
                         },
                         isSelectionMode = isSelectionMode,
@@ -203,10 +204,10 @@ fun InvoicesListScreen(
             .setTitle(context.getString(R.string.delete_selected_invoices))
             .setMessage(context.getString(R.string.are_you_sure_to_delete_selected_invoices))
             .setPositiveButton(context.getString(R.string.delete)) { _, _ ->
-                viewModel.deleteSelectedInvoices()
+                invoiceListViewModel.deleteSelectedInvoices()
             }
             .setNegativeButton(context.getString(R.string.cancel)) { _, _ ->
-                viewModel.dismissDeleteConfirmationDialog()
+                invoiceListViewModel.dismissDeleteConfirmationDialog()
             }
             .show()
     }
@@ -214,7 +215,7 @@ fun InvoicesListScreen(
 
 @Composable
 private fun InvoicesLazyList(
-    invoices: List<Invoice>,
+    invoiceWithProductsList: List<InvoiceWithProducts>,
     onInvoiceClick: (Long) -> Unit,
     onDelete: (Long) -> Unit,
     onLongClick: (Long) -> Unit = {},
@@ -223,129 +224,14 @@ private fun InvoicesLazyList(
 ) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(invoices, key = { it.id }) { invoice ->
+            items(invoiceWithProductsList, key = { it.invoiceId }) { invoice ->
                 InvoiceItem(
-                    invoice = invoice,
-                    onClick = { onInvoiceClick(invoice.id) },
-                    onDelete = { onDelete(invoice.id) },
-                    onLongClick = { onLongClick(invoice.id) },
-                    isSelected = selectedInvoices.contains(invoice.id),
+                    invoiceWithProducts = invoice,
+                    onClick = { onInvoiceClick(invoice.invoiceId.value) },
+                    onDelete = { onDelete(invoice.invoiceId.value) },
+                    onLongClick = { onLongClick(invoice.invoiceId.value) },
+                    isSelected = selectedInvoices.contains(invoice.invoiceId.value),
                     isSelectionMode = isSelectionMode
-                )
-            }
-        }
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-fun InvoicesListScreenPreview() {
-    ComposeTrainerTheme {
-        val sampleProducts = listOf(
-            ProductWithQuantity(
-                product = Product(
-                    id = 1,
-                    name = "Smartphone",
-                    price = 699L,
-                    barcode = "123456789",
-                    subCategoryId = 1,
-                    date = System.currentTimeMillis(),
-                    stock = 10,
-                    image = null,
-                    costPrice = null,
-                    description = null,
-                    supplierId = null,
-                    unit = null,
-                    minStockLevel = null,
-                    maxStockLevel = null,
-                    isActive = true,
-                    tags = null,
-                    lastSoldDate = null
-                ),
-                quantity = 2
-            ),
-            ProductWithQuantity(
-                product = Product(
-                    id = 2,
-                    name = "Laptop",
-                    price = 1299L,
-                    barcode = "987654321",
-                    subCategoryId = 1,
-                    date = System.currentTimeMillis(),
-                    stock = 5,
-                    image = null,
-                    costPrice = null,
-                    description = null,
-                    supplierId = null,
-                    unit = null,
-                    minStockLevel = null,
-                    maxStockLevel = null,
-                    isActive = true,
-                    tags = null,
-                    lastSoldDate = null
-                ),
-                quantity = 1
-            )
-        )
-
-        val sampleInvoices = listOf(
-            Invoice(
-                id = 1,
-                prefix = "INV",
-                invoiceDate = "1403-02-16",
-                invoiceNumber = 10001,
-                products = sampleProducts.take(1),
-                totalPrice = 1398L
-            ),
-            Invoice(
-                id = 2,
-                prefix = "INV",
-                invoiceDate = "1403-02-17",
-                invoiceNumber = 10002,
-                products = sampleProducts,
-                totalPrice = 2697L
-            ),
-            Invoice(
-                id = 3,
-                prefix = "INV",
-                invoiceDate = "1403-02-18",
-                invoiceNumber = 10003,
-                products = sampleProducts.take(1),
-                totalPrice = 1398L
-            )
-        )
-
-        InvoicesListScreenPreviewContent(sampleInvoices)
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Composable
-fun InvoicesListScreenPreviewContent(invoices: List<Invoice>) {
-    CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Rtl) {
-        Scaffold(
-            topBar = {
-                TopAppBar(
-                    title = { Text(str(R.string.sale_invoices), fontFamily = BHoma) },
-                    actions = {
-                        IconButton(onClick = { }) {
-                            Icon(
-                                Icons.Default.Sort,
-                                contentDescription = "Sort invoices"
-                            )
-                        }
-                        IconButton(onClick = { }) {
-                            Icon(Icons.Default.Add, contentDescription = "New Invoice")
-                        }
-                    }
-                )
-            }
-        ) { innerPadding ->
-            Box(modifier = Modifier.padding(innerPadding)) {
-                InvoicesLazyList(
-                    invoices = invoices,
-                    onInvoiceClick = { },
-                    onDelete = { }
                 )
             }
         }

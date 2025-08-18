@@ -29,8 +29,14 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.domain.model.ProductId
+import com.example.composetrainer.domain.model.SubcategoryId
+import com.example.composetrainer.domain.model.Barcode
+import com.example.composetrainer.domain.model.type.Money
+import com.example.composetrainer.domain.model.StockQuantity
+import com.example.composetrainer.domain.model.ProductName
 import com.example.composetrainer.utils.BarcodeGenerator
-
+import java.time.LocalDateTime
 
 @Composable
 fun AddProductBottomSheet(
@@ -38,10 +44,14 @@ fun AddProductBottomSheet(
     onSave: (Product) -> Unit,
     onDismiss: () -> Unit
 ) {
-    var name by remember { mutableStateOf(initialProduct?.name ?: "") }
-    var barcode by remember { mutableStateOf(initialProduct?.barcode ?: "") }
-    var price by remember { mutableStateOf(initialProduct?.price?.toString() ?: "") }
-    var categoryID by remember { mutableStateOf(initialProduct?.subcategoryId?.toString() ?: "") }
+    var name by remember { mutableStateOf(initialProduct?.name?.value ?: "") }
+    var barcode by remember { mutableStateOf(initialProduct?.barcode?.value ?: "") }
+    var price by remember { mutableStateOf(initialProduct?.price?.amount?.toString() ?: "") }
+    var subcategoryId by remember {
+        mutableStateOf(
+            initialProduct?.subcategoryId?.value?.toString() ?: ""
+        )
+    }
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -130,10 +140,10 @@ fun AddProductBottomSheet(
 
             Spacer(modifier = Modifier.height(16.dp))
 
-            // Category ID
+            // Subcategory ID
             OutlinedTextField(
-                value = categoryID,
-                onValueChange = { categoryID = it },
+                value = subcategoryId,
+                onValueChange = { subcategoryId = it },
                 label = { Text(stringResource(R.string.category_id_optional)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(
@@ -152,15 +162,17 @@ fun AddProductBottomSheet(
             Button(
                 onClick = {
                     val newProduct = Product(
-                        id = initialProduct?.id ?: 0, // Use existing ID if editing
-                        name = name,
-                        barcode = if (barcode.isEmpty()) BarcodeGenerator.generateBarcodeNumber() else barcode,
-                        price = price.toLongOrNull(),
+                        id = initialProduct?.id ?: ProductId(0),
+                        name = ProductName(name),
+                        barcode = if (barcode.isEmpty()) Barcode(BarcodeGenerator.generateBarcodeNumber()) else Barcode(
+                            barcode
+                        ),
+                        price = price.toLongOrNull()?.let { Money(it) } ?: Money(0),
                         image = initialProduct?.image,
-                        subCategoryId = categoryID.toIntOrNull(),
-                        date = initialProduct?.date ?: System.currentTimeMillis(),
-                        stock = initialProduct?.stock ?: 0,
-                        costPrice = initialProduct?.costPrice,
+                        subcategoryId = subcategoryId.toIntOrNull()?.let { SubcategoryId(it) },
+                        date = initialProduct?.date ?: LocalDateTime.now(),
+                        stock = initialProduct?.stock ?: StockQuantity(0),
+                        costPrice = initialProduct?.costPrice ?: Money(0),
                         description = initialProduct?.description,
                         supplierId = initialProduct?.supplierId,
                         unit = initialProduct?.unit,
@@ -168,7 +180,10 @@ fun AddProductBottomSheet(
                         maxStockLevel = initialProduct?.maxStockLevel,
                         isActive = initialProduct?.isActive ?: true,
                         tags = initialProduct?.tags,
-                        lastSoldDate = initialProduct?.lastSoldDate
+                        lastSoldDate = initialProduct?.lastSoldDate,
+                        synced = false,
+                        createdAt = initialProduct?.createdAt ?: LocalDateTime.now(),
+                        updatedAt = LocalDateTime.now()
                     )
                     onSave(newProduct)
                 },
