@@ -1,9 +1,11 @@
 package com.example.composetrainer.di
 
+import com.example.composetrainer.data.repository.InvoiceProductRepoImpl
 import com.example.composetrainer.data.repository.InvoiceRepoImpl
 import com.example.composetrainer.data.repository.ProductRepoImpl
 import com.example.composetrainer.data.repository.ProductSalesSummaryRepoImpl
 import com.example.composetrainer.data.repository.StockMovementRepoImpl
+import com.example.composetrainer.domain.repository.InvoiceProductRepository
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.ProductRepository
 import com.example.composetrainer.domain.repository.ProductSalesSummaryRepository
@@ -17,6 +19,12 @@ import javax.inject.Singleton
 @Module
 @InstallIn(SingletonComponent::class)
 object RepositoryModule {
+
+    @Provides
+    @Singleton
+    fun provideInvoiceProductRepository(
+        repoImpl: InvoiceProductRepoImpl
+    ): InvoiceProductRepository = repoImpl
 
     @Provides
     @Singleton

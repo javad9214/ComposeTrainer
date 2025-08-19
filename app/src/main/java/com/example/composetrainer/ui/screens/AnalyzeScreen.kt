@@ -50,6 +50,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
+import com.example.composetrainer.domain.model.ProductSalesSummary
 import com.example.composetrainer.domain.model.TimeRange
 import com.example.composetrainer.domain.model.TopSellingProductInfo
 import com.example.composetrainer.ui.theme.Beirut_Medium
@@ -197,34 +198,31 @@ fun AnalyzeScreen(
                     }
 
                     // Product Sales Summary
-                    uiState.productSalesSummary?.let { salesSummary ->
-                        // Header for the time range
-                        item {
-                            Text(
-                                text = "Sales Summary: ${salesSummary.timeRange.displayName}",
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
-                            )
+                    // Show summary header for the selected time range
+                    item {
+                        Text(
+                            text = "Sales Summary: ${uiState.selectedTimeRange.displayName}",
+                            style = MaterialTheme.typography.titleMedium,
+                            fontWeight = FontWeight.Bold,
+                            modifier = Modifier.padding(top = 16.dp, bottom = 8.dp)
+                        )
+                    }
+                    // Show top selling products for the selected time range
+                    if (uiState.productSalesSummary.isNotEmpty()) {
+                        items(uiState.productSalesSummary) { productSummary ->
+                            TopSellingProductCard(product = productSummary.toTopSellingProductInfo())
                         }
-
-                        // Top selling products for the selected time range
-                        if (salesSummary.products.isNotEmpty()) {
-                            items(salesSummary.products) { product ->
-                                TopSellingProductCard(product = product)
-                            }
-                        } else {
-                            item {
-                                Card(
-                                    modifier = Modifier.fillMaxWidth()
-                                ) {
-                                    Text(
-                                        text = "No sales data for ${salesSummary.timeRange.displayName}",
-                                        modifier = Modifier.padding(16.dp),
-                                        textAlign = TextAlign.Center,
-                                        style = MaterialTheme.typography.bodyLarge
-                                    )
-                                }
+                    } else {
+                        item {
+                            Card(
+                                modifier = Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "No sales data for ${uiState.selectedTimeRange.displayName}",
+                                    modifier = Modifier.padding(16.dp),
+                                    textAlign = TextAlign.Center,
+                                    style = MaterialTheme.typography.bodyLarge
+                                )
                             }
                         }
                     }
@@ -233,6 +231,16 @@ fun AnalyzeScreen(
         }
     }
 
+}
+
+// Helper extension for mapping ProductSalesSummary to TopSellingProductInfo
+private fun ProductSalesSummary.toTopSellingProductInfo(): TopSellingProductInfo {
+    // Use productId as placeholder name since real name is not available
+    return TopSellingProductInfo(
+        name = "Product ${this.productId.value}",
+        totalQuantity = this.totalSold.value,
+        totalSales = this.totalRevenue.amount
+    )
 }
 
 @Composable

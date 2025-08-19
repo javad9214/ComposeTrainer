@@ -1,4 +1,4 @@
-package com.example.composetrainer.domain.usecase.invoice
+package com.example.composetrainer.domain.usecase.product
 
 import com.example.composetrainer.domain.repository.ProductRepository
 import javax.inject.Inject

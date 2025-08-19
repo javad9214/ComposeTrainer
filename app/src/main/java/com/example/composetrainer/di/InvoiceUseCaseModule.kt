@@ -2,18 +2,14 @@ package com.example.composetrainer.di
 
 import com.example.composetrainer.domain.repository.InvoiceProductRepository
 import com.example.composetrainer.domain.repository.InvoiceRepository
-import com.example.composetrainer.domain.repository.ProductRepository
 import com.example.composetrainer.domain.repository.ProductSalesSummaryRepository
 import com.example.composetrainer.domain.repository.StockMovementRepository
-import com.example.composetrainer.domain.usecase.product.AddProductUseCase
-import com.example.composetrainer.domain.usecase.analytics.GetAnalyticsDataUseCase
+import com.example.composetrainer.domain.usecase.invoice.DeleteInvoiceUseCase
 import com.example.composetrainer.domain.usecase.invoice.GetAllInvoiceUseCase
 import com.example.composetrainer.domain.usecase.invoice.GetInvoiceNumberUseCase
 import com.example.composetrainer.domain.usecase.invoice.GetInvoiceWithDetailsUseCase
 import com.example.composetrainer.domain.usecase.invoice.InitInvoiceWithProductsUseCase
 import com.example.composetrainer.domain.usecase.invoice.InsertInvoiceUseCase
-import com.example.composetrainer.domain.usecase.product.GetProductByQueryUseCase
-import com.example.composetrainer.domain.usecase.sales.GetProductSalesSummaryUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -22,9 +18,8 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object UseCaseModule {
+object InvoiceUseCaseModule {
 
-    // Invoice UseCases
 
     @Provides
     @Singleton
@@ -67,32 +62,14 @@ object UseCaseModule {
         invoiceProductRepository
     )
 
-    // Product UseCases
     @Provides
     @Singleton
-    fun provideAddProductUseCase(
-        repository: ProductRepository
-    ): AddProductUseCase = AddProductUseCase(repository)
-
-    @Provides
-    @Singleton
-    fun provideGetProductsUseCase(
-        repository: ProductRepository
-    ): GetProductByQueryUseCase = GetProductByQueryUseCase(repository)
-
-    @Provides
-    @Singleton
-    fun provideGetAnalyticsDataUseCase(
+    fun provideDeleteInvoiceUseCase(
         invoiceRepository: InvoiceRepository
-    ): GetAnalyticsDataUseCase = GetAnalyticsDataUseCase(invoiceRepository)
+    ): DeleteInvoiceUseCase = DeleteInvoiceUseCase(invoiceRepository)
 
 
-    @Provides
-    @Singleton
-    fun provideGetProductSalesSummaryUseCase(
-        productSalesSummaryRepository: ProductSalesSummaryRepository
-    ): GetProductSalesSummaryUseCase =
-        GetProductSalesSummaryUseCase(productSalesSummaryRepository)
+
 
 
 }

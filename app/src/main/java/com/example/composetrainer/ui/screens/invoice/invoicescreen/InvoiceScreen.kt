@@ -38,6 +38,7 @@ import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.ui.components.BarcodeScannerView
 import com.example.composetrainer.ui.viewmodels.HomeViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
+import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.utils.BarcodeSoundPlayer
 
 @Composable
@@ -46,6 +47,7 @@ fun InvoiceScreen(
     onClose: () -> Unit,
     invoiceListViewModel: InvoiceListViewModel = hiltViewModel(),
     invoiceViewModel: InvoiceViewModel = hiltViewModel(),
+    productsViewModel: ProductsViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel()
 ) {
 
@@ -53,7 +55,7 @@ fun InvoiceScreen(
     val currentTime = remember { FarsiDateUtil.getCurrentTimeFormatted() }
     var showProductSelection by remember { mutableStateOf(false) }
     var showBarcodeScannerView by remember { mutableStateOf(false) }
-    val products by invoiceListViewModel.products.collectAsState()
+    val products by productsViewModel.products.collectAsState()
     val currentInvoice by invoiceViewModel.currentInvoice.collectAsState()
     val isLoading by invoiceListViewModel.isLoading.collectAsState()
 

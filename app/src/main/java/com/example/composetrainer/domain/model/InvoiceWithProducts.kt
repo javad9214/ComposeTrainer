@@ -32,9 +32,9 @@ data class InvoiceWithProducts(
 
         // Factory method for creating with default invoice values
         fun createDefault(
-            invoiceId: InvoiceId = InvoiceId(0),
+            invoiceId: InvoiceId = InvoiceId(1),
             prefix: InvoicePrefix = InvoicePrefix("INV"),
-            invoiceNumber: InvoiceNumber = InvoiceNumber(0),
+            invoiceNumber: InvoiceNumber = InvoiceNumber(1),
             customerId: CustomerId? = null,
             invoiceType: InvoiceType? = null,
             paymentMethod: PaymentMethod? = null,

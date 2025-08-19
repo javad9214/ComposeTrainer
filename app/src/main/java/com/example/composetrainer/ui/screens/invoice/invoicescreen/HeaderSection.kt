@@ -35,6 +35,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
+import com.example.composetrainer.domain.model.InvoiceNumber
 import com.example.composetrainer.ui.theme.BHoma
 import com.example.composetrainer.ui.theme.BKoodak
 import com.example.composetrainer.ui.theme.BMitra
@@ -225,7 +226,7 @@ fun HeaderSection(
 fun HeaderSectionPreview() {
     ComposeTrainerTheme {
         HeaderSection(
-            invoiceNumber = 1234,
+            invoiceNumber = "1234",
             persianDate = "1402/12/25",
             currentTime = "14:30",
             onAddProductClick = { },
@@ -243,7 +244,7 @@ fun HeaderSectionPreview() {
 fun HeaderSectionNoInvoiceNumberPreview() {
     ComposeTrainerTheme {
         HeaderSection(
-            invoiceNumber = null,
+            invoiceNumber = "12324",
             persianDate = "1402/12/25",
             currentTime = "14:30",
             onAddProductClick = { },

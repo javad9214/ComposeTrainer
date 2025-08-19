@@ -8,14 +8,13 @@ import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductId
 import com.example.composetrainer.domain.model.Quantity
-import com.example.composetrainer.domain.usecase.invoice.CheckProductStockUseCase
+import com.example.composetrainer.domain.usecase.product.CheckProductStockUseCase
 import com.example.composetrainer.domain.usecase.invoice.DeleteInvoiceUseCase
 import com.example.composetrainer.domain.usecase.invoice.GetInvoiceNumberUseCase
 import com.example.composetrainer.domain.usecase.invoice.InsertInvoiceUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
