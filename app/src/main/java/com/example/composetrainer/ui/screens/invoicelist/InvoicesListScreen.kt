@@ -224,7 +224,7 @@ private fun InvoicesLazyList(
 ) {
     CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            items(invoiceWithProductsList, key = { it.invoiceId }) { invoice ->
+            items(invoiceWithProductsList, key = { it.invoiceId.value }) { invoice ->
                 InvoiceItem(
                     invoiceWithProducts = invoice,
                     onClick = { onInvoiceClick(invoice.invoiceId.value) },

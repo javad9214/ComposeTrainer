@@ -113,7 +113,7 @@ data class Invoice (
 @JvmInline
 value class InvoiceId(val value: Long) {
     init {
-        require(value > 0) { "Invoice ID must be positive" }
+        require(value >= 0) { "Invoice ID must be positive" }
     }
 }
 
@@ -232,7 +232,7 @@ fun Invoice.toEntity(): InvoiceEntity {
 // Factory for creating new invoices
 object InvoiceFactory {
     fun createDraft(
-        invoiceId: InvoiceId = InvoiceId(1),
+        invoiceId: InvoiceId = InvoiceId(0),
         customerId: Long? = null,
         invoiceType: InvoiceType = InvoiceType.SALE,
         prefix: String = "INV"

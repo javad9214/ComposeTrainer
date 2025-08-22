@@ -112,6 +112,7 @@ class SettingViewModel @Inject constructor(
                                 costPriceAtTransaction = product.costPrice,
                                 discount = (0..10).random().toLong()
                             )
+
                             invoiceWithProducts =
                                 invoiceWithProducts.copy(products = invoiceWithProducts.products + product)
 
