@@ -94,12 +94,25 @@ object FarsiDateUtil {
 
     fun getFormattedPersianDate(dateTime: LocalDateTime): String {
         // Step 1: Extract date components
-        val (year, month, day) = dateTime.toDateTriple()
+        val (year, month, day) = getShamsiDateTriple(dateTime)
 
         // Step 2: Get day of week
         val dayOfWeek = getDayOfWeek(year, month, day)
 
         // Step 3: Format the final string
         return getFormattedDate(dayOfWeek, day, month, year)
+    }
+
+    private fun getShamsiDateTriple(localDateTime: LocalDateTime): Triple<Int, Int, Int> {
+        val gregorianYear = localDateTime.year
+        val gregorianMonth = localDateTime.monthValue
+        val gregorianDay = localDateTime.dayOfMonth
+
+        val persianDate = PersianDate()
+        persianDate.initGrgDate(gregorianYear, gregorianMonth, gregorianDay)
+        val persianYear = persianDate.shYear
+        val persianMonth = persianDate.shMonth
+        val persianDay = persianDate.shDay
+        return Triple(persianYear, persianMonth, persianDay)
     }
 }

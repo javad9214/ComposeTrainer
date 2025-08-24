@@ -130,8 +130,9 @@ fun InvoicesListScreen(
                         if (invoices.isNotEmpty()) {
                             IconButton(onClick = { invoiceListViewModel.toggleSelectionMode() }) {
                                 Icon(
-                                    Icons.Default.Delete,
-                                    contentDescription = str(R.string.selection_mode)
+                                    painter = painterResource(id = R.drawable.delete_24px),
+                                    contentDescription = str(R.string.delete),
+                                    tint = Color.Gray
                                 )
                             }
                         }

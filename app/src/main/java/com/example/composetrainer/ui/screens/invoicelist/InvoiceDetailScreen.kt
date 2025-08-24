@@ -57,6 +57,8 @@ import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.utils.PriceValidator.formatPrice
+import com.example.composetrainer.utils.dateandtime.FarsiDateUtil.getFormattedDate
+import com.example.composetrainer.utils.dateandtime.FarsiDateUtil.getFormattedPersianDate
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
 import com.example.composetrainer.utils.str
@@ -223,21 +225,21 @@ private fun InvoiceDetailContent(
                 ) {
                     InfoRow(
                         label = str(R.string.invoice_number),
-                        value = "${invoiceWithProducts.invoice.prefix}-${invoiceWithProducts.invoiceNumber}"
+                        value = "${invoiceWithProducts.invoice.prefix.value}-${invoiceWithProducts.invoiceNumber.value}"
                     )
 
                     Divider(color = MaterialTheme.colorScheme.outlineVariant)
 
                     InfoRow(
                         label = str(R.string.date),
-                        value = invoiceWithProducts.invoice.invoiceDate.toString()
+                        value = getFormattedPersianDate(invoiceWithProducts.invoice.invoiceDate),
                     )
 
                     Divider(color = MaterialTheme.colorScheme.outlineVariant)
 
                     InfoRow(
                         label = str(R.string.total),
-                        value = formatPrice(invoiceWithProducts.calculateTotalAmount().toString()),
+                        value = formatPrice(invoiceWithProducts.calculateTotalAmount().amount.toString()),
                         isAmount = true
                     )
                 }
@@ -262,7 +264,7 @@ private fun InvoiceDetailContent(
                 )
 
                 Text(
-                    text = stringResource(R.string.product_count),
+                    text = stringResource(R.string.product_count, invoiceWithProducts.products.size),
                     style = MaterialTheme.typography.bodyMedium,
                     fontFamily = BMitra,
                 )
@@ -375,7 +377,7 @@ private fun InvoiceDetailContent(
 
 
                     Text(
-                        text = formatPrice(invoiceProduct.calculateTotal().toString()),
+                        text = formatPrice(invoiceProduct.calculateTotal().amount.toString()),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier
@@ -423,7 +425,7 @@ private fun InvoiceDetailContent(
 
                     Row {
                         Text(
-                            formatPrice(invoiceWithProducts.calculateTotalCost().toString()),
+                            formatPrice(invoiceWithProducts.calculateTotalCost().amount.toString()),
                             style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
