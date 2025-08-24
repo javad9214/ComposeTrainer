@@ -57,7 +57,6 @@ import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.utils.PriceValidator.formatPrice
-import com.example.composetrainer.utils.dateandtime.FarsiDateUtil.getFormattedDate
 import com.example.composetrainer.utils.dateandtime.FarsiDateUtil.getFormattedPersianDate
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize

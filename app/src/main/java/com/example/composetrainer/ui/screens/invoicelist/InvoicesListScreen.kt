@@ -1,6 +1,5 @@
 package com.example.composetrainer.ui.screens.invoicelist
 
-import android.app.AlertDialog as AndroidAlertDialog
 import android.widget.Toast
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -13,18 +12,14 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material.icons.filled.Sort
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
-import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.collectAsState
@@ -36,20 +31,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
-import com.example.composetrainer.domain.model.Invoice
 import com.example.composetrainer.domain.model.InvoiceWithProducts
-import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.ui.theme.BComps
-import com.example.composetrainer.ui.theme.BHoma
 import com.example.composetrainer.ui.theme.Beirut_Medium
-import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
 import com.example.composetrainer.utils.str
+import android.app.AlertDialog as AndroidAlertDialog
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -131,8 +122,7 @@ fun InvoicesListScreen(
                             IconButton(onClick = { invoiceListViewModel.toggleSelectionMode() }) {
                                 Icon(
                                     painter = painterResource(id = R.drawable.delete_24px),
-                                    contentDescription = str(R.string.delete),
-                                    tint = Color.Gray
+                                    contentDescription = str(R.string.delete)
                                 )
                             }
                         }

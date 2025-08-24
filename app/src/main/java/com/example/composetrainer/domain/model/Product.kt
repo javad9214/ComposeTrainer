@@ -212,7 +212,6 @@ data class Product(
 @JvmInline
 value class ProductName(val value: String) {
     init {
-        require(value.isNotBlank()) { "Product name cannot be blank" }
         require(value.length <= 200) { "Product name cannot exceed 200 characters" }
     }
 }
