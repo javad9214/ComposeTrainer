@@ -8,6 +8,8 @@ import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductId
 import com.example.composetrainer.domain.model.Quantity
+import com.example.composetrainer.domain.model.addProduct
+import com.example.composetrainer.domain.model.updateProduct
 import com.example.composetrainer.domain.usecase.product.CheckProductStockUseCase
 import com.example.composetrainer.domain.usecase.invoice.DeleteInvoiceUseCase
 import com.example.composetrainer.domain.usecase.invoice.GetInvoiceNumberUseCase
@@ -61,15 +63,11 @@ class InvoiceViewModel @Inject constructor(
             val finalQuantity = if (newTotalQuantity > availableStock.value) availableStock.value else newTotalQuantity
 
             // Update the existing invoice item
-            _currentInvoice.value.copy(
-                invoiceProducts = _currentInvoice.value.invoiceProducts.map { productItem ->
-                    if (productItem.productId == product.id) {
-                        productItem.copy(quantity = Quantity(finalQuantity))
-                    } else {
-                        productItem
-                    }
-                }
-            )
+            _currentInvoice.value.updateProduct(
+                productId = product.id,
+                updater = { invoiceProduct ->
+                        invoiceProduct.copy(quantity = Quantity(finalQuantity))
+                })
         } else {
             // Create a new invoiceProduct item if no existing item is found
             val newItem = InvoiceProductFactory.create(
@@ -79,9 +77,7 @@ class InvoiceViewModel @Inject constructor(
                 priceAtSale = product.price,
                 costPriceAtTransaction = product.costPrice
             )
-            _currentInvoice.value.copy(
-                invoiceProducts = _currentInvoice.value.invoiceProducts + newItem
-            )
+            _currentInvoice.value.addProduct(newItem, product)
         }
 
         // Update the current invoice state

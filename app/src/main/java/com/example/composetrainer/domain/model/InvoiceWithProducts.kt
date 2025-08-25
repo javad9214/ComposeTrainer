@@ -20,6 +20,8 @@ data class InvoiceWithProducts(
     // Validation
     fun isValid(): Boolean = invoiceProducts.all { it.invoiceId == invoice.id }
 
+    
+    
     companion object {
         // Factory method for creating empty InvoiceWithProducts
         fun empty(): InvoiceWithProducts {
@@ -215,6 +217,10 @@ fun InvoiceWithProducts.getProduct(productId: ProductId): InvoiceProduct? {
 
 fun InvoiceWithProducts.hasProduct(productId: ProductId): Boolean {
     return invoiceProducts.any { it.productId == productId }
+}
+
+fun InvoiceWithProducts.hasProducts(): Boolean {
+    return invoiceProducts.isNotEmpty()
 }
 
 // Extension function to auto-create Invoice from invoiceProducts data and update InvoiceWithProducts

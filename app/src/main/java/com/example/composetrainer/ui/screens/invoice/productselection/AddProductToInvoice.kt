@@ -177,7 +177,7 @@ fun AddProductToInvoice(
                             modifier = Modifier.fillMaxSize()
                         ) {
 
-                            items(filteredProducts, key = { it.id }) { product ->
+                            items(filteredProducts, key = { it.id.value }) { product ->
                                 ProductSelectionItem(
                                     product = product,
                                     onClick = { onProductSelected(product) },

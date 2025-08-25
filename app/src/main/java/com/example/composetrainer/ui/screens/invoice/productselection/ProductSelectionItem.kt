@@ -63,7 +63,7 @@ fun ProductSelectionItem(
 
                 Text(
                     modifier = Modifier.padding(start = dimen(R.dimen.space_1)),
-                    text = PriceValidator.formatPrice(product.price.toString()),
+                    text = PriceValidator.formatPrice(product.price.amount.toString()),
                     style = MaterialTheme.typography.titleMedium
                 )
             }
@@ -82,7 +82,7 @@ fun ProductSelectionItem(
                 )
                 if (showStock) {
                     Text(
-                        text = "${stringResource(R.string.stock)} : ${product.stock}",
+                        text = "${stringResource(R.string.stock)} : ${product.stock.value}",
                         fontFamily = BRoya,
                         style = MaterialTheme.typography.bodySmall,
                         color = if (product.stock.value > 0)

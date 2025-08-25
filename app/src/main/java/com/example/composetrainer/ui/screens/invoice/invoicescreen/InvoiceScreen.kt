@@ -31,6 +31,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.calculateTotalAmount
+import com.example.composetrainer.domain.model.hasProducts
 import com.example.composetrainer.ui.screens.invoice.productselection.AddProductToInvoice
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
@@ -67,6 +68,8 @@ fun InvoiceScreen(
     // Context for MediaPlayer
     val context = LocalContext.current
 
+    val TAG = "InvoiceScreen"
+
     // Handle when a product is found by barcode
     LaunchedEffect(scannedProduct) {
         scannedProduct?.let { product ->
@@ -92,13 +95,18 @@ fun InvoiceScreen(
             )
 
             // Products list section
-            if (currentInvoice.isValid()) {
+            if (currentInvoice.hasProducts()) {
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
                         .padding(horizontal = dimen(R.dimen.space_2))
                 ) {
+                    Log.i(
+                        TAG,
+                        "InvoiceScreen: Total ProductsCount = ${currentInvoice.totalProductsCount}"
+                    )
+                    Log.i(TAG, "InvoiceScreen: products = ${currentInvoice.products.size}")
                     items(currentInvoice.totalProductsCount, key = {currentInvoice.invoiceId.value}) { item ->
                         InvoiceProductItem(
                             productWithQuantity = currentInvoice.invoiceProducts[item],
@@ -187,4 +195,5 @@ fun InvoiceScreen(
             }
         }
     }
+
 }
