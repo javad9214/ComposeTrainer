@@ -107,13 +107,18 @@ fun InvoiceScreen(
                         "InvoiceScreen: Total ProductsCount = ${currentInvoice.totalProductsCount}"
                     )
                     Log.i(TAG, "InvoiceScreen: products = ${currentInvoice.products.size}")
-                    items(currentInvoice.totalProductsCount, key = {currentInvoice.invoiceId.value}) { item ->
+                    items(
+                        currentInvoice.totalProductsCount,
+                        key = { currentInvoice.products[it].id.value }) { item ->
                         InvoiceProductItem(
                             productWithQuantity = currentInvoice.invoiceProducts[item],
                             product = currentInvoice.products[item],
                             onRemove = { invoiceViewModel.removeFromCurrentInvoice(currentInvoice.products[item].id.value) },
                             onQuantityChange = { newQuantity ->
-                                invoiceViewModel.updateItemQuantity(currentInvoice.products[item].id.value, newQuantity)
+                                invoiceViewModel.updateItemQuantity(
+                                    currentInvoice.products[item].id.value,
+                                    newQuantity
+                                )
                             }
                         )
                     }
