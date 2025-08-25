@@ -99,7 +99,7 @@ fun InvoiceScreen(
                         .weight(1f)
                         .padding(horizontal = dimen(R.dimen.space_2))
                 ) {
-                    items(currentInvoice.totalProductsCount) { item ->
+                    items(currentInvoice.totalProductsCount, key = {currentInvoice.invoiceId.value}) { item ->
                         InvoiceProductItem(
                             productWithQuantity = currentInvoice.invoiceProducts[item],
                             product = currentInvoice.products[item],

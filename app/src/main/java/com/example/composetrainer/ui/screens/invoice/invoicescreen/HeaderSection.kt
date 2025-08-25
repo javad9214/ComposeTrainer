@@ -82,7 +82,7 @@ fun HeaderSection(
                     }
 
                     Text(
-                        text = invoiceNumber?.toString() ?: "...",
+                        text = invoiceNumber,
                         fontFamily = BMitra,
                         fontWeight = FontWeight.Bold,
                         fontSize = dimenTextSize(R.dimen.text_size_md),

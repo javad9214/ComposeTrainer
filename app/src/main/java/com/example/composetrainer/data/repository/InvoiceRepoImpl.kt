@@ -5,13 +5,11 @@ import com.example.composetrainer.data.local.dao.InvoiceProductDao
 import com.example.composetrainer.data.local.dao.ProductDao
 import com.example.composetrainer.data.local.relation.InvoiceWithProductsRelation
 import com.example.composetrainer.domain.model.Invoice
-import com.example.composetrainer.domain.model.InvoiceProduct
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.TopSellingProductInfo
 import com.example.composetrainer.domain.model.toDomain
 import com.example.composetrainer.domain.model.toEntity
 import com.example.composetrainer.domain.repository.InvoiceRepository
-import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getTodayAsTimestamp
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import java.text.SimpleDateFormat
