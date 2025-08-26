@@ -115,7 +115,6 @@ fun MainScreen(
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = onToggleTheme,
                     navController = navController,
-                    invoiceListViewModel = sharedInvoiceListViewModel,
                     homeViewModel = sharedHomeViewModel
                 )
             }

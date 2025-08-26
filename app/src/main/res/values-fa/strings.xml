@@ -3,7 +3,9 @@
 
     <!-- Home -->
     <string name="welcomeToHomeScreen">Welcome To Yar Anbar</string>
-
+    <string name="Hello">سـلام !</string>
+    <string name="daily_message">روزت بخیر</string>
+    <string name="today">امـروز</string>
     <!-- Invoice -->
     <string name="sale_invoice">فاکتور فروش</string>
     <string name="total">مجموع</string>

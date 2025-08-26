@@ -3,6 +3,9 @@
 
     <!-- Home -->
     <string name="welcomeToHomeScreen">Welcome to Yaranbar!</string>
+    <string name="Hello">HI</string>
+    <string name="daily_message">Good Morning</string>
+    <string name="today">TODAY</string>
 
     <!-- Invoice -->
     <string name="sale_invoice">Sales Invoice</string>
