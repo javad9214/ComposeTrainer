@@ -220,12 +220,21 @@ fun ProductScreenContent(
                     fontSize = dimenTextSize(R.dimen.text_size_xl)
                 )
 
-                IconButton(onClick = { onSortOrderSelected(sortOrder) }) {
-                    Icon(
-                        Icons.Default.Sort,
-                        contentDescription = "Sort"
-                    )
+                Row{
+
+                    IconButton(onClick = onAddProduct) {
+                        Icon(Icons.Default.Add, contentDescription = "Add Product")
+                    }
+
+                    IconButton(onClick = { onSortOrderSelected(sortOrder) }) {
+                        Icon(
+                            Icons.AutoMirrored.Filled.Sort,
+                            contentDescription = "Sort"
+                        )
+                    }
                 }
+
+
             }
 
             // SearchBar with barcode scan button
@@ -306,14 +315,6 @@ fun ProductScreenContent(
                 }
             }
 
-            FloatingActionButton(
-                onClick = onAddProduct,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp)
-            ) {
-                Icon(Icons.Default.Add, contentDescription = "Add Product")
-            }
         }
 
     }
