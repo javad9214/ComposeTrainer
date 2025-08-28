@@ -1,4 +1,4 @@
-package com.example.composetrainer.ui.viewmodels
+package com.example.composetrainer.ui.viewmodels.home
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope

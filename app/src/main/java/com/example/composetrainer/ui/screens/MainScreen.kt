@@ -29,7 +29,7 @@ import com.example.composetrainer.ui.screens.invoicelist.InvoicesListScreen
 import com.example.composetrainer.ui.screens.productlist.ProductDetailsScreen
 import com.example.composetrainer.ui.screens.productlist.ProductScreen
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
-import com.example.composetrainer.ui.viewmodels.HomeViewModel
+import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.login.ui.screens.LoginScreen
 

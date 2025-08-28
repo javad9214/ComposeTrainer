@@ -37,7 +37,7 @@ import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.ui.components.BarcodeScannerView
-import com.example.composetrainer.ui.viewmodels.HomeViewModel
+import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.utils.BarcodeSoundPlayer

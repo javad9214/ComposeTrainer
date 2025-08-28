@@ -48,7 +48,7 @@ import com.example.composetrainer.ui.screens.invoice.productselection.ProductSel
 import com.example.composetrainer.ui.theme.Kamran
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
-import com.example.composetrainer.ui.viewmodels.HomeViewModel
+import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.ui.components.BarcodeScannerView
 import com.example.composetrainer.ui.navigation.Screen
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel

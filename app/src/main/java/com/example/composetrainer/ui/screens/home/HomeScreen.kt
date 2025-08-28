@@ -40,7 +40,7 @@ import androidx.navigation.compose.rememberNavController
 import com.example.composetrainer.R
 import com.example.composetrainer.ui.navigation.Screen
 import com.example.composetrainer.ui.theme.Beirut_Medium
-import com.example.composetrainer.ui.viewmodels.HomeViewModel
+import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
 import com.example.composetrainer.utils.dimen
