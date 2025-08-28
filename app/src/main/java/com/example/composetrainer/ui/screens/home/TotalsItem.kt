@@ -18,12 +18,19 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
+import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.ui.theme.Beirut_Medium
+import com.example.composetrainer.ui.viewmodels.home.HomeTotalItemsViewModel
+import com.example.composetrainer.utils.PriceValidator
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
 import com.example.composetrainer.utils.str
@@ -31,7 +38,12 @@ import com.example.composetrainer.utils.str
 @Composable
 fun TotalsItem(
     modifier: Modifier = Modifier,
+    viewModel: HomeTotalItemsViewModel = hiltViewModel()
 ) {
+
+    val totalInvoiceCount by viewModel.totalInvoiceCount.collectAsState()
+    val totalSales by viewModel.totalSoldPrice.collectAsState()
+    val totalProfit by viewModel.totalProfitPrice.collectAsState()
 
     ElevatedCard(
         modifier = modifier
@@ -59,16 +71,16 @@ fun TotalsItem(
                     horizontalArrangement = Arrangement.SpaceBetween) {
 
                     Text(
-                        text = str(R.string.total_sales),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontFamily = BNazanin,
+                        text = PriceValidator.formatPrice(totalSales.amount.toString()),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
                         fontSize = dimenTextSize(R.dimen.text_size_lg)
                     )
 
                     Spacer(modifier = Modifier.padding(dimen(R.dimen.space_1)))
 
                     Icon(
-                        modifier = Modifier.size(dimen(R.dimen.size_sm)).padding(end = dimen(R.dimen.space_1)),
+                        modifier = Modifier.size(dimen(R.dimen.size_lg)).padding(end = dimen(R.dimen.space_1)),
                         painter = painterResource(id = R.drawable.toman),
                         contentDescription = "down",
                     )
@@ -94,14 +106,16 @@ fun TotalsItem(
                 Row ( verticalAlignment = Alignment.CenterVertically) {
 
                     Text(
-                        text = str(R.string.today),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontFamily = Beirut_Medium,
+                        text = PriceValidator.formatPrice(totalProfit.amount.toString()),
+                        style = MaterialTheme.typography.titleMedium,
+                        fontWeight = FontWeight.Bold,
                         fontSize = dimenTextSize(R.dimen.text_size_lg)
                     )
 
+                    Spacer(modifier = Modifier.padding(dimen(R.dimen.space_1)))
+
                     Icon(
-                        modifier = Modifier.size(dimen(R.dimen.size_sm)).padding(end = dimen(R.dimen.space_1)),
+                        modifier = Modifier.size(dimen(R.dimen.size_lg)).padding(end = dimen(R.dimen.space_1)),
                         painter = painterResource(id = R.drawable.toman),
                         contentDescription = "down",
                     )
@@ -124,10 +138,11 @@ fun TotalsItem(
                     fontSize = dimenTextSize(R.dimen.text_size_lg)
                 )
 
-                Icon(
-                    modifier = Modifier.padding(end = dimen(R.dimen.space_1)),
-                    painter = painterResource(id = R.drawable.keyboard_arrow_down_24px),
-                    contentDescription = "down",
+                Text(
+                    text = totalInvoiceCount.toString(),
+                    style = MaterialTheme.typography.bodyLarge,
+                    fontFamily = BMitra,
+                    fontSize = dimenTextSize(R.dimen.text_size_lg)
                 )
             }
 

@@ -4,6 +4,8 @@ import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.ProductSalesSummaryRepository
 import com.example.composetrainer.domain.usecase.analytics.GetAnalyticsDataUseCase
 import com.example.composetrainer.domain.usecase.analytics.GetInvoiceReportCountUseCase
+import com.example.composetrainer.domain.usecase.analytics.GetTotalProfitPriceUseCase
+import com.example.composetrainer.domain.usecase.analytics.GetTotalSoldPriceUseCase
 import com.example.composetrainer.domain.usecase.sales.GetProductSalesSummaryUseCase
 import dagger.Module
 import dagger.Provides
@@ -29,8 +31,6 @@ object AnalyzeUseCaseModule {
     ): GetInvoiceReportCountUseCase = GetInvoiceReportCountUseCase(invoiceRepository)
 
 
-
-
     @Provides
     @Singleton
     fun provideGetProductSalesSummaryUseCase(
@@ -39,5 +39,16 @@ object AnalyzeUseCaseModule {
         GetProductSalesSummaryUseCase(productSalesSummaryRepository)
 
 
+    @Provides
+    @Singleton
+    fun provideGetTotalSoldPriceUseCase(
+        invoiceRepository: InvoiceRepository
+    ): GetTotalSoldPriceUseCase = GetTotalSoldPriceUseCase(invoiceRepository)
 
+
+    @Provides
+    @Singleton
+    fun provideGetTotalProfitPriceUseCase(
+        invoiceRepository: InvoiceRepository
+    ): GetTotalProfitPriceUseCase = GetTotalProfitPriceUseCase(invoiceRepository)
 }

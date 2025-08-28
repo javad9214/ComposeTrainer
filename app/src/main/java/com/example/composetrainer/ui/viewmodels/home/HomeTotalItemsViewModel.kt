@@ -23,7 +23,14 @@ class HomeTotalItemsViewModel @Inject constructor(
     private val getTotalProfitPriceUseCase: GetTotalProfitPriceUseCase
 ) : ViewModel() {
 
+    private val _totalInvoiceCount = MutableStateFlow(0)
+    val totalInvoiceCount: StateFlow<Int> get() = _totalInvoiceCount
 
+    private val _totalSoldPrice = MutableStateFlow(Money(0))
+    val totalSoldPrice: StateFlow<Money> get() = _totalSoldPrice
+
+    private val _totalProfitPrice = MutableStateFlow(Money(0))
+    val totalProfitPrice: StateFlow<Money> get() = _totalProfitPrice
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
@@ -31,12 +38,18 @@ class HomeTotalItemsViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
 
+    init {
+        loadAnalyticsData()
+    }
+
     private fun loadAnalyticsData(){
         viewModelScope.launch {
             _isLoading.value = true
             try {
-
-
+                _totalInvoiceCount.value = getInvoiceReportCountUseCase.getTodayInvoiceCount()
+                _totalSoldPrice.value = getTotalSoldPriceUseCase.getTodayTotalSold()
+                _totalProfitPrice.value = getTotalProfitPriceUseCase.getTodayTotalProfit()
+                _isLoading.value = false
 
             } catch (e: Exception) {
                 _errorMessage.value = e.message
