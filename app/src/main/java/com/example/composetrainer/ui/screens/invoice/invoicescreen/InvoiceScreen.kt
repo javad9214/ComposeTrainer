@@ -118,7 +118,7 @@ fun InvoiceScreen(
                         InvoiceProductItem(
                             productWithQuantity = currentInvoice.invoiceProducts[item],
                             product = currentInvoice.products[item],
-                            onRemove = { invoiceViewModel.removeFromCurrentInvoice(currentInvoice.products[item].id.value) },
+                            onRemove = { invoiceViewModel.removeFromCurrentInvoice(currentInvoice.products[item].id) },
                             onQuantityChange = { newQuantity ->
                                 invoiceViewModel.updateItemQuantity(
                                     currentInvoice.products[item].id.value,

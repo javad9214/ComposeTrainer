@@ -10,6 +10,7 @@ import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductId
 import com.example.composetrainer.domain.model.Quantity
 import com.example.composetrainer.domain.model.addProduct
+import com.example.composetrainer.domain.model.removeProduct
 import com.example.composetrainer.domain.model.updateProduct
 import com.example.composetrainer.domain.model.updateQuantity
 import com.example.composetrainer.domain.usecase.product.CheckProductStockUseCase
@@ -86,10 +87,8 @@ class InvoiceViewModel @Inject constructor(
         _currentInvoice.value = updatedList
     }
     
-    fun removeFromCurrentInvoice(productId: Long) {
-        _currentInvoice.value = _currentInvoice.value.copy(
-            invoiceProducts = _currentInvoice.value.invoiceProducts.filter { it.productId.value != productId }
-        )
+    fun removeFromCurrentInvoice(productId: ProductId) {
+        _currentInvoice.value = _currentInvoice.value.removeProduct(productId)
     }
 
     fun updateItemQuantity(productId: Long, newQuantity: Int) {

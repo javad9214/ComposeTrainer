@@ -18,6 +18,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -55,16 +56,13 @@ fun HeaderSection(
     onScanBarcodeClick: () -> Unit = {}
 ) {
     CompositionLocalProvider(LocalLayoutDirection.provides(LayoutDirection.Ltr)) {
-        Card(
+        ElevatedCard(
             modifier = Modifier.fillMaxWidth(),
             shape = RoundedCornerShape(
                 bottomStart = dimen(R.dimen.radius_xl),
                 bottomEnd = dimen(R.dimen.radius_xl)
             ),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            elevation = CardDefaults.cardElevation(
-                defaultElevation = 6.dp,
-            )
         ) {
 
             Column {

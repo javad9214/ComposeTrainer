@@ -93,7 +93,7 @@ fun InvoiceProductItem(
                             .background(MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.1f))
                     ) {
                         Icon(
-                            imageVector = Icons.Rounded.Close,
+                            painter = painterResource(R.drawable.delete_24px),
                             contentDescription = "حذف",
                             tint = MaterialTheme.colorScheme.error,
                             modifier = Modifier.size(18.dp)
