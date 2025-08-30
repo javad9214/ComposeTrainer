@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.InvoiceNumber
@@ -10,6 +11,7 @@ import com.example.composetrainer.domain.model.ProductId
 import com.example.composetrainer.domain.model.Quantity
 import com.example.composetrainer.domain.model.addProduct
 import com.example.composetrainer.domain.model.updateProduct
+import com.example.composetrainer.domain.model.updateQuantity
 import com.example.composetrainer.domain.usecase.product.CheckProductStockUseCase
 import com.example.composetrainer.domain.usecase.invoice.DeleteInvoiceUseCase
 import com.example.composetrainer.domain.usecase.invoice.GetInvoiceNumberUseCase
@@ -98,7 +100,7 @@ class InvoiceViewModel @Inject constructor(
                     val availableStock = _currentInvoice.value.products.find { it.id == ProductId(productId) }?.stock?.value ?: 0
                     // Ensure new quantity doesn't exceed stock
                     val safeQuantity = if (newQuantity > availableStock) availableStock else newQuantity
-                    invoiceProduct.copy(quantity = Quantity(safeQuantity))
+                    invoiceProduct.updateQuantity(safeQuantity)
                 } else {
                     invoiceProduct
                 }
@@ -131,5 +133,9 @@ class InvoiceViewModel @Inject constructor(
 
     fun clearCurrentInvoice() {
         _currentInvoice.value = InvoiceWithProducts.empty()
+    }
+
+    companion object{
+        const val TAG = "InvoiceViewModel"
     }
 }
