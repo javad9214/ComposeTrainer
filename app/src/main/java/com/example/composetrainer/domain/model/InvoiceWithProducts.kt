@@ -400,6 +400,19 @@ fun InvoiceWithProducts.syncInvoiceTotals(): InvoiceWithProducts {
     )
 }
 
+// Update invoice ID and all related invoice products' invoice IDs
+fun InvoiceWithProducts.updateInvoiceId(newInvoiceId: InvoiceId): InvoiceWithProducts {
+    return this.copy(
+        invoice = invoice.copy(
+            id = newInvoiceId,
+            updatedAt = LocalDateTime.now()
+        ),
+        invoiceProducts = invoiceProducts.map { invoiceProduct ->
+            invoiceProduct.copy(invoiceId = newInvoiceId)
+        }
+    )
+}
+
 // Mapping functions for different use cases
 fun InvoiceWithProducts.toInvoiceOnly(): Invoice = invoice
 

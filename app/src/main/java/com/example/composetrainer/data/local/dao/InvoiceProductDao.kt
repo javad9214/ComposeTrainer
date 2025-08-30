@@ -9,7 +9,8 @@ import com.example.composetrainer.data.local.entity.InvoiceProductCrossRefEntity
 
 @Dao
 interface InvoiceProductDao {
-    @Insert(onConflict = androidx.room.OnConflictStrategy.IGNORE)
+
+    @Insert
     suspend fun insertCrossRef(crossRef: InvoiceProductCrossRefEntity)
 
     @Delete

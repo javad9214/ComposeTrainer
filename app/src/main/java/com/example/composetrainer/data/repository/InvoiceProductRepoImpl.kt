@@ -1,5 +1,6 @@
 package com.example.composetrainer.data.repository
 
+import android.util.Log
 import com.example.composetrainer.data.local.dao.InvoiceProductDao
 import com.example.composetrainer.domain.model.InvoiceProduct
 import com.example.composetrainer.domain.model.toDomain
@@ -7,12 +8,19 @@ import com.example.composetrainer.domain.model.toEntity
 import com.example.composetrainer.domain.repository.InvoiceProductRepository
 import javax.inject.Inject
 
+const val TAG = "InvoiceProductRepoImpl"
+
 class InvoiceProductRepoImpl @Inject constructor(
     private val invoiceProductDao: InvoiceProductDao
 ): InvoiceProductRepository {
 
     override suspend fun insertCrossRef(invoiceProduct: InvoiceProduct) {
-        invoiceProductDao.insertCrossRef(invoiceProduct.toEntity())
+        try {
+            invoiceProductDao.insertCrossRef(invoiceProduct.toEntity())
+        }catch (e: Exception){
+            Log.i(TAG, "insertCrossRef: failed ${e.message}")
+        }
+
     }
 
     override suspend fun deleteCrossRef(invoiceProduct: InvoiceProduct) {

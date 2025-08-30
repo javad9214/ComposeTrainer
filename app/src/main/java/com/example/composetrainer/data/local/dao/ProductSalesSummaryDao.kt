@@ -6,7 +6,7 @@ import com.example.composetrainer.data.local.entity.ProductSalesSummaryEntity
 @Dao
 interface ProductSalesSummaryDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    @Insert
     suspend fun insert(summary: ProductSalesSummaryEntity)
 
     @Query("""

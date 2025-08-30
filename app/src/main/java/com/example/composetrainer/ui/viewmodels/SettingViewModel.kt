@@ -76,6 +76,7 @@ class SettingViewModel @Inject constructor(
             _isLoading.value = true
             _invoiceCreationProgress.value = 0
             try {
+                Log.i(TAG, "createRandomInvoices: in SettingViewModel")
                 var invoiceWithProducts: InvoiceWithProducts =
                     initInvoiceWithProductsUseCase.invoke()
                 // Get all products first

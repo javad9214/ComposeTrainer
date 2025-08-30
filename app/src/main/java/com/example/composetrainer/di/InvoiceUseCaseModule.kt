@@ -43,10 +43,9 @@ object InvoiceUseCaseModule {
     @Provides
     @Singleton
     fun provideInitInvoiceWithProductUseCase(
-        repository: InvoiceRepository,
         invoiceNumberUseCase: GetInvoiceNumberUseCase
     ): InitInvoiceWithProductsUseCase =
-        InitInvoiceWithProductsUseCase(invoiceNumberUseCase, repository)
+        InitInvoiceWithProductsUseCase(invoiceNumberUseCase)
 
     @Provides
     @Singleton

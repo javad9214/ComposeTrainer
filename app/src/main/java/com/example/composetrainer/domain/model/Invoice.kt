@@ -2,12 +2,12 @@ package com.example.composetrainer.domain.model
 
 import com.example.composetrainer.data.local.entity.InvoiceEntity
 import com.example.composetrainer.domain.model.type.Money
+import java.math.BigDecimal
+import java.math.RoundingMode
 import java.time.Instant
 import java.time.LocalDateTime
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
-import java.math.BigDecimal
-import java.math.RoundingMode
 
 // Domain Model
 data class Invoice (
@@ -113,7 +113,7 @@ data class Invoice (
 @JvmInline
 value class InvoiceId(val value: Long) {
     init {
-        require(value >= 0) { "Invoice ID must be positive" }
+        require(value >= 0) { "Invoice ID must be positive and Can be zero for new invoices" }
     }
 }
 
@@ -342,6 +342,13 @@ fun Invoice.cancel(): Invoice {
 fun Invoice.updateInvoiceDate(newDate: LocalDateTime): Invoice {
     return copy(
         invoiceDate = newDate,
+        updatedAt = LocalDateTime.now()
+    )
+}
+
+fun Invoice.updateInvoiceId(newInvoiceId: InvoiceId): Invoice {
+    return copy(
+        id = newInvoiceId,
         updatedAt = LocalDateTime.now()
     )
 }

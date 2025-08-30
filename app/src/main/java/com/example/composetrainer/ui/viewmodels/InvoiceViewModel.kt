@@ -3,20 +3,21 @@ package com.example.composetrainer.ui.viewmodels
 import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.composetrainer.domain.model.InvoiceNumber
 import com.example.composetrainer.domain.model.InvoiceProductFactory
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductId
 import com.example.composetrainer.domain.model.Quantity
 import com.example.composetrainer.domain.model.addProduct
+import com.example.composetrainer.domain.model.autoCreateInvoiceFromTemplate
 import com.example.composetrainer.domain.model.removeProduct
 import com.example.composetrainer.domain.model.updateProduct
 import com.example.composetrainer.domain.model.updateQuantity
-import com.example.composetrainer.domain.usecase.product.CheckProductStockUseCase
 import com.example.composetrainer.domain.usecase.invoice.DeleteInvoiceUseCase
 import com.example.composetrainer.domain.usecase.invoice.GetInvoiceNumberUseCase
+import com.example.composetrainer.domain.usecase.invoice.InitInvoiceWithProductsUseCase
 import com.example.composetrainer.domain.usecase.invoice.InsertInvoiceUseCase
+import com.example.composetrainer.domain.usecase.product.CheckProductStockUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -25,6 +26,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class InvoiceViewModel @Inject constructor(
+    private val initInvoiceWithProductsUseCase: InitInvoiceWithProductsUseCase,
     private val deleteInvoiceUseCase: DeleteInvoiceUseCase,
     private val insertInvoiceUseCase: InsertInvoiceUseCase,
     private val getInvoiceNumberUseCase: GetInvoiceNumberUseCase,
@@ -40,18 +42,31 @@ class InvoiceViewModel @Inject constructor(
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
     
+
     init {
         initCurrentInvoice()
     }
     
     private fun initCurrentInvoice(){
-
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                Log.i(TAG, "initCurrentInvoice: InvoiceViewModel")
+                val initialInvoice = initInvoiceWithProductsUseCase.invoke()
+                _currentInvoice.value = initialInvoice
+            } catch (e: Exception) {
+                _errorMessage.value = "Failed to init invoice: ${e.message}"
+            } finally {
+                _isLoading.value = false
+            }
+        }
         val invoiceWithProductsDraft = InvoiceWithProducts.createDefault()
         _currentInvoice.value = invoiceWithProductsDraft
     }
 
 
     fun addToCurrentInvoice(product: Product, quantity: Int) {
+
         // Find the existing item in the current invoice
         val existingItem = _currentInvoice.value.invoiceProducts.find{
              item -> item.productId == product.id 
@@ -111,14 +126,9 @@ class InvoiceViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                val invoiceNumber = getInvoiceNumberUseCase.invoke()
-                val invoiceWithProductsFinal = InvoiceWithProducts.createWithCalculatedTotals(
-                    invoiceNumber = InvoiceNumber(invoiceNumber),
-                    domainProducts = _currentInvoice.value.products,
-                    invoiceProducts = _currentInvoice.value.invoiceProducts
-                )
-
-                insertInvoiceUseCase.invoke(invoiceWithProductsFinal)
+                val finalInvoice = _currentInvoice.value.autoCreateInvoiceFromTemplate()
+                _currentInvoice.value = _currentInvoice.value.copy(invoice = finalInvoice)
+                insertInvoiceUseCase.invoke(_currentInvoice.value)
                 _currentInvoice.value = InvoiceWithProducts.empty()
                 _errorMessage.value = null
             } catch (e: Exception) {
