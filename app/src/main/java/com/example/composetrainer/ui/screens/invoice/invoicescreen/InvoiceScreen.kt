@@ -8,8 +8,11 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material3.CircularProgressIndicator
@@ -100,7 +103,9 @@ fun InvoiceScreen(
                     modifier = Modifier
                         .fillMaxWidth()
                         .weight(1f)
-                        .padding(horizontal = dimen(R.dimen.space_2))
+                        .padding(horizontal = dimen(R.dimen.space_2)),
+                    contentPadding = PaddingValues(bottom = dimen(R.dimen.space_14))
+
                 ) {
                     Log.i(
                         TAG,
@@ -121,6 +126,7 @@ fun InvoiceScreen(
                                 )
                             }
                         )
+
                     }
                 }
             } else {
@@ -141,6 +147,10 @@ fun InvoiceScreen(
         }
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
+            Log.i(
+                TAG,
+                "InvoiceScreen: is Loading $isLoading , hasItem ${currentInvoice.products.size}"
+            )
             // Bottom total section
             BottomTotalSection(
                 totalPrice = totalPrice.amount,
