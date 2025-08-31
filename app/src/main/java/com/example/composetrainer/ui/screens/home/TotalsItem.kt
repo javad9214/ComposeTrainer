@@ -58,7 +58,8 @@ fun TotalsItem(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(dimen(R.dimen.space_2)),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = str(R.string.total_sales),
@@ -94,7 +95,8 @@ fun TotalsItem(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(dimen(R.dimen.space_2)),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = str(R.string.total_profit),
@@ -129,7 +131,8 @@ fun TotalsItem(
                 modifier = modifier
                     .fillMaxWidth()
                     .padding(dimen(R.dimen.space_2)),
-                horizontalArrangement = Arrangement.SpaceBetween
+                horizontalArrangement = Arrangement.SpaceBetween,
+                verticalAlignment = Alignment.CenterVertically
             ) {
                 Text(
                     text = str(R.string.total_invoice_registered),
