@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -13,6 +14,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -42,6 +45,7 @@ import com.example.composetrainer.ui.navigation.Screen
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
+import com.example.composetrainer.ui.viewmodels.home.HomeTotalItemsViewModel
 import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
@@ -57,11 +61,20 @@ fun HomeScreen(
     onTodayButtonClick: () -> Unit = {},
     isDarkTheme: Boolean = false,
     navController: NavController = rememberNavController(),
-    homeViewModel: HomeViewModel,
-    invoiceViewModel: InvoiceViewModel = hiltViewModel()
+    homeViewModel: HomeViewModel = hiltViewModel(),
+    invoiceViewModel: InvoiceViewModel = hiltViewModel(),
+    homeTotalItemsViewModel: HomeTotalItemsViewModel = hiltViewModel()
 
 ) {
 
+    // most Sold Product Details
+    val mostSoldProducts by homeTotalItemsViewModel.products.collectAsState()
+    val mostSoldProductsSummery by homeTotalItemsViewModel.productSalesSummaryList.collectAsState()
+
+    // total Items Details
+    val totalInvoiceCount by homeTotalItemsViewModel.totalInvoiceCount.collectAsState()
+    val totalSales by homeTotalItemsViewModel.totalSoldPrice.collectAsState()
+    val totalProfit by homeTotalItemsViewModel.totalProfitPrice.collectAsState()
 
     val persianDate = remember { FarsiDateUtil.getTodayFormatted() }
     var showBottomSheet by remember { mutableStateOf(false) }
@@ -149,7 +162,8 @@ fun HomeScreen(
             ) {
                 Box(
                     modifier = Modifier
-                        .fillMaxHeight().padding(end = dimen(R.dimen.space_1) , start = dimen(R.dimen.space_4)),
+                        .fillMaxHeight()
+                        .padding(end = dimen(R.dimen.space_1), start = dimen(R.dimen.space_4)),
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
@@ -173,8 +187,37 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
 
-        TotalsItem(modifier = Modifier)
+        TotalsItem(
+            modifier = Modifier,
+            totalInvoiceCount = totalInvoiceCount,
+            totalSales = totalSales,
+            totalProfit = totalProfit
+        )
 
+        Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
+
+        Text(
+            modifier = Modifier.padding(start = dimen(R.dimen.space_4)),
+            text = str(R.string.most_sold_products),
+            style = MaterialTheme.typography.bodyLarge,
+            fontFamily = Beirut_Medium,
+            fontSize = dimenTextSize(R.dimen.text_size_lg)
+        )
+
+        Spacer(modifier = Modifier.height(dimen(R.dimen.space_2)))
+
+        LazyRow(
+            modifier = Modifier.fillMaxWidth(),
+            contentPadding = PaddingValues(horizontal = dimen(R.dimen.space_1))
+        ) {
+            items(mostSoldProducts, key = { it.id.value }) { product ->
+                MostSoldProductItem(
+                    modifier = Modifier.padding(end = dimen(R.dimen.space_2)),
+                    product = product,
+                    productSalesSummary = mostSoldProductsSummery.find { it.productId == product.id } ?: return@items
+                )
+            }
+        }
     }
 
 }
