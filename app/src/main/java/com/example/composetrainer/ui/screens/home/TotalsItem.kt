@@ -117,7 +117,7 @@ fun TotalsItem(
                     Spacer(modifier = Modifier.padding(dimen(R.dimen.space_1)))
 
                     Icon(
-                        modifier = Modifier.size(dimen(R.dimen.size_lg)).padding(end = dimen(R.dimen.space_1)),
+                        modifier = Modifier.size(dimen(R.dimen.size_md)).padding(end = dimen(R.dimen.space_1)),
                         painter = painterResource(id = R.drawable.toman),
                         contentDescription = "down",
                     )
@@ -141,11 +141,13 @@ fun TotalsItem(
                     fontSize = dimenTextSize(R.dimen.text_size_lg)
                 )
 
+
                 Text(
                     text = totalInvoiceCount.toString(),
                     style = MaterialTheme.typography.bodyLarge,
                     fontFamily = BMitra,
-                    fontSize = dimenTextSize(R.dimen.text_size_lg)
+                    fontSize = dimenTextSize(R.dimen.text_size_lg),
+                    modifier = Modifier.padding(end = dimen(R.dimen.space_4))
                 )
             }
 

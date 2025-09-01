@@ -8,6 +8,16 @@
     <string name="today">امـروز</string>
     <string name="total_profit">مجموع سود</string>
     <string name="total_invoice_registered">تعداد کل فاکتورهای ثبت شده</string>
+    <string name="most_sold_products">پرفروش ترین محصولات</string>
+    <string name="most_profitable_products">پرسـودترین محصولات</string>
+    <string name="running_out_products">موجودی درحال اتمام</string>
+
+    <!-- Most Sold Products -->
+    <string name="products_sold_count">تعداد فروخته شده</string>
+    <string name="profit">سـود</string>
+    <string name="total_amount">مبلغ کل</string>
+
+
     <!-- Invoice -->
     <string name="sale_invoice">فاکتور فروش</string>
     <string name="total">مجموع</string>

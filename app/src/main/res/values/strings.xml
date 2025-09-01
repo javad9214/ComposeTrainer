@@ -8,6 +8,14 @@
     <string name="today">TODAY</string>
     <string name="total_profit">total profit</string>
     <string name="total_invoice_registered">total invoice registered</string>
+    <string name="most_sold_products">most sold products</string>
+    <string name="most_profitable_products">most profitable products</string>
+    <string name="running_out_products">running out_products</string>
+
+    <!-- Most Sold Products -->
+    <string name="products_sold_count">products sold count</string>
+    <string name="profit">profit</string>
+    <string name="total_amount">total amount</string>
 
     <!-- Invoice -->
     <string name="sale_invoice">Sales Invoice</string>
