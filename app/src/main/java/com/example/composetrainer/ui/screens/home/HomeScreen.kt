@@ -187,6 +187,8 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
 
+        Log.i(TAG, "HomeScreen: total sale ${totalSales.amount} total profit ${totalProfit.amount}")
+
         TotalsItem(
             modifier = Modifier,
             totalInvoiceCount = totalInvoiceCount,

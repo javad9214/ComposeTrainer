@@ -5,6 +5,9 @@ import androidx.compose.ui.graphics.Color
 // --- Custom Color Roles ---
 val muted_sage_white = Color(0xFFEAE8E1) // Muted Sage White
 val blue = Color(0xFF003d99)
+val smoke_white = Color(0xFFF5F5F5)
+val snow_white = Color(0xFFFAFAFA)
+val cultured_white = Color(0xFFF3F4F6)
 
 // --- Material 3 Color Roles ---
 // Light theme colors

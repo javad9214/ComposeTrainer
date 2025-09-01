@@ -1,5 +1,6 @@
 package com.example.composetrainer.domain.usecase.analytics
 
+import android.util.Log
 import com.example.composetrainer.domain.model.type.Money
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getCurrentShamsiMonthStartEndMillis
@@ -13,6 +14,7 @@ import javax.inject.Inject
 class GetTotalSoldPriceUseCase @Inject constructor(
     private val invoiceRepository: InvoiceRepository
 ) {
+
 
     suspend fun getTodayTotalSold(): Money {
         val (start, end) = getTodayStartEndMillis()

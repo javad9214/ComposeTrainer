@@ -13,13 +13,16 @@ class ProductSalesSummaryRepoImpl @Inject constructor(
     private val productSalesSummaryDao: ProductSalesSummaryDao
 ) : ProductSalesSummaryRepository {
 
-    override suspend fun addProductSale(productId: Long, quantity: Int) {
+    override suspend fun addProductSale(productSalesSummary: ProductSalesSummary) {
+        val productId = productSalesSummary.productId.value
+        val quantity = productSalesSummary.totalSold.value
         val currentDate = getStartOfCurrentHour()
         val existingSummary = productSalesSummaryDao.getByProductAndDate(productId, currentDate)
 
         if (existingSummary != null) {
             val updatedSummary = existingSummary.copy(
-                totalSold = existingSummary.totalSold + quantity
+                totalSold = existingSummary.totalSold + quantity,
+                totalCost = existingSummary.totalCost + productSalesSummary.totalCost
             )
             productSalesSummaryDao.update(updatedSummary)
         } else {

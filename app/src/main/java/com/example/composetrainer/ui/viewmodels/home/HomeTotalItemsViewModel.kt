@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.viewmodels.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Product
@@ -80,5 +81,9 @@ class HomeTotalItemsViewModel @Inject constructor(
                 _isLoading.value = false
             }
         }
+    }
+
+    companion object {
+        const val TAG = "HomeTotalItemsViewModel"
     }
 }

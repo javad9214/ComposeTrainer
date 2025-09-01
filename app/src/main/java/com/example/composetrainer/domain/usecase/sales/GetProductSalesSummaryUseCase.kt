@@ -14,6 +14,8 @@ class GetProductSalesSummaryUseCase @Inject constructor(
     private val getProductsByIDsUseCase: GetProductsByIDsUseCase
 ) {
 
+
+
     suspend operator fun invoke(timeRange: TimeRange): Pair<List<ProductSalesSummary> , List<Product>> {
         val (startTime, endTime) = timeRange.getStartAndEndTimes()
         val summaries = productSalesSummaryRepository.getTopSellingProductsBetween(startTime, endTime)
