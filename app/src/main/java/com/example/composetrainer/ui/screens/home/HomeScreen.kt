@@ -214,7 +214,6 @@ fun HomeScreen(
         ) {
             items(mostSoldProducts, key = { it.id.value }) { product ->
                 MostSoldProductItem(
-                    modifier = Modifier.padding(end = dimen(R.dimen.space_2)),
                     product = product,
                     productSalesSummary = mostSoldProductsSummery.find { it.productId == product.id } ?: return@items
                 )
