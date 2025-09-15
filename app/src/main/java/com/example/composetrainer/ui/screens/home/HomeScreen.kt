@@ -212,10 +212,10 @@ fun HomeScreen(
             modifier = Modifier.fillMaxWidth(),
             contentPadding = PaddingValues(horizontal = dimen(R.dimen.space_1))
         ) {
-            items(mostSoldProducts, key = { it.id.value }) { product ->
+            items(mostSoldProductsSummery, key = { it.id.value }) { mostSoldProductsSummery ->
                 MostSoldProductItem(
-                    product = product,
-                    productSalesSummary = mostSoldProductsSummery.find { it.productId == product.id } ?: return@items
+                    product = mostSoldProducts.find { it.id == mostSoldProductsSummery.productId} ?: return@items,
+                    productSalesSummary = mostSoldProductsSummery
                 )
             }
         }

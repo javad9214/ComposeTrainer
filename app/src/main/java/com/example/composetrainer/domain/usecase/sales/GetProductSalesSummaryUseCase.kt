@@ -1,5 +1,6 @@
 package com.example.composetrainer.domain.usecase.sales
 
+import android.util.Log
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductSalesSummary
 import com.example.composetrainer.domain.model.SalesQuantity
@@ -20,6 +21,11 @@ class GetProductSalesSummaryUseCase @Inject constructor(
         val (startTime, endTime) = timeRange.getStartAndEndTimes()
         val summaries = productSalesSummaryRepository.getTopSellingProductsBetween(startTime, endTime)
 
+        Log.d("UseCase", "Raw summaries:")
+        summaries.forEach { s ->
+            Log.d("UseCase", "productId=${s.productId.value}, totalSold=${s.totalSold.value}, date=${s.date}")
+        }
+        
         // Group by productId and sum the values
         val aggregatedSummaries = summaries
             .groupBy { it.productId }
@@ -55,6 +61,11 @@ class GetProductSalesSummaryUseCase @Inject constructor(
             }
             // Order by total revenue in descending order (you can change this criteria)
             .sortedByDescending { it.totalSold.value }
+
+        Log.d("UseCase", "Aggregated & sorted summaries:")
+        aggregatedSummaries.forEach { s ->
+            Log.d("UseCase", "productId=${s.productId.value}, totalSold=${s.totalSold.value}")
+        }
 
         val productIds = getProductsByIDsUseCase.invoke(aggregatedSummaries.map { it.productId.value })
 
