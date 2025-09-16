@@ -172,7 +172,7 @@ fun ProductDetailsContent(
             ) {
                 // Product Name
                 Text(
-                    text = "Name",
+                    text = str(R.string.product_name),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.primary
@@ -187,7 +187,7 @@ fun ProductDetailsContent(
 
                 // Barcode
                 Text(
-                    text = "Barcode",
+                    text = str(R.string.Barcode),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.primary
@@ -215,7 +215,7 @@ fun ProductDetailsContent(
 
                 // Stock (Editable)
                 Text(
-                    text = "Stock",
+                    text = str(R.string.stock),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.primary
@@ -272,7 +272,7 @@ fun ProductDetailsContent(
 
                 // Price (Editable)
                 Text(
-                    text = "Price",
+                    text = str(R.string.price),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.primary
@@ -306,7 +306,7 @@ fun ProductDetailsContent(
 
                 // Category (Read-only)
                 Text(
-                    text = "Category",
+                    text = str(R.string.category_id_optional),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.primary
@@ -321,7 +321,7 @@ fun ProductDetailsContent(
 
                 // Subcategory (Read-only)
                 Text(
-                    text = "Subcategory",
+                    text = str(R.string.category_id_optional),
                     fontWeight = FontWeight.Bold,
                     fontSize = 16.sp,
                     color = MaterialTheme.colorScheme.primary
@@ -345,7 +345,7 @@ fun ProductDetailsContent(
                 onClick = onCancel,
                 modifier = Modifier.weight(1f)
             ) {
-                Text("Cancel")
+                Text(str(R.string.cancel))
             }
 
             Button(
@@ -362,7 +362,7 @@ fun ProductDetailsContent(
                     containerColor = MaterialTheme.colorScheme.primary
                 )
             ) {
-                Text("Save")
+                Text(str(R.string.save))
             }
         }
     }

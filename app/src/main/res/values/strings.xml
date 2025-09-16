@@ -86,6 +86,13 @@
     <string name="search_products">Search Products...</string>
     <string name="clear_search">Clear Search</string>
 
+    <!-- Product Details -->
+    <string name="products_name">Product Name</string>
+    <string name="Barcode">Barcode</string>
+
+    
+    
+    
     <!-- Analyze Screen -->
     <string name="sales_analyse">Sales Analysis</string>
     <string name="refresh">Refresh</string>

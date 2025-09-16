@@ -92,6 +92,10 @@
     <string name="search_product">جستجوی محصول...</string>
     <string name="confirm">تایید</string>
 
+    <!-- Product Details -->
+    <string name="products_name">نام محصول</string>
+    <string name="Barcode">بارکد</string>
+
     <!-- Analyze Screen -->
     <string name="sales_analyse">تحلیل فروش</string>
     <string name="refresh">بارگذاری مجدد</string>
