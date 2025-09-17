@@ -85,9 +85,14 @@ dependencies {
     kapt(libs.hilt.compiler)
     implementation(libs.hilt.navigation.compose)
 
-
-    implementation (libs.gson)
-
+    // Network
+    implementation(libs.gson)
+    implementation(libs.retrofit)
+    implementation(libs.converter.gson)
+    implementation(libs.adapter.rxjava2)
+    implementation(libs.okhttp)
+    implementation(libs.logging.interceptor)
+    implementation(libs.sandwich)
     // Room
     implementation(libs.room.runtime)
     ksp(libs.room.compiler)
