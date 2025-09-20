@@ -1,3 +1,6 @@
+import java.util.Properties
+import java.io.FileInputStream
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.jetbrains.kotlin.android)
@@ -7,9 +10,16 @@ plugins {
     id("com.google.devtools.ksp")
 }
 
+
+val localProperties = Properties().apply {
+    load(FileInputStream(rootProject.file("local.properties")))
+}
+
 android {
     namespace = "com.example.composetrainer"
     compileSdk = 36
+
+
 
     defaultConfig {
         applicationId = "com.example.composetrainer"
@@ -17,6 +27,9 @@ android {
         targetSdk = 36
         versionCode = 11
         versionName = "0.4.4"
+
+        // Add BASE_URL from local.properties
+        buildConfigField("String", "BASE_URL", "\"${localProperties["BASE_URL"]}\"")
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         vectorDrawables {
@@ -41,6 +54,7 @@ android {
         jvmTarget = "17"
     }
     buildFeatures {
+        buildConfig = true
         compose = true
     }
     composeOptions {
