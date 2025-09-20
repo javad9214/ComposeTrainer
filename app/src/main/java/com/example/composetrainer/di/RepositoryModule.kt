@@ -4,11 +4,13 @@ import com.example.composetrainer.data.repository.InvoiceProductRepoImpl
 import com.example.composetrainer.data.repository.InvoiceRepoImpl
 import com.example.composetrainer.data.repository.ProductRepoImpl
 import com.example.composetrainer.data.repository.ProductSalesSummaryRepoImpl
+import com.example.composetrainer.data.repository.ServerMainProductRepoImpl
 import com.example.composetrainer.data.repository.StockMovementRepoImpl
 import com.example.composetrainer.domain.repository.InvoiceProductRepository
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.ProductRepository
 import com.example.composetrainer.domain.repository.ProductSalesSummaryRepository
+import com.example.composetrainer.domain.repository.ServerMainProductRepository
 import com.example.composetrainer.domain.repository.StockMovementRepository
 import dagger.Module
 import dagger.Provides
@@ -49,4 +51,10 @@ object RepositoryModule {
     fun provideStockMovementRepository(
         repoImpl: StockMovementRepoImpl
     ) : StockMovementRepository = repoImpl
+
+    @Provides
+    @Singleton
+    fun provideServerMainProductRepository(
+        repoImpl: ServerMainProductRepoImpl
+    ): ServerMainProductRepository = repoImpl
 }
