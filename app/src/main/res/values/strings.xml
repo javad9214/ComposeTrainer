@@ -90,7 +90,9 @@
     <string name="products_name">Product Name</string>
     <string name="Barcode">Barcode</string>
 
-    
+    <!-- Server Main Products  -->
+    <string name="add_to_my_products">Add To My Products</string>
+    <string name="suggestion_price">Suggestion Price</string>
     
     
     <!-- Analyze Screen -->

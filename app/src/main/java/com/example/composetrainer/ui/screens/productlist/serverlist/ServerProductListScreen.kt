@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.Sort
 import androidx.compose.material.icons.filled.Close
@@ -17,13 +18,19 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.Beirut_Medium
+import com.example.composetrainer.ui.viewmodels.MainProductsViewModel
 import com.example.composetrainer.ui.viewmodels.SortOrder
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
@@ -36,7 +43,24 @@ fun ServerProductListScreen(
     onSearchQueryChange: (String) -> Unit,
     onSortOrderSelected: (SortOrder) -> Unit,
     onScanBarcode: () -> Unit,
+    mainProductsViewModel: MainProductsViewModel = hiltViewModel()
 ) {
+
+    val uiState by mainProductsViewModel.uiState.collectAsState()
+    val listState = rememberLazyListState()
+
+    LaunchedEffect(listState) {
+        snapshotFlow {
+            listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index
+        }.collect { lastVisibleIndex ->
+            if (lastVisibleIndex != null &&
+                lastVisibleIndex >= uiState.products.size - 3 &&
+                uiState.hasMorePages &&
+                !uiState.isLoadingMore) {
+                mainProductsViewModel.loadMoreProducts()
+            }
+        }
+    }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -112,5 +136,7 @@ fun ServerProductListScreen(
                 errorIndicatorColor = Color.Transparent
             )
         )
+        
+        
     }
 }
