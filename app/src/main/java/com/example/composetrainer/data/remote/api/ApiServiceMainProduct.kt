@@ -1,5 +1,6 @@
 package com.example.composetrainer.data.remote.api
 
+import com.example.composetrainer.data.remote.dto.ApiResponseDto
 import com.example.composetrainer.data.remote.dto.PagedResponseDto
 import com.example.composetrainer.data.remote.dto.ProductDto
 import retrofit2.http.GET
@@ -28,14 +29,14 @@ interface ApiServiceMainProduct {
     ):  ApiResponse<PagedResponseDto<ProductDto>>
 
     @POST("products")
-    suspend fun createProduct(@Body product: ProductDto): ProductDto
+    suspend fun createProduct(@Body product: ProductDto): ApiResponse<ApiResponseDto<Long>>
 
     @PUT("products/{id}")
     suspend fun updateProduct(
         @Path("id") id: Long,
         @Body product: ProductDto
-    ): ProductDto
+    ): ApiResponse<ApiResponseDto<Void>>
 
     @DELETE("products/{id}")
-    suspend fun deleteProduct(@Path("id") id: Long): Response<Void>
+    suspend fun deleteProduct(@Path("id") id: Long): ApiResponse<ApiResponseDto<Void>>
 }

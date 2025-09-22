@@ -7,8 +7,8 @@ import com.example.composetrainer.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 
 interface ServerMainProductRepository {
-    suspend fun createProduct(product: ProductDto): ProductDto
-    suspend fun updateProduct(id: Long, product: ProductDto): ProductDto
+    suspend fun createProduct(product: Product)
+    suspend fun updateProduct(id: Long, product: Product)
     suspend fun deleteProduct(id: Long)
     fun getAllProducts(page: Int, size: Int): Flow<Resource<PagedResponseDto<Product>>>
     fun searchProducts(query: String, page: Int, size: Int): Flow<Resource<PagedResponseDto<Product>>>

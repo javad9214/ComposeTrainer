@@ -6,6 +6,7 @@ import com.example.composetrainer.data.remote.dto.ProductDto
 import com.example.composetrainer.data.remote.util.ApiResponseHandler
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.toDomain
+import com.example.composetrainer.domain.model.toDto
 import com.example.composetrainer.domain.repository.ServerMainProductRepository
 import com.example.composetrainer.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
@@ -13,12 +14,12 @@ import kotlinx.coroutines.flow.Flow
 class ServerMainProductRepoImpl(private val apiServiceMainProduct: ApiServiceMainProduct) :
     ServerMainProductRepository {
 
-    override suspend fun createProduct(product: ProductDto): ProductDto {
-        return apiServiceMainProduct.createProduct(product)
+    override suspend fun createProduct(product: Product) {
+         apiServiceMainProduct.createProduct(product.toDto())
     }
 
-    override suspend fun updateProduct(id: Long, product: ProductDto): ProductDto {
-        return apiServiceMainProduct.updateProduct(id, product)
+    override suspend fun updateProduct(id: Long, product: Product){
+         apiServiceMainProduct.updateProduct(id, product.toDto())
     }
 
     override suspend fun deleteProduct(id: Long) {
