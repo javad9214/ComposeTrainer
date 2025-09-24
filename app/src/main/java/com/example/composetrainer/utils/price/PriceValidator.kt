@@ -1,4 +1,4 @@
-package com.example.composetrainer.utils
+package com.example.composetrainer.utils.price
 
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols

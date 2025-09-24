@@ -35,7 +35,8 @@ import com.example.composetrainer.domain.model.Barcode
 import com.example.composetrainer.domain.model.type.Money
 import com.example.composetrainer.domain.model.StockQuantity
 import com.example.composetrainer.domain.model.ProductName
-import com.example.composetrainer.utils.BarcodeGenerator
+import com.example.composetrainer.utils.barcode.BarcodeGenerator
+import com.example.composetrainer.utils.price.ThousandSeparatorTransformation
 import java.time.LocalDateTime
 
 @Composable
@@ -124,12 +125,16 @@ fun AddProductBottomSheet(
             // Price
             OutlinedTextField(
                 value = price,
-                onValueChange = { price = it },
+                onValueChange = { newText ->
+                    // store raw number (without commas) in state
+                    price = newText.replace(",", "")
+                },
                 label = { Text(stringResource(R.string.price_optional)) },
                 modifier = Modifier.fillMaxWidth(),
                 keyboardOptions = KeyboardOptions.Default.copy(
                     keyboardType = KeyboardType.Number
                 ),
+                visualTransformation = ThousandSeparatorTransformation(),
                 shape = RoundedCornerShape(12.dp),
                 colors = OutlinedTextFieldDefaults.colors(
                     focusedBorderColor = MaterialTheme.colorScheme.primary,
