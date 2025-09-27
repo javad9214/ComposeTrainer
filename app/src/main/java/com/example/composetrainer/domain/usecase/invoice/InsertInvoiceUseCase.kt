@@ -2,6 +2,7 @@ package com.example.composetrainer.domain.usecase.invoice
 
 import android.util.Log
 import com.example.composetrainer.domain.model.InvoiceId
+import com.example.composetrainer.domain.model.InvoiceType
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.StockMovementFactory
 import com.example.composetrainer.domain.model.updateInvoiceId
@@ -31,21 +32,10 @@ class InsertInvoiceUseCase @Inject constructor(
         invoiceWithProducts.updateInvoiceId(InvoiceId(invoiceId))
 
         // save InvoiceProduct
-        Log.i(
-            TAG,
-            "invoke: Starting InvoiceProduct loop with ${invoiceWithProducts.invoiceProducts.size} items"
-        )
         invoiceWithProducts.invoiceProducts.forEachIndexed { index, invoiceProduct ->
             try {
-                Log.i(
-                    TAG,
-                    "invoke: Processing InvoiceProduct for item $index - ProductId: ${invoiceProduct.productId}"
-                )
                 invoiceProductRepository.insertCrossRef(invoiceProduct)
-                Log.i(
-                    TAG,
-                    "invoke: Successfully processed InvoiceProduct for item $index - ProductId: ${invoiceProduct.productId}"
-                )
+
             } catch (e: Exception) {
                 Log.e(
                     TAG,
@@ -55,24 +45,20 @@ class InsertInvoiceUseCase @Inject constructor(
                 throw e
             }
         }
-        Log.i(TAG, "invoke: Completed InvoiceProduct loop")
 
+        if (invoiceWithProducts.invoice.invoiceType == InvoiceType.SALE) {
+            insertSaleInvoice(invoiceWithProducts)
+        } else insertPurchaseInvoice(invoiceWithProducts)
+
+    }
+
+    private suspend fun insertSaleInvoice(invoiceWithProducts: InvoiceWithProducts) {
         // save ProductSalesSummary
-        Log.i(
-            TAG,
-            "invoke: Starting ProductSalesSummary loop with ${invoiceWithProducts.invoiceProducts.size} items"
-        )
         invoiceWithProducts.invoiceProducts.forEachIndexed { index, invoiceProduct ->
             try {
-                Log.i(
-                    TAG,
-                    "invoke: Processing item $index - ProductId: ${invoiceProduct.productId}"
-                )
+
                 saveProductSaleSummeryUseCase.invoke(invoiceProduct)
-                Log.i(
-                    TAG,
-                    "invoke: Successfully processed item $index - ProductId: ${invoiceProduct.productId}"
-                )
+
             } catch (e: Exception) {
                 Log.e(
                     TAG,
@@ -83,29 +69,16 @@ class InsertInvoiceUseCase @Inject constructor(
                 throw e
             }
         }
-        Log.i(TAG, "invoke: Completed ProductSalesSummary loop")
 
         // save StockMovement
-        Log.i(
-            TAG,
-            "invoke: Starting StockMovement loop with ${invoiceWithProducts.invoiceProducts.size} items"
-        )
         invoiceWithProducts.invoiceProducts.forEachIndexed { index, invoiceProduct ->
             try {
-                Log.i(
-                    TAG,
-                    "invoke: Processing StockMovement for item $index - ProductId: ${invoiceProduct.productId}"
-                )
                 stockMovementRepository.insert(
                     StockMovementFactory.createSale(
                         productId = invoiceProduct.productId.value,
                         quantitySold = invoiceProduct.quantity.value,
                         invoiceId = invoiceProduct.invoiceId.value,
                     )
-                )
-                Log.i(
-                    TAG,
-                    "invoke: Successfully processed StockMovement for item $index - ProductId: ${invoiceProduct.productId}"
                 )
             } catch (e: Exception) {
                 Log.e(
@@ -116,6 +89,27 @@ class InsertInvoiceUseCase @Inject constructor(
                 throw e
             }
         }
-        Log.i(TAG, "invoke: Completed StockMovement loop")
+    }
+
+    private suspend fun insertPurchaseInvoice(invoiceWithProducts: InvoiceWithProducts) {
+        // save StockMovement
+        invoiceWithProducts.invoiceProducts.forEachIndexed { index, invoiceProduct ->
+            try {
+                stockMovementRepository.insert(
+                    StockMovementFactory.createPurchase(
+                        productId = invoiceProduct.productId.value,
+                        quantityPurchased = invoiceProduct.quantity.value,
+                        invoiceId = invoiceProduct.invoiceId.value,
+                    )
+                )
+            } catch (e: Exception) {
+                Log.e(
+                    TAG,
+                    "invoke: Error processing StockMovement for item $index - ProductId: ${invoiceProduct.productId}",
+                    e
+                )
+                throw e
+            }
+        }
     }
 }

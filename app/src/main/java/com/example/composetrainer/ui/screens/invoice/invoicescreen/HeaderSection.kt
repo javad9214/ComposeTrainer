@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material3.Button
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
@@ -42,10 +41,9 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
+import com.example.composetrainer.domain.model.InvoiceType
 import com.example.composetrainer.ui.theme.BKoodak
-import com.example.composetrainer.ui.theme.BLotus
 import com.example.composetrainer.ui.theme.BMitra
-import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.theme.smoke_white
@@ -60,11 +58,11 @@ fun HeaderSection(
     currentTime: String,
     onAddProductClick: () -> Unit,
     onClose: () -> Unit,
-    onScanBarcodeClick: () -> Unit = {}
+    onScanBarcodeClick: () -> Unit = {},
+    onInvoiceTypeChange: (InvoiceType) -> Unit = {}
 ) {
 
     var isSaleInvoice by remember { mutableStateOf(true) }
-
 
     CompositionLocalProvider(LocalLayoutDirection.provides(LayoutDirection.Ltr)) {
         ElevatedCard(
@@ -107,7 +105,11 @@ fun HeaderSection(
                                 bounded = true
                             ),
                             interactionSource = remember { MutableInteractionSource() }
-                        ) { isSaleInvoice = !isSaleInvoice },
+                        ) {
+                            isSaleInvoice = !isSaleInvoice
+                            if (isSaleInvoice) onInvoiceTypeChange(InvoiceType.SALE)
+                            else onInvoiceTypeChange(InvoiceType.PURCHASE)
+                        },
                         shape = RoundedCornerShape(dimen(R.dimen.radius_md)),
                         colors = CardDefaults.cardColors(containerColor = smoke_white),
                     ) {

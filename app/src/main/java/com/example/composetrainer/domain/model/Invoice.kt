@@ -137,7 +137,6 @@ value class InvoiceNumber(val value: Long) {
 enum class InvoiceType(val code: String, val displayName: String) {
     SALE("S", "Sale"),
     PURCHASE("B", "Purchase"),  // "B" for Buy
-    SERVICE("SV", "Service"),
     REFUND("R", "Refund");
 
     companion object {

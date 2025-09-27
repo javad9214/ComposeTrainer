@@ -41,7 +41,6 @@ class MainProductsViewModel @Inject constructor(
     private val _deleteState = MutableStateFlow<Resource<Product>>(Resource.Loading())
     val deleteState: StateFlow<Resource<Product>> = _deleteState
 
-
     init {
         loadProducts(reset = true)
     }

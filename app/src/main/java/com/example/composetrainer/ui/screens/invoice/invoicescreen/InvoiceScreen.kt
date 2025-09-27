@@ -33,15 +33,15 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.calculateTotalAmount
 import com.example.composetrainer.domain.model.hasProducts
+import com.example.composetrainer.ui.components.barcodescanner.BarcodeScannerView
 import com.example.composetrainer.ui.screens.invoice.productselection.AddProductToInvoice
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
-import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
-import com.example.composetrainer.utils.dimen
-import com.example.composetrainer.ui.components.barcodescanner.BarcodeScannerView
-import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
+import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.utils.barcode.BarcodeSoundPlayer
+import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
+import com.example.composetrainer.utils.dimen
 
 @Composable
 fun InvoiceScreen(
@@ -92,7 +92,10 @@ fun InvoiceScreen(
                 currentTime = currentTime,
                 onAddProductClick = { showProductSelection = true },
                 onClose = onClose,
-                onScanBarcodeClick = { showBarcodeScannerView = true }
+                onScanBarcodeClick = { showBarcodeScannerView = true },
+                onInvoiceTypeChange = { invoiceType ->
+                    invoiceViewModel.changeInvoiceType(invoiceType)
+                }
             )
 
             // Products list section

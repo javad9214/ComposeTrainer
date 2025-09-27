@@ -4,6 +4,7 @@ import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.InvoiceProductFactory
+import com.example.composetrainer.domain.model.InvoiceType
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductId
@@ -41,13 +42,13 @@ class InvoiceViewModel @Inject constructor(
 
     private val _errorMessage = MutableStateFlow<String?>(null)
     val errorMessage: StateFlow<String?> get() = _errorMessage
-    
+
 
     init {
         initCurrentInvoice()
     }
-    
-    private fun initCurrentInvoice(){
+
+    private fun initCurrentInvoice() {
         viewModelScope.launch {
             _isLoading.value = true
             try {
@@ -64,27 +65,28 @@ class InvoiceViewModel @Inject constructor(
         _currentInvoice.value = invoiceWithProductsDraft
     }
 
-
     fun addToCurrentInvoice(product: Product, quantity: Int) {
 
         // Find the existing item in the current invoice
-        val existingItem = _currentInvoice.value.invoiceProducts.find{
-             item -> item.productId == product.id 
+        val existingItem = _currentInvoice.value.invoiceProducts.find { item ->
+            item.productId == product.id
         }
 
         val availableStock = product.stock
-        val safeQuantityToAdd = if (quantity > availableStock.value) availableStock.value else quantity
+        val safeQuantityToAdd =
+            if (quantity > availableStock.value) availableStock.value else quantity
 
         val updatedList = if (existingItem != null) {
             // Calculate the new total quantity for the existing item
             val newTotalQuantity = existingItem.quantity.value + safeQuantityToAdd
-            val finalQuantity = if (newTotalQuantity > availableStock.value) availableStock.value else newTotalQuantity
+            val finalQuantity =
+                if (newTotalQuantity > availableStock.value) availableStock.value else newTotalQuantity
 
             // Update the existing invoice item
             _currentInvoice.value.updateProduct(
                 productId = product.id,
                 updater = { invoiceProduct ->
-                        invoiceProduct.copy(quantity = Quantity(finalQuantity))
+                    invoiceProduct.copy(quantity = Quantity(finalQuantity))
                 })
         } else {
             // Create a new invoiceProduct item if no existing item is found
@@ -101,7 +103,7 @@ class InvoiceViewModel @Inject constructor(
         // Update the current invoice state
         _currentInvoice.value = updatedList
     }
-    
+
     fun removeFromCurrentInvoice(productId: ProductId) {
         _currentInvoice.value = _currentInvoice.value.removeProduct(productId)
     }
@@ -111,9 +113,12 @@ class InvoiceViewModel @Inject constructor(
             invoiceProducts = _currentInvoice.value.invoiceProducts.map { invoiceProduct ->
                 if (invoiceProduct.productId.value == productId) {
                     // Get available stock from the product
-                    val availableStock = _currentInvoice.value.products.find { it.id == ProductId(productId) }?.stock?.value ?: 0
+                    val availableStock =
+                        _currentInvoice.value.products.find { it.id == ProductId(productId) }?.stock?.value
+                            ?: 0
                     // Ensure new quantity doesn't exceed stock
-                    val safeQuantity = if (newQuantity > availableStock) availableStock else newQuantity
+                    val safeQuantity =
+                        if (newQuantity > availableStock) availableStock else newQuantity
                     invoiceProduct.updateQuantity(safeQuantity)
                 } else {
                     invoiceProduct
@@ -140,11 +145,19 @@ class InvoiceViewModel @Inject constructor(
         }
     }
 
+    fun changeInvoiceType(invoiceType: InvoiceType) {
+        _currentInvoice.value = _currentInvoice.value.copy(
+            invoice = _currentInvoice.value.invoice.copy(
+                invoiceType = invoiceType
+            )
+        )
+    }
+
     fun clearCurrentInvoice() {
         _currentInvoice.value = InvoiceWithProducts.empty()
     }
 
-    companion object{
+    companion object {
         const val TAG = "InvoiceViewModel"
     }
 }
