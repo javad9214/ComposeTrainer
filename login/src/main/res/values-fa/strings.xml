@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="register_title">ایجاد حساب</string>
+    <string name="register_subtitle">به ما بپیوندید و انبار خود را آسان مدیریت کنید</string>
+    <string name="register_button">ثبت‌نام</string>
+    <string name="full_name">نام کامل</string>
+    <string name="phone_number">شماره تلفن</string>
+    <string name="password">رمز عبور</string>
+</resources>
