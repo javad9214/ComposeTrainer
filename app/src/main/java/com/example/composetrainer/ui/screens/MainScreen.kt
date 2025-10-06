@@ -22,6 +22,7 @@ import androidx.navigation.navArgument
 import com.example.composetrainer.ui.components.CustomNavigationBar
 import com.example.composetrainer.ui.navigation.BottomNavItem
 import com.example.composetrainer.ui.navigation.Routes
+import com.example.composetrainer.ui.navigation.Screen
 import com.example.composetrainer.ui.screens.home.HomeScreen
 import com.example.composetrainer.ui.screens.invoice.invoicescreen.InvoiceScreen
 import com.example.composetrainer.ui.screens.invoicelist.InvoiceDetailScreen
@@ -33,6 +34,7 @@ import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.login.ui.screens.LoginScreen
+import com.example.login.ui.screens.RegisterScreen
 
 @Composable
 fun MainScreen(
@@ -93,15 +95,34 @@ fun MainScreen(
             modifier = Modifier
                 .padding(innerPadding)
         ) {
-            composable(Routes.LOGIN) {
+            composable(route = Screen.Login.route) {
                 LoginScreen(
                     onLoginSuccess = {
                         navController.navigate(Routes.HOME) {
                             popUpTo(Routes.LOGIN) { inclusive = true }
                         }
+                    },
+                    onRegisterClick = {
+                        navController.navigate(Screen.Register.route)
                     }
                 )
             }
+
+            composable(route = Screen.Register.route) {
+                RegisterScreen(
+                    onRegisterClick = {
+                        navController.navigate(Routes.HOME) {
+                            popUpTo(Routes.LOGIN) { inclusive = true }
+                        }
+                    },
+                    onNavigateToLogin = {
+                        navController.navigate(Screen.Login.route) {
+                            popUpTo(Screen.Login.route) { inclusive = true }
+                        }
+                    }
+                )
+            }
+
             composable(Routes.PRODUCTS_LIST) {
                 ProductScreen(navController = navController)
             }

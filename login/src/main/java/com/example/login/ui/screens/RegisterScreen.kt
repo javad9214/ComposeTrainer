@@ -36,7 +36,8 @@ import com.example.login.R
 
 @Composable
 fun RegisterScreen(
-    onRegisterClick: () -> Unit = {}
+    onRegisterClick: () -> Unit = {},
+    onNavigateToLogin: () -> Unit = {}
 ) {
     var fullName by remember { mutableStateOf("") }
     var phoneNumber by remember { mutableStateOf("") }

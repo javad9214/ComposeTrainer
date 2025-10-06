@@ -1,6 +1,8 @@
 package com.example.composetrainer.ui.navigation
 
 sealed class Screen(val route: String) {
+    object Login : Screen(Routes.LOGIN)
+    object Register : Screen(Routes.REGISTER)
     object Home : Screen(Routes.HOME)
     object Products : Screen(Routes.PRODUCTS_LIST)
     object Invoice : Screen(Routes.INVOICE_CREATE)
