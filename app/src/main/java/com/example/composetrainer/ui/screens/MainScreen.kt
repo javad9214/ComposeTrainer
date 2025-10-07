@@ -110,11 +110,7 @@ fun MainScreen(
 
             composable(route = Screen.Register.route) {
                 RegisterScreen(
-                    onRegisterClick = {
-                        navController.navigate(Routes.HOME) {
-                            popUpTo(Routes.LOGIN) { inclusive = true }
-                        }
-                    },
+
                     onNavigateToLogin = {
                         navController.navigate(Screen.Login.route) {
                             popUpTo(Screen.Login.route) { inclusive = true }

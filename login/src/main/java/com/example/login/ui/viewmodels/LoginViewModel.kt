@@ -6,6 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.login.domain.usecase.LoginUseCase
+import com.example.login.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,12 +37,20 @@ class LoginViewModel @Inject constructor(
 
     fun login(onSuccess: () -> Unit) {
         viewModelScope.launch {
-            if (validateInputs()){
-                val result = loginUseCase(username.value, password.value)
-                if(result.isSuccess){
-                    onSuccess()
-                }else{
-                    _errorMessage.value = result.exceptionOrNull()?.message?:"Login failed"
+            if (validateInputs()) {
+                _errorMessage.value = null
+                loginUseCase(username.value, password.value).collect { result ->
+                    when (result) {
+                        is Resource.Success -> {
+                            onSuccess()
+                        }
+                        is Resource.Error -> {
+                            _errorMessage.value = result.message
+                        }
+                        is Resource.Loading -> {
+                            // Optionally handle loading state here if needed
+                        }
+                    }
                 }
             }
         }

@@ -22,6 +22,7 @@ object NetworkModule {
         level = HttpLoggingInterceptor.Level.BODY // Change to your preferred log level
     }
 
+    @LoginOkHttpClient
     @Provides
     @Singleton
     fun provideOkHttpClient(): OkHttpClient {

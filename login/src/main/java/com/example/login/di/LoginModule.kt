@@ -6,6 +6,7 @@ import com.example.login.data.repository.LoginRepositoryImpl
 import com.example.login.domain.repository.AuthRepository
 import com.example.login.domain.repository.LoginRepository
 import com.example.login.domain.usecase.LoginUseCase
+import com.example.login.domain.usecase.RegisterUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -35,6 +36,6 @@ object LoginModule {
 
     @Provides
     @Singleton
-    fun provideRegisterUseCase(authRepository: AuthRepository): LoginUseCase =
-        LoginUseCase(authRepository)
+    fun provideRegisterUseCase(authRepository: AuthRepository): RegisterUseCase =
+        RegisterUseCase(authRepository)
 }

@@ -54,6 +54,12 @@ fun LoginScreen(
                     onLoginSuccess()
                     viewModel.clearLoginState()
                 }
+                is Resource.Error -> {
+                    // No side-effect here; UI shows the error message
+                }
+                is Resource.Loading -> {
+                    // No side-effect here; UI shows the loading state
+                }
             }
         }
     }

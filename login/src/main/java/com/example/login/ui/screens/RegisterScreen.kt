@@ -55,10 +55,10 @@ fun RegisterScreen(
                     viewModel.clearRegisterState()
                 }
                 is Resource.Error -> {
-                    // 错误情况不需要特殊处理，将在UI中显示
+                    // No side-effect here; UI shows the error message
                 }
                 is Resource.Loading -> {
-                    // 加载状态不需要特殊处理
+                    // No side-effect here; UI shows the loading state
                 }
             }
         }
