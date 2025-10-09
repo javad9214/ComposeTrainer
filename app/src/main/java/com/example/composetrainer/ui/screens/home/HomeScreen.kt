@@ -33,6 +33,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -42,6 +43,7 @@ import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.composetrainer.R
 import com.example.composetrainer.ui.navigation.Screen
+import com.example.composetrainer.ui.screens.component.TodayCard
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
@@ -194,6 +196,10 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
 
+        TodayCard(modifier = Modifier, onSelected = {})
+
+        Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
+
         Log.i(TAG, "HomeScreen: total sale ${totalSales.amount} total profit ${totalProfit.amount}")
 
         TotalsItem(
@@ -221,7 +227,8 @@ fun HomeScreen(
         ) {
             items(mostSoldProductsSummery, key = { it.id.value }) { mostSoldProductsSummery ->
                 MostSoldProductItem(
-                    product = mostSoldProducts.find { it.id == mostSoldProductsSummery.productId} ?: return@items,
+                    product = mostSoldProducts.find { it.id == mostSoldProductsSummery.productId }
+                        ?: return@items,
                     productSalesSummary = mostSoldProductsSummery
                 )
             }

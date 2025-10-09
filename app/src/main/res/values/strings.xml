@@ -8,12 +8,21 @@
     <string name="welcomeToHomeScreen">Welcome to Yaranbar!</string>
     <string name="Hello">HI</string>
     <string name="daily_message">Good Morning</string>
-    <string name="today">TODAY</string>
     <string name="total_profit">total profit</string>
     <string name="total_invoice_registered">total invoice registered</string>
     <string name="most_sold_products">most sold products</string>
     <string name="most_profitable_products">most profitable products</string>
     <string name="running_out_products">running out_products</string>
+
+    <!-- DATES -->
+    <string name="today">TODAY</string>
+    <string name="yesterday">YESTERDAY</string>
+    <string name="this_week">THIS WEEK</string>
+    <string name="last_week">LAST WEEK</string>
+    <string name="this_month">THIS MONTH</string>
+    <string name="last_month">LAST MONTH</string>
+    <string name="this_year">THIS YEAR</string>
+    <string name="last_year">LAST YEAR</string>
 
     <!-- Most Sold Products -->
     <string name="products_sold_count">products sold count</string>

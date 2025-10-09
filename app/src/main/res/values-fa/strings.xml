@@ -9,12 +9,22 @@
     <string name="welcomeToHomeScreen">Welcome To Yar Anbar</string>
     <string name="Hello">سـلام !</string>
     <string name="daily_message">روزت بخیر</string>
-    <string name="today">امـروز</string>
+
     <string name="total_profit">مجموع سود</string>
     <string name="total_invoice_registered">تعداد کل فاکتورهای ثبت شده</string>
     <string name="most_sold_products">پرفروش ترین محصولات</string>
     <string name="most_profitable_products">پرسـودترین محصولات</string>
     <string name="running_out_products">موجودی درحال اتمام</string>
+
+    <!-- DATES -->
+    <string name="today">امـروز</string>
+    <string name="yesterday">دیروز</string>
+    <string name="this_week">این هفته</string>
+    <string name="last_week">هفته گذشته</string>
+    <string name="this_month">این ماه</string>
+    <string name="last_month">ماه گذشته</string>
+    <string name="this_year">امسال</string>
+    <string name="last_year">سال گذشته</string>
 
     <!-- Most Sold Products -->
     <string name="products_sold_count">تعداد فروخته شده</string>

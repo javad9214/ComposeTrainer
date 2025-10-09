@@ -54,9 +54,11 @@ fun LoginScreen(
                     onLoginSuccess()
                     viewModel.clearLoginState()
                 }
+
                 is Resource.Error -> {
                     // No side-effect here; UI shows the error message
                 }
+
                 is Resource.Loading -> {
                     // No side-effect here; UI shows the loading state
                 }
@@ -98,7 +100,10 @@ fun LoginScreen(
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 Button(
-                    onClick = { viewModel.login(phoneNumber, password) },
+                    onClick = {
+                       // viewModel.login(phoneNumber, password)
+                        onLoginSuccess()
+                    },
                     modifier = Modifier.fillMaxWidth(),
                     shape = MaterialTheme.shapes.medium,
                     enabled = loginState !is Resource.Loading
@@ -160,8 +165,16 @@ fun LoginScreen(
 
             loginState?.let {
                 when (it) {
-                    is Resource.Loading -> Text("Logging in...", color = MaterialTheme.colorScheme.primary)
-                    is Resource.Error -> Text("Error: ${it.message}", color = MaterialTheme.colorScheme.error)
+                    is Resource.Loading -> Text(
+                        "Logging in...",
+                        color = MaterialTheme.colorScheme.primary
+                    )
+
+                    is Resource.Error -> Text(
+                        "Error: ${it.message}",
+                        color = MaterialTheme.colorScheme.error
+                    )
+
                     is Resource.Success -> {} // handled in LaunchedEffect
                 }
             }
