@@ -17,13 +17,16 @@ import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material3.Card
+import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -33,27 +36,25 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.modifier.modifierLocalConsumer
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import com.example.composetrainer.R
 import com.example.composetrainer.ui.navigation.Screen
-import com.example.composetrainer.ui.screens.component.TodayCard
+import com.example.composetrainer.ui.screens.component.DatePickerBottomDialog
 import com.example.composetrainer.ui.theme.Beirut_Medium
-import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.ui.viewmodels.home.HomeTotalItemsViewModel
+import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
+import com.example.composetrainer.utils.dateandtime.TimeRange
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
 import com.example.composetrainer.utils.str
 
-
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun HomeScreen(
     onAlertClick: () -> Unit,
@@ -65,7 +66,6 @@ fun HomeScreen(
     homeViewModel: HomeViewModel = hiltViewModel(),
     invoiceViewModel: InvoiceViewModel = hiltViewModel(),
     homeTotalItemsViewModel: HomeTotalItemsViewModel = hiltViewModel()
-
 ) {
 
     // most Sold Product Details
@@ -78,12 +78,15 @@ fun HomeScreen(
     val totalProfit by homeTotalItemsViewModel.totalProfitPrice.collectAsState()
 
     val persianDate = remember { FarsiDateUtil.getTodayFormatted() }
-    var showBottomSheet by remember { mutableStateOf(false) }
-    var showBarcodeScannerView by remember { mutableStateOf(false) }
-    val context = LocalContext.current
+
+    var showDatePickerBottomSheet by remember { mutableStateOf(false) }
+    val datePickerSheetState = rememberModalBottomSheetState()
+    var selectedDate by remember { mutableStateOf(TimeRange.TODAY) }
 
     // Observe scanned product
     val scannedProduct by homeViewModel.scannedProduct.collectAsState()
+
+
 
 
     // Handle navigation when product is found
@@ -153,15 +156,14 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(dimen(R.dimen.space_5)))
 
-        Card(
+        ElevatedCard (
             modifier = Modifier
                 .height(dimen(R.dimen.size_lg))
                 .wrapContentWidth()
                 .align(Alignment.CenterHorizontally),
             shape = RoundedCornerShape(dimen(R.dimen.radius_xxl)),
-            elevation = CardDefaults.cardElevation(defaultElevation = 4.dp),
             colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            onClick = onTodayButtonClick
+            onClick = { showDatePickerBottomSheet = true }
         ) {
 
             Row(
@@ -176,7 +178,7 @@ fun HomeScreen(
                     contentAlignment = Alignment.Center
                 ) {
                     Text(
-                        text = str(R.string.today),
+                        text = str(selectedDate.getResourceId()),
                         style = MaterialTheme.typography.bodyLarge,
                         fontFamily = Beirut_Medium,
                         fontSize = dimenTextSize(R.dimen.text_size_lg)
@@ -194,9 +196,26 @@ fun HomeScreen(
             }
         }
 
+        if (showDatePickerBottomSheet){
+            ModalBottomSheet(
+                onDismissRequest = { showDatePickerBottomSheet = false },
+                sheetState = datePickerSheetState,
+                dragHandle = { BottomSheetDefaults.DragHandle() },
+                containerColor = MaterialTheme.colorScheme.surface,
+                shape = RoundedCornerShape(topStart = dimen(R.dimen.radius_lg), topEnd = dimen(R.dimen.radius_lg))
+            ) {
+                DatePickerBottomDialog(
+                    selectedItem = selectedDate,
+                    onNewSelected = { timeRange ->
+                        selectedDate = timeRange
+                        showDatePickerBottomSheet = false
+                    }
+                )
+            }
+        }
+
         Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
 
-        TodayCard(modifier = Modifier, onSelected = {})
 
         Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
 

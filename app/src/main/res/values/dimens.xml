@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <dimen name="stroke_dimen">1dp</dimen>
-    <dimen name="efdocclient_stroke_dimen">2dp</dimen>
-    <dimen name="efdocclient_button_padding">10dp</dimen>
+    <dimen name="stroke_dimen_xs">1dp</dimen>
+    <dimen name="stroke_dimen_sm">2dp</dimen>
+    <dimen name="button_padding">10dp</dimen>
 
 
     <!-- radius -->

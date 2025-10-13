@@ -1,5 +1,6 @@
 package com.example.composetrainer.utils.dateandtime
 
+import com.example.composetrainer.R
 import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getCurrentShamsiMonthStartEndMillis
 import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getCurrentWeekStartEndMillis
 import com.example.composetrainer.utils.dateandtime.TimeStampUtil.getLastShamsiMonthStartEndMillis
@@ -17,6 +18,41 @@ enum class TimeRange(val displayName: String) {
     LAST_MONTH("Last Month"),
     THIS_YEAR("This Year"),
     LAST_YEAR("Last Year");
+
+    fun getResourceId() : Int {
+
+        when(this){
+            TODAY -> {
+                return R.string.today
+            }
+
+            YESTERDAY -> {
+                return R.string.yesterday
+            }
+
+            THIS_WEEK -> {
+                return R.string.this_week
+            }
+
+            LAST_WEEK -> {
+                return R.string.last_week
+            }
+
+            THIS_MONTH -> {
+                return R.string.this_month
+            }
+
+            LAST_MONTH -> {
+                return R.string.last_month
+            }
+
+            THIS_YEAR -> return R.string.this_year
+
+
+            LAST_YEAR -> return R.string.last_year
+
+        }
+    }
 
     fun getStartAndEndTimes(): Pair<Long, Long> {
         val calendar = Calendar.getInstance()
