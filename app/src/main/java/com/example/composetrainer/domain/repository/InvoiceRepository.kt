@@ -42,11 +42,11 @@ interface InvoiceRepository {
 
     suspend fun getTopSellingProductsForMonth(yearMonth: String): List<TopSellingProductInfo>
 
-    suspend fun getTotalProfitBetweenDates(start: Long, end: Long): Long
+    fun getTotalProfitBetweenDates(start: Long, end: Long): Flow<Long>
 
-    suspend fun getTotalSalesBetweenDates(start: Long, end: Long): Long
+    fun getTotalSalesBetweenDates(start: Long, end: Long): Flow<Long>
 
-    suspend fun getTotalInvoicesBetweenDates(start: Long, end: Long): Int  
+    fun getTotalInvoicesBetweenDates(start: Long, end: Long): Flow<Int>
     
     // Debug methods
     suspend fun getTotalInvoiceCount(): Int

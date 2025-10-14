@@ -59,19 +59,21 @@ class AnalyzeViewModel @Inject constructor(
         }
     }
 
-    fun loadProductSalesSummary(timeRange: TimeRange) {
+    private fun loadProductSalesSummary(timeRange: TimeRange) {
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, selectedTimeRange = timeRange) }
             try {
-                val productSalesSummary = getProductSalesSummaryUseCase(timeRange)
-                _uiState.update {
-                    it.copy(
-                        productSalesSummary = productSalesSummary.first,
-                        products = productSalesSummary.second,
-                        isLoading = false,
-                        error = null
-                    )
+                 getProductSalesSummaryUseCase(timeRange).collect{ productSalesSummary->
+                     _uiState.update {
+                         it.copy(
+                             productSalesSummary = productSalesSummary.first,
+                             products = productSalesSummary.second,
+                             isLoading = false,
+                             error = null
+                         )
+                     }
                 }
+
             } catch (e: Exception) {
                 Log.e("AnalyzeViewModel", "Error loading product sales summary", e)
                 _uiState.update {
@@ -85,7 +87,6 @@ class AnalyzeViewModel @Inject constructor(
     }
 
 
-
     fun refresh() {
         loadAnalyticsData()
         loadProductSalesSummary(uiState.value.selectedTimeRange)
@@ -95,7 +96,7 @@ class AnalyzeViewModel @Inject constructor(
 data class AnalyzeUiState(
     val analyticsData: AnalyticsData? = null,
     val productSalesSummary: List<ProductSalesSummary> = emptyList(),
-    val products : List<Product> = emptyList(),
+    val products: List<Product> = emptyList(),
     val selectedTimeRange: TimeRange = TimeRange.THIS_MONTH,
     val isLoading: Boolean = false,
     val error: String? = null,

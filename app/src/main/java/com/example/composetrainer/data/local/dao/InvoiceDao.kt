@@ -95,7 +95,7 @@ interface InvoiceDao {
     WHERE i.invoiceDate BETWEEN :startDate AND :endDate
     """
     )
-    suspend fun getTotalProfitBetweenDates(startDate: Long, endDate: Long): Long
+    fun getTotalProfitBetweenDates(startDate: Long, endDate: Long): Flow<Long>
 
     @Query(
         """
@@ -106,7 +106,7 @@ interface InvoiceDao {
     WHERE i.invoiceDate BETWEEN :startDate AND :endDate
     """
     )
-    suspend fun getTotalSalesBetweenDates(startDate: Long, endDate: Long): Long
+    fun getTotalSalesBetweenDates(startDate: Long, endDate: Long): Flow<Long>
 
     @Query(
         """
@@ -114,7 +114,7 @@ interface InvoiceDao {
     WHERE invoiceDate BETWEEN :startDate AND :endDate
     """
     )
-    suspend fun getTotalInvoicesBetweenDates(startDate: Long, endDate: Long): Int
+    fun getTotalInvoicesBetweenDates(startDate: Long, endDate: Long): Flow<Int>
 
     // Debug queries
     @Query("SELECT * FROM invoices ORDER BY createdAt DESC LIMIT 5")

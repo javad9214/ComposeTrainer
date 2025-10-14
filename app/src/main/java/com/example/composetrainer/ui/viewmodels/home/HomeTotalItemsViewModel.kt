@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.viewmodels.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Product
@@ -46,18 +47,49 @@ class HomeTotalItemsViewModel @Inject constructor(
     val errorMessage: StateFlow<String?> get() = _errorMessage
 
     init {
-        loadAnalyticsData()
+        loadAnalyticsData(TimeRange.TODAY)
         loadProductSalesSummary(TimeRange.TODAY)
     }
 
-    private fun loadAnalyticsData(){
+    private fun loadAnalyticsData(timeRange: TimeRange) {
         viewModelScope.launch {
             _isLoading.value = true
             try {
-                _totalInvoiceCount.value = getInvoiceReportCountUseCase.getTodayInvoiceCount()
-                _totalSoldPrice.value = getTotalSoldPriceUseCase.getTodayTotalSold()
-                _totalProfitPrice.value = getTotalProfitPriceUseCase.getTodayTotalProfit()
+                launch {
+                    getInvoiceReportCountUseCase.invoke(timeRange).collect {
+                        _totalInvoiceCount.value = it
+                    }
+                }
+                launch {
+                    getTotalSoldPriceUseCase.invoke(timeRange).collect {
+                        _totalSoldPrice.value = Money(it)
+                    }
+                }
+                launch {
+                    getTotalProfitPriceUseCase.invoke(timeRange).collect {
+                        _totalProfitPrice.value = Money(it)
+                    }
+                }
+
+
+            } catch (e: Exception) {
+                _errorMessage.value = e.message
+            }finally {
                 _isLoading.value = false
+            }
+        }
+    }
+
+    private fun loadProductSalesSummary(timeRange: TimeRange) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+               getProductSalesSummaryUseCase.invoke(timeRange).collect{ (productsSaleSummeryList, products) ->
+                   _productSalesSummaryList.value = productsSaleSummeryList
+                   _products.value = products
+                   _isLoading.value = false
+               }
+
 
             } catch (e: Exception) {
                 _errorMessage.value = e.message
@@ -66,24 +98,9 @@ class HomeTotalItemsViewModel @Inject constructor(
         }
     }
 
-    private fun loadProductSalesSummary(timeRange: TimeRange){
-        viewModelScope.launch {
-            _isLoading.value = true
-            try {
-                val (productsSaleSummeryList, products) = getProductSalesSummaryUseCase.invoke(timeRange)
-                _productSalesSummaryList.value = productsSaleSummeryList
-                _products.value = products
-                _isLoading.value = false
-
-            } catch (e: Exception) {
-                _errorMessage.value = e.message
-                _isLoading.value = false
-            }
-        }
-    }
-
-    fun reLoadProductSaleSummary(timeRange: TimeRange){
+    fun reLoadProductSaleSummary(timeRange: TimeRange) {
         loadProductSalesSummary(timeRange)
+        loadAnalyticsData(timeRange)
     }
 
     companion object {

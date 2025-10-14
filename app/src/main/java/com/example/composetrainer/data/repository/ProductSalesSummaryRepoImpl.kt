@@ -7,6 +7,8 @@ import com.example.composetrainer.domain.model.ProductSalesSummary
 import com.example.composetrainer.domain.model.toDomain
 import com.example.composetrainer.domain.model.toEntity
 import com.example.composetrainer.domain.repository.ProductSalesSummaryRepository
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class ProductSalesSummaryRepoImpl @Inject constructor(
@@ -16,7 +18,7 @@ class ProductSalesSummaryRepoImpl @Inject constructor(
     val TAG = "ProductSalesSummaryRepoImpl"
 
     override suspend fun insertProductSale(productSalesSummary: ProductSalesSummary) {
-            productSalesSummaryDao.insert(productSalesSummary.toEntity())
+        productSalesSummaryDao.insert(productSalesSummary.toEntity())
         Log.i(TAG, "insertProductSale: ${productSalesSummary.totalCost}")
     }
 
@@ -25,11 +27,12 @@ class ProductSalesSummaryRepoImpl @Inject constructor(
         Log.i(TAG, "updateProductSale: ${productSalesSummary.totalCost}")
     }
 
-    override suspend fun getTopSellingProductsBetween(
+    override fun getTopSellingProductsBetween(
         start: Long,
         end: Long
-    ): List<ProductSalesSummary> {
-        return productSalesSummaryDao.getTopSellingProductsBetween(start, end).map { it.toDomain() }
+    ): Flow<List<ProductSalesSummary>> {
+        return productSalesSummaryDao.getTopSellingProductsBetween(start, end)
+            .map { list -> list.map { it.toDomain() } }
     }
 
     override suspend fun getByProductAndDate(

@@ -2,6 +2,7 @@ package com.example.composetrainer.data.local.dao
 
 import androidx.room.*
 import com.example.composetrainer.data.local.entity.ProductSalesSummaryEntity
+import kotlinx.coroutines.flow.Flow
 
 @Dao
 interface ProductSalesSummaryDao {
@@ -14,10 +15,10 @@ interface ProductSalesSummaryDao {
         WHERE date BETWEEN :start AND :end
         ORDER BY totalSold DESC
     """)
-    suspend fun getTopSellingProductsBetween(
+     fun getTopSellingProductsBetween(
         start: Long,
         end: Long
-    ): List<ProductSalesSummaryEntity>
+    ): Flow<List<ProductSalesSummaryEntity>>
 
     @Query("""
         SELECT * FROM product_sales_summary

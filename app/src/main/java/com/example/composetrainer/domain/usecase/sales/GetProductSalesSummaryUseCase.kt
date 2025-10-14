@@ -8,6 +8,8 @@ import com.example.composetrainer.domain.model.type.Money
 import com.example.composetrainer.domain.repository.ProductSalesSummaryRepository
 import com.example.composetrainer.domain.usecase.product.GetProductsByIDsUseCase
 import com.example.composetrainer.utils.dateandtime.TimeRange
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class GetProductSalesSummaryUseCase @Inject constructor(
@@ -15,61 +17,54 @@ class GetProductSalesSummaryUseCase @Inject constructor(
     private val getProductsByIDsUseCase: GetProductsByIDsUseCase
 ) {
 
-
-
-    suspend operator fun invoke(timeRange: TimeRange): Pair<List<ProductSalesSummary> , List<Product>> {
+    operator fun invoke(timeRange: TimeRange): Flow<Pair<List<ProductSalesSummary>, List<Product>>> {
         val (startTime, endTime) = timeRange.getStartAndEndTimes()
-        val summaries = productSalesSummaryRepository.getTopSellingProductsBetween(startTime, endTime)
 
-        Log.d("UseCase", "Raw summaries: ${summaries.size}")
-        summaries.forEach { s ->
-            Log.d("UseCase", "productId=${s.productId.value}, totalSold=${s.totalSold.value}, date=${s.date}")
-        }
         
-        // Group by productId and sum the values
-        val aggregatedSummaries = summaries
-            .groupBy { it.productId }
-            .map { (productId, productSummaries) ->
-                // Take the first summary as base and aggregate the rest
-                val baseSummary = productSummaries.first()
+        val summariesFlow = productSalesSummaryRepository.getTopSellingProductsBetween(startTime, endTime)
 
-                // Sum all the financial and quantity data
-                val totalSold = productSummaries.sumOf { it.totalSold.value }
-                val totalRevenue = productSummaries.sumOf { it.totalRevenue.amount }
-                val totalCost = productSummaries.sumOf { it.totalCost.amount }
-
-                // Find the earliest and latest dates for created/updated times
-                val earliestCreated = productSummaries.minOf { it.createdAt }
-                val latestUpdated = productSummaries.maxOf { it.updatedAt }
-
-                // Use the earliest date from the summaries
-                val earliestDate = productSummaries.minOf { it.date }
-
-                // Check if all summaries are synced
-                val allSynced = productSummaries.all { it.synced }
-
-                // Create aggregated summary
-                baseSummary.copy(
-                    date = earliestDate, // or you might want to use a date range
-                    totalSold = SalesQuantity(totalSold),
-                    totalRevenue = Money(totalRevenue),
-                    totalCost = Money(totalCost),
-                    createdAt = earliestCreated,
-                    updatedAt = latestUpdated,
-                    synced = allSynced
-                )
+        return summariesFlow.map { summaries ->
+            Log.d("UseCase", "Raw summaries: ${summaries.size}")
+            summaries.forEach { s ->
+                Log.d("UseCase", "productId=${s.productId.value}, totalSold=${s.totalSold.value}, date=${s.date}")
             }
-            // Order by total revenue in descending order (you can change this criteria)
-            .sortedByDescending { it.totalSold.value }
 
-        Log.d("UseCase", "Aggregated & sorted summaries:")
-        aggregatedSummaries.forEach { s ->
-            Log.d("UseCase", "productId=${s.productId.value}, totalSold=${s.totalSold.value}")
+            // Group by productId and sum the values
+            val aggregatedSummaries = summaries
+                .groupBy { it.productId }
+                .map { (productId, productSummaries) ->
+                    val baseSummary = productSummaries.first()
+                    val totalSold = productSummaries.sumOf { it.totalSold.value }
+                    val totalRevenue = productSummaries.sumOf { it.totalRevenue.amount }
+                    val totalCost = productSummaries.sumOf { it.totalCost.amount }
+                    val earliestCreated = productSummaries.minOf { it.createdAt }
+                    val latestUpdated = productSummaries.maxOf { it.updatedAt }
+                    val earliestDate = productSummaries.minOf { it.date }
+                    val allSynced = productSummaries.all { it.synced }
+
+                    baseSummary.copy(
+                        date = earliestDate,
+                        totalSold = SalesQuantity(totalSold),
+                        totalRevenue = Money(totalRevenue),
+                        totalCost = Money(totalCost),
+                        createdAt = earliestCreated,
+                        updatedAt = latestUpdated,
+                        synced = allSynced
+                    )
+                }
+                .sortedByDescending { it.totalSold.value }
+
+            Log.d("UseCase", "Aggregated & sorted summaries:")
+            aggregatedSummaries.forEach { s ->
+                Log.d("UseCase", "productId=${s.productId.value}, totalSold=${s.totalSold.value}")
+            }
+
+            // Fetch product details for these IDs (one-shot suspend)
+            val productIds = getProductsByIDsUseCase.invoke(aggregatedSummaries.map { it.productId.value })
+
+            // Emit a single pair for each emission from the repository
+            aggregatedSummaries to productIds
         }
-
-        val productIds = getProductsByIDsUseCase.invoke(aggregatedSummaries.map { it.productId.value })
-
-        return aggregatedSummaries to productIds
     }
 
 
