@@ -1,5 +1,5 @@
 [versions]
-agp = "8.8.0"
+agp = "8.11.2"
 kotlin = "2.1.21"
 coreKtx = "1.16.0"
 junit = "4.13.2"
@@ -25,7 +25,8 @@ retrofit = "2.11.0"
 okhttp = "4.12.0"
 sandwich = "2.0.8"
 adapter-rxjava2 = "2.6.2"
-converter-gson = "2.9.0"
+converter-gson = "3.0.0"
+vico = "2.2.1"
 
 [libraries]
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
@@ -76,6 +77,12 @@ androidx-camera-view = { module = "androidx.camera:camera-view", version.ref = "
 
 # ML Kit Barcode Scanning
 google-mlkit-barcode-scanning = { module = "com.google.mlkit:barcode-scanning", version.ref = "mlkit-barcode" }
+
+
+# Vico Chart
+vico-core = { module = "com.patrykandpatrick.vico:core", version.ref = "vico" }
+vico-compose = { group = "com.patrykandpatrick.vico", name = "compose", version.ref = "vico" }
+vico-compose-m3 = { group = "com.patrykandpatrick.vico", name = "compose-m3", version.ref = "vico" }
 
 acra-http = { module = "ch.acra:acra-http", version.ref = "acra" }
 acra-core = { module = "ch.acra:acra-core", version.ref = "acra" }

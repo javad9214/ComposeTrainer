@@ -128,6 +128,11 @@ dependencies {
     implementation(libs.acra.http)
     implementation(libs.acra.core)
 
+    // Vico
+    implementation(libs.vico.core)
+    implementation(libs.vico.compose)
+    implementation(libs.vico.compose.m3)
+
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)

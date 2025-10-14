@@ -4,7 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Refresh
@@ -14,15 +16,18 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
+import com.example.composetrainer.ui.screens.component.JetpackComposeBasicColumnChart
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.AnalyzeViewModel
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
 import com.example.composetrainer.utils.str
+import com.patrykandpatrick.vico.core.cartesian.data.CartesianChartModelProducer
 
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -31,7 +36,7 @@ fun AnalyzeScreen(
     modifier: Modifier = Modifier,
     viewModel: AnalyzeViewModel = hiltViewModel()
 ) {
-
+    val modelProducer = remember { CartesianChartModelProducer() }
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -54,6 +59,10 @@ fun AnalyzeScreen(
             }
         }
 
+        Spacer(modifier = Modifier.height(dimen(R.dimen.space_5)))
+
+
+        JetpackComposeBasicColumnChart(modelProducer)
     }
 
 }
