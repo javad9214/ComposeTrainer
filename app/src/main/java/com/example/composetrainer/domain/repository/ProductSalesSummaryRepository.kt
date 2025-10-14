@@ -8,7 +8,7 @@ interface ProductSalesSummaryRepository {
     suspend fun insertProductSale(productSalesSummary: ProductSalesSummary)
     suspend fun updateProductSale(productSalesSummary: ProductSalesSummary)
 
-     fun getTopSellingProductsBetween(
+    fun getTopSellingProductsBetween(
         start: Long,
         end: Long
     ): Flow<List<ProductSalesSummary>>
