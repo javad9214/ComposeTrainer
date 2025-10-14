@@ -16,7 +16,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalLayoutDirection
+import androidx.compose.ui.platform.LocalWindowInfo
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
@@ -69,11 +71,14 @@ private fun ProductSelectionList(
     products: List<Product>,
     onProductSelected: (Product) -> Unit
 ) {
-    val screenHeight = LocalConfiguration.current.screenHeightDp.dp
-    
+
+    val density = LocalDensity.current
+    val containerHeightPx = LocalWindowInfo.current.containerSize.height
+    val containerHeightDp = with(density) { containerHeightPx.toDp() }
+
     LazyColumn(
         modifier = Modifier
-            .heightIn(max = screenHeight * 0.5f)
+            .heightIn(max = containerHeightDp * 0.5f)
             .clip(RoundedCornerShape(12.dp))
             .padding(top = 16.dp),
         verticalArrangement = Arrangement.spacedBy(12.dp)
