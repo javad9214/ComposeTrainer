@@ -21,7 +21,7 @@ class GetProductSalesSummaryUseCase @Inject constructor(
         val (startTime, endTime) = timeRange.getStartAndEndTimes()
         val summaries = productSalesSummaryRepository.getTopSellingProductsBetween(startTime, endTime)
 
-        Log.d("UseCase", "Raw summaries:")
+        Log.d("UseCase", "Raw summaries: ${summaries.size}")
         summaries.forEach { s ->
             Log.d("UseCase", "productId=${s.productId.value}, totalSold=${s.totalSold.value}, date=${s.date}")
         }

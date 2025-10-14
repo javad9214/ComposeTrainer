@@ -38,7 +38,7 @@ data class InvoiceWithProducts(
             prefix: InvoicePrefix = InvoicePrefix("INV"),
             invoiceNumber: InvoiceNumber = InvoiceNumber(1),
             customerId: CustomerId? = null,
-            invoiceType: InvoiceType? = null,
+            invoiceType: InvoiceType = InvoiceType.SALE,
             paymentMethod: PaymentMethod? = null,
             notes: Note? = null
         ): InvoiceWithProducts {
