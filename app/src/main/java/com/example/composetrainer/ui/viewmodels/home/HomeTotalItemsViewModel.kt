@@ -1,6 +1,5 @@
 package com.example.composetrainer.ui.viewmodels.home
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Product
@@ -9,7 +8,7 @@ import com.example.composetrainer.domain.model.type.Money
 import com.example.composetrainer.domain.usecase.analytics.GetInvoiceReportCountUseCase
 import com.example.composetrainer.domain.usecase.analytics.GetTotalProfitPriceUseCase
 import com.example.composetrainer.domain.usecase.analytics.GetTotalSoldPriceUseCase
-import com.example.composetrainer.domain.usecase.sales.GetProductSalesSummaryUseCase
+import com.example.composetrainer.domain.usecase.sales.GetTopSellingProductsUseCase
 import com.example.composetrainer.utils.dateandtime.TimeRange
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,7 +21,7 @@ class HomeTotalItemsViewModel @Inject constructor(
     private val getInvoiceReportCountUseCase: GetInvoiceReportCountUseCase,
     private val getTotalSoldPriceUseCase: GetTotalSoldPriceUseCase,
     private val getTotalProfitPriceUseCase: GetTotalProfitPriceUseCase,
-    private val getProductSalesSummaryUseCase: GetProductSalesSummaryUseCase
+    private val getTopSellingProductsUseCase: GetTopSellingProductsUseCase
 ) : ViewModel() {
 
     private val _totalInvoiceCount = MutableStateFlow(0)
@@ -84,7 +83,7 @@ class HomeTotalItemsViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-               getProductSalesSummaryUseCase.invoke(timeRange).collect{ (productsSaleSummeryList, products) ->
+               getTopSellingProductsUseCase.invoke(timeRange).collect{ (productsSaleSummeryList, products) ->
                    _productSalesSummaryList.value = productsSaleSummeryList
                    _products.value = products
                    _isLoading.value = false

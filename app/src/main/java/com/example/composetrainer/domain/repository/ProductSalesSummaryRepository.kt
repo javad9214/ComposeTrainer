@@ -13,5 +13,10 @@ interface ProductSalesSummaryRepository {
         end: Long
     ): Flow<List<ProductSalesSummary>>
 
+    fun getTopProfitableProductsBetween(
+        start: Long,
+        end: Long
+    ): Flow<List<ProductSalesSummary>>
+
     suspend fun getByProductAndDate(productId: Long, date: Long): ProductSalesSummaryEntity?
 }

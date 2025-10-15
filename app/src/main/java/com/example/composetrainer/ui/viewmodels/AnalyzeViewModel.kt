@@ -9,7 +9,7 @@ import com.example.composetrainer.domain.model.ProductSalesSummary
 import com.example.composetrainer.utils.dateandtime.TimeRange
 import com.example.composetrainer.domain.usecase.analytics.GetAnalyticsDataUseCase
 import com.example.composetrainer.domain.usecase.analytics.GetInvoiceReportCountUseCase
-import com.example.composetrainer.domain.usecase.sales.GetProductSalesSummaryUseCase
+import com.example.composetrainer.domain.usecase.sales.GetTopSellingProductsUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -21,7 +21,7 @@ import javax.inject.Inject
 @HiltViewModel
 class AnalyzeViewModel @Inject constructor(
     private val getAnalyticsDataUseCase: GetAnalyticsDataUseCase,
-    private val getProductSalesSummaryUseCase: GetProductSalesSummaryUseCase,
+    private val getTopSellingProductsUseCase: GetTopSellingProductsUseCase,
     private val getInvoiceReportCountUseCase: GetInvoiceReportCountUseCase
 ) : ViewModel() {
 
@@ -63,7 +63,7 @@ class AnalyzeViewModel @Inject constructor(
         viewModelScope.launch {
             _uiState.update { it.copy(isLoading = true, selectedTimeRange = timeRange) }
             try {
-                 getProductSalesSummaryUseCase(timeRange).collect{ productSalesSummary->
+                 getTopSellingProductsUseCase(timeRange).collect{ productSalesSummary->
                      _uiState.update {
                          it.copy(
                              productSalesSummary = productSalesSummary.first,

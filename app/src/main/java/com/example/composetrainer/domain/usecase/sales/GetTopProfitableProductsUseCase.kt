@@ -12,16 +12,15 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class GetProductSalesSummaryUseCase @Inject constructor(
+class GetTopProfitableProductsUseCase @Inject constructor(
     private val productSalesSummaryRepository: ProductSalesSummaryRepository,
     private val getProductsByIDsUseCase: GetProductsByIDsUseCase
 ) {
-
     operator fun invoke(timeRange: TimeRange): Flow<Pair<List<ProductSalesSummary>, List<Product>>> {
         val (startTime, endTime) = timeRange.getStartAndEndTimes()
 
-        
-        val summariesFlow = productSalesSummaryRepository.getTopSellingProductsBetween(startTime, endTime)
+
+        val summariesFlow = productSalesSummaryRepository.getTopProfitableProductsBetween(startTime, endTime)
 
         return summariesFlow.map { summaries ->
             Log.d("UseCase", "Raw summaries: ${summaries.size}")
@@ -66,6 +65,4 @@ class GetProductSalesSummaryUseCase @Inject constructor(
             aggregatedSummaries to productIds
         }
     }
-
-
 }

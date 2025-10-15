@@ -35,6 +35,14 @@ class ProductSalesSummaryRepoImpl @Inject constructor(
             .map { list -> list.map { it.toDomain() } }
     }
 
+    override fun getTopProfitableProductsBetween(
+        start: Long,
+        end: Long
+    ): Flow<List<ProductSalesSummary>> {
+        return productSalesSummaryDao.getTopProfitableProductsBetween(start, end)
+            .map { list -> list.map { it.toDomain() } }
+    }
+
     override suspend fun getByProductAndDate(
         productId: Long,
         date: Long
