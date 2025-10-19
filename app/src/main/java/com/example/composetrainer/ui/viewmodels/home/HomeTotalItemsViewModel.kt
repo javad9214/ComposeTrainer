@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.viewmodels.home
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Product
@@ -8,6 +9,7 @@ import com.example.composetrainer.domain.model.type.Money
 import com.example.composetrainer.domain.usecase.analytics.GetInvoiceReportCountUseCase
 import com.example.composetrainer.domain.usecase.analytics.GetTotalProfitPriceUseCase
 import com.example.composetrainer.domain.usecase.analytics.GetTotalSoldPriceUseCase
+import com.example.composetrainer.domain.usecase.sales.GetTopProfitableProductsUseCase
 import com.example.composetrainer.domain.usecase.sales.GetTopSellingProductsUseCase
 import com.example.composetrainer.utils.dateandtime.TimeRange
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -21,7 +23,8 @@ class HomeTotalItemsViewModel @Inject constructor(
     private val getInvoiceReportCountUseCase: GetInvoiceReportCountUseCase,
     private val getTotalSoldPriceUseCase: GetTotalSoldPriceUseCase,
     private val getTotalProfitPriceUseCase: GetTotalProfitPriceUseCase,
-    private val getTopSellingProductsUseCase: GetTopSellingProductsUseCase
+    private val getTopSellingProductsUseCase: GetTopSellingProductsUseCase,
+    private val getTopProfitableProductsUseCase: GetTopProfitableProductsUseCase
 ) : ViewModel() {
 
     private val _totalInvoiceCount = MutableStateFlow(0)
@@ -33,11 +36,18 @@ class HomeTotalItemsViewModel @Inject constructor(
     private val _totalProfitPrice = MutableStateFlow(Money(0))
     val totalProfitPrice: StateFlow<Money> get() = _totalProfitPrice
 
-    private val _productSalesSummaryList = MutableStateFlow<List<ProductSalesSummary>>(emptyList())
-    val productSalesSummaryList: StateFlow<List<ProductSalesSummary>> get() = _productSalesSummaryList
+    private val _topSellingProductList = MutableStateFlow<List<ProductSalesSummary>>(emptyList())
+    val topSellingProductList: StateFlow<List<ProductSalesSummary>> get() = _topSellingProductList
 
-    private val _products = MutableStateFlow<List<Product>>(emptyList())
-    val products: StateFlow<List<Product>> get() = _products
+    private val _topProfitableProductList = MutableStateFlow<List<ProductSalesSummary>>(emptyList())
+    val topProfitableProductList: StateFlow<List<ProductSalesSummary>> get() = _topProfitableProductList
+
+    private val _mostSoldProducts = MutableStateFlow<List<Product>>(emptyList())
+    val mostSoldProducts: StateFlow<List<Product>> get() = _mostSoldProducts
+
+
+    private val _mostProfitableProducts = MutableStateFlow<List<Product>>(emptyList())
+    val mostProfitableProducts: StateFlow<List<Product>> get() = _mostProfitableProducts
 
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
@@ -73,7 +83,7 @@ class HomeTotalItemsViewModel @Inject constructor(
 
             } catch (e: Exception) {
                 _errorMessage.value = e.message
-            }finally {
+            } finally {
                 _isLoading.value = false
             }
         }
@@ -83,15 +93,30 @@ class HomeTotalItemsViewModel @Inject constructor(
         viewModelScope.launch {
             _isLoading.value = true
             try {
-               getTopSellingProductsUseCase.invoke(timeRange).collect{ (productsSaleSummeryList, products) ->
-                   _productSalesSummaryList.value = productsSaleSummeryList
-                   _products.value = products
-                   _isLoading.value = false
-               }
+
+                launch {
+                    getTopSellingProductsUseCase.invoke(timeRange)
+                        .collect { (productsSaleSummeryList, products) ->
+                            _topSellingProductList.value = productsSaleSummeryList
+                            _mostSoldProducts.value = products
+                        }
+                }
+
+
+                launch {
+                    getTopProfitableProductsUseCase.invoke(timeRange)
+                        .collect { (productsSaleSummeryList, products) ->
+                            Log.d(TAG, "loadProductSalesSummary: $productsSaleSummeryList")
+                            _topProfitableProductList.value = productsSaleSummeryList
+                            _mostProfitableProducts.value = products
+                        }
+                }
 
 
             } catch (e: Exception) {
                 _errorMessage.value = e.message
+                _isLoading.value = false
+            } finally {
                 _isLoading.value = false
             }
         }

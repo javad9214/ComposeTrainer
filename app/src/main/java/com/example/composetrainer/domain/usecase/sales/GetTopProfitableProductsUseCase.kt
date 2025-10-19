@@ -23,9 +23,9 @@ class GetTopProfitableProductsUseCase @Inject constructor(
         val summariesFlow = productSalesSummaryRepository.getTopProfitableProductsBetween(startTime, endTime)
 
         return summariesFlow.map { summaries ->
-            Log.d("UseCase", "Raw summaries: ${summaries.size}")
+            Log.d("GetTopProfitableProductsUseCase", "Raw summaries: ${summaries.size}")
             summaries.forEach { s ->
-                Log.d("UseCase", "productId=${s.productId.value}, totalSold=${s.totalSold.value}, date=${s.date}")
+                Log.d("GetTopProfitableProductsUseCase", "productId=${s.productId.value}, totalMargin=${s.getTotalProfit().amount}, date=${s.date}")
             }
 
             // Group by productId and sum the values
@@ -51,7 +51,7 @@ class GetTopProfitableProductsUseCase @Inject constructor(
                         synced = allSynced
                     )
                 }
-                .sortedByDescending { it.totalSold.value }
+                .sortedByDescending { it.getTotalProfit().amount }
 
             Log.d("UseCase", "Aggregated & sorted summaries:")
             aggregatedSummaries.forEach { s ->

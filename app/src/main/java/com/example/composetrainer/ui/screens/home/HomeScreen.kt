@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -16,7 +17,9 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.BottomSheetDefaults
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.ElevatedCard
@@ -69,8 +72,12 @@ fun HomeScreen(
 ) {
 
     // most Sold Product Details
-    val mostSoldProducts by homeTotalItemsViewModel.products.collectAsState()
-    val mostSoldProductsSummery by homeTotalItemsViewModel.productSalesSummaryList.collectAsState()
+    val mostSoldProducts by homeTotalItemsViewModel.mostSoldProducts.collectAsState()
+    val mostSoldProductsSummery by homeTotalItemsViewModel.topSellingProductList.collectAsState()
+
+    // most Profitable Products Details
+    val mostProfitableProducts by homeTotalItemsViewModel.mostProfitableProducts.collectAsState()
+    val mostProfitableProductsSummery by homeTotalItemsViewModel.topProfitableProductList.collectAsState()
 
     // total Items Details
     val totalInvoiceCount by homeTotalItemsViewModel.totalInvoiceCount.collectAsState()
@@ -85,8 +92,6 @@ fun HomeScreen(
 
     // Observe scanned product
     val scannedProduct by homeViewModel.scannedProduct.collectAsState()
-
-
 
 
     // Handle navigation when product is found
@@ -156,102 +161,137 @@ fun HomeScreen(
 
         Spacer(modifier = Modifier.height(dimen(R.dimen.space_5)))
 
-        ElevatedCard (
-            modifier = Modifier
-                .height(dimen(R.dimen.size_lg))
-                .wrapContentWidth()
-                .align(Alignment.CenterHorizontally),
-            shape = RoundedCornerShape(dimen(R.dimen.radius_xxl)),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-            onClick = { showDatePickerBottomSheet = true }
-        ) {
-
-            Row(
+        Column(modifier = Modifier
+            .fillMaxSize()
+            .verticalScroll(rememberScrollState())) {
+            ElevatedCard(
                 modifier = Modifier
-                    .padding(dimen(R.dimen.space_1)),
-                verticalAlignment = Alignment.CenterVertically
+                    .height(dimen(R.dimen.size_lg))
+                    .wrapContentWidth()
+                    .align(Alignment.CenterHorizontally),
+                shape = RoundedCornerShape(dimen(R.dimen.radius_xxl)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+                onClick = { showDatePickerBottomSheet = true }
             ) {
-                Box(
+
+                Row(
                     modifier = Modifier
-                        .fillMaxHeight()
-                        .padding(end = dimen(R.dimen.space_1), start = dimen(R.dimen.space_4)),
-                    contentAlignment = Alignment.Center
+                        .padding(dimen(R.dimen.space_1)),
+                    verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Text(
-                        text = str(selectedDate.getResourceId()),
-                        style = MaterialTheme.typography.bodyLarge,
-                        fontFamily = Beirut_Medium,
-                        fontSize = dimenTextSize(R.dimen.text_size_lg)
+                    Box(
+                        modifier = Modifier
+                            .fillMaxHeight()
+                            .padding(end = dimen(R.dimen.space_1), start = dimen(R.dimen.space_4)),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = str(selectedDate.getResourceId()),
+                            style = MaterialTheme.typography.bodyLarge,
+                            fontFamily = Beirut_Medium,
+                            fontSize = dimenTextSize(R.dimen.text_size_lg)
+                        )
+                    }
+
+                    Spacer(modifier = Modifier.width(dimen(R.dimen.space_1)))
+
+                    Icon(
+                        modifier = Modifier.padding(end = dimen(R.dimen.space_1)),
+                        painter = painterResource(id = R.drawable.keyboard_arrow_down_24px),
+                        contentDescription = "down",
+                    )
+
+                }
+            }
+
+            if (showDatePickerBottomSheet) {
+                ModalBottomSheet(
+                    onDismissRequest = { showDatePickerBottomSheet = false },
+                    sheetState = datePickerSheetState,
+                    dragHandle = { BottomSheetDefaults.DragHandle() },
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    shape = RoundedCornerShape(
+                        topStart = dimen(R.dimen.radius_lg),
+                        topEnd = dimen(R.dimen.radius_lg)
+                    )
+                ) {
+                    DatePickerBottomDialog(
+                        selectedItem = selectedDate,
+                        onNewSelected = { timeRange ->
+                            selectedDate = timeRange
+                            showDatePickerBottomSheet = false
+                            homeTotalItemsViewModel.reLoadProductSaleSummary(selectedDate)
+                        }
                     )
                 }
-
-                Spacer(modifier = Modifier.width(dimen(R.dimen.space_1)))
-
-                Icon(
-                    modifier = Modifier.padding(end = dimen(R.dimen.space_1)),
-                    painter = painterResource(id = R.drawable.keyboard_arrow_down_24px),
-                    contentDescription = "down",
-                )
-
             }
-        }
 
-        if (showDatePickerBottomSheet){
-            ModalBottomSheet(
-                onDismissRequest = { showDatePickerBottomSheet = false },
-                sheetState = datePickerSheetState,
-                dragHandle = { BottomSheetDefaults.DragHandle() },
-                containerColor = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(topStart = dimen(R.dimen.radius_lg), topEnd = dimen(R.dimen.radius_lg))
+            Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
+
+            TotalsItem(
+                modifier = Modifier,
+                totalInvoiceCount = totalInvoiceCount,
+                totalSales = totalSales,
+                totalProfit = totalProfit
+            )
+
+            Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
+
+            Text(
+                modifier = Modifier.padding(start = dimen(R.dimen.space_4)),
+                text = str(R.string.most_sold_products),
+                style = MaterialTheme.typography.bodyLarge,
+                fontFamily = Beirut_Medium,
+                fontSize = dimenTextSize(R.dimen.text_size_lg)
+            )
+
+            Spacer(modifier = Modifier.height(dimen(R.dimen.space_2)))
+
+            // Most Sold Products
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = dimen(R.dimen.space_1))
             ) {
-                DatePickerBottomDialog(
-                    selectedItem = selectedDate,
-                    onNewSelected = { timeRange ->
-                        selectedDate = timeRange
-                        showDatePickerBottomSheet = false
-                        homeTotalItemsViewModel.reLoadProductSaleSummary(selectedDate)
-                    }
-                )
+                items(
+                    mostSoldProductsSummery,
+                    key = { it.id.value }) { mostSoldProductsSummeryItem ->
+                    MostSoldProductItem(
+                        product = mostSoldProducts.find { it.id == mostSoldProductsSummeryItem.productId }
+                            ?: return@items,
+                        productSalesSummary = mostSoldProductsSummeryItem
+                    )
+                }
             }
-        }
 
-        Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
+            Spacer(modifier = Modifier.height(dimen(R.dimen.space_2)))
 
+            Text(
+                modifier = Modifier.padding(start = dimen(R.dimen.space_4)),
+                text = str(R.string.most_profitable_products),
+                style = MaterialTheme.typography.bodyLarge,
+                fontFamily = Beirut_Medium,
+                fontSize = dimenTextSize(R.dimen.text_size_lg)
+            )
 
-        Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
+            Spacer(modifier = Modifier.height(dimen(R.dimen.space_2)))
 
-        Log.i(TAG, "HomeScreen: total sale ${totalSales.amount} total profit ${totalProfit.amount}")
-
-        TotalsItem(
-            modifier = Modifier,
-            totalInvoiceCount = totalInvoiceCount,
-            totalSales = totalSales,
-            totalProfit = totalProfit
-        )
-
-        Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
-
-        Text(
-            modifier = Modifier.padding(start = dimen(R.dimen.space_4)),
-            text = str(R.string.most_sold_products),
-            style = MaterialTheme.typography.bodyLarge,
-            fontFamily = Beirut_Medium,
-            fontSize = dimenTextSize(R.dimen.text_size_lg)
-        )
-
-        Spacer(modifier = Modifier.height(dimen(R.dimen.space_2)))
-
-        LazyRow(
-            modifier = Modifier.fillMaxWidth(),
-            contentPadding = PaddingValues(horizontal = dimen(R.dimen.space_1))
-        ) {
-            items(mostSoldProductsSummery, key = { it.id.value }) { mostSoldProductsSummery ->
-                MostSoldProductItem(
-                    product = mostSoldProducts.find { it.id == mostSoldProductsSummery.productId }
-                        ?: return@items,
-                    productSalesSummary = mostSoldProductsSummery
-                )
+            // Most Profitable Products
+            LazyRow(
+                modifier = Modifier.fillMaxWidth(),
+                contentPadding = PaddingValues(horizontal = dimen(R.dimen.space_1))
+            ) {
+                items(
+                    mostProfitableProductsSummery,
+                    key = { it.id.value }) { mostProfitableProductsSummeryItem ->
+                    MostSoldProductItem(
+                        product = mostProfitableProducts.find { it.id == mostProfitableProductsSummeryItem.productId }
+                            ?: return@items,
+                        productSalesSummary = mostProfitableProductsSummeryItem
+                    )
+                }
             }
+
+            Spacer(modifier = Modifier.height(dimen(R.dimen.space_8)))
         }
     }
 

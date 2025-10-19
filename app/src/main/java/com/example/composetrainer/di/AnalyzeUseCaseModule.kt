@@ -7,6 +7,7 @@ import com.example.composetrainer.domain.usecase.analytics.GetInvoiceReportCount
 import com.example.composetrainer.domain.usecase.analytics.GetTotalProfitPriceUseCase
 import com.example.composetrainer.domain.usecase.analytics.GetTotalSoldPriceUseCase
 import com.example.composetrainer.domain.usecase.product.GetProductsByIDsUseCase
+import com.example.composetrainer.domain.usecase.sales.GetTopProfitableProductsUseCase
 import com.example.composetrainer.domain.usecase.sales.GetTopSellingProductsUseCase
 import com.example.composetrainer.domain.usecase.sales.SaveProductSaleSummeryUseCase
 import dagger.Module
@@ -35,11 +36,21 @@ object AnalyzeUseCaseModule {
 
     @Provides
     @Singleton
-    fun provideGetProductSalesSummaryUseCase(
+    fun provideGetTopSellingProductSalesSummaryUseCase(
         productSalesSummaryRepository: ProductSalesSummaryRepository,
         getProductsByIDsUseCase: GetProductsByIDsUseCase
     ): GetTopSellingProductsUseCase =
         GetTopSellingProductsUseCase(productSalesSummaryRepository, getProductsByIDsUseCase)
+
+
+
+    @Provides
+    @Singleton
+    fun provideGetTopProfitableProductSalesSummaryUseCase(
+        productSalesSummaryRepository: ProductSalesSummaryRepository,
+        getProductsByIDsUseCase: GetProductsByIDsUseCase
+    ): GetTopProfitableProductsUseCase =
+        GetTopProfitableProductsUseCase(productSalesSummaryRepository, getProductsByIDsUseCase)
 
     @Provides
     @Singleton
