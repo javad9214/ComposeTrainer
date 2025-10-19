@@ -235,7 +235,7 @@ fun InvoiceProductItem(
                             verticalAlignment = Alignment.CenterVertically,
                             modifier = Modifier.height(dimen(R.dimen.size_sm))
                         ) {
-                            val itemTotal = productWithQuantity.calculateTotal()
+                            val itemTotal = productWithQuantity.calculateTotalRevenue()
                             Text(
                                 text = PriceValidator.formatPrice(itemTotal.amount.toString()),
                                 modifier = Modifier

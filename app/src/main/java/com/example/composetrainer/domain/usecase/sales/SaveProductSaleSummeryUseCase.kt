@@ -1,6 +1,5 @@
 package com.example.composetrainer.domain.usecase.sales
 
-import android.util.Log
 import com.example.composetrainer.domain.model.InvoiceProduct
 import com.example.composetrainer.domain.model.ProductSalesSummaryFactory
 import com.example.composetrainer.domain.model.SalesQuantity
@@ -26,18 +25,17 @@ class SaveProductSaleSummeryUseCase@Inject constructor(
         if (existingSummary != null) {
             val updatedSummary = existingSummary.toDomain().copy(
                 totalSold = SalesQuantity(existingSummary.totalSold + quantity),
-                totalCost = Money(existingSummary.totalCost + invoiceProduct.calculateTotal().amount),
+                totalCost = Money(existingSummary.totalCost + invoiceProduct.calculateTotalCost().amount),
                 totalRevenue = Money(existingSummary.totalRevenue + invoiceProduct.getTotalProfitAfterDiscount().amount)
             )
-            Log.i(TAG, "invoke:  SaveProductSaleSummeryUseCase ")
             productSalesSummaryRepository.updateProductSale(updatedSummary)
         } else {
             val newSummary = ProductSalesSummaryFactory.create(
                 productId = productId,
                 date = toDateTime(getStartOfCurrentHour()),
                 totalSold = quantity,
-                totalCost = invoiceProduct.calculateTotal().amount,
-                totalRevenue = invoiceProduct.calculateTotal().amount
+                totalCost = invoiceProduct.calculateTotalCost().amount,
+                totalRevenue = invoiceProduct.calculateTotalRevenue().amount
             )
             productSalesSummaryRepository.insertProductSale(newSummary)
         }

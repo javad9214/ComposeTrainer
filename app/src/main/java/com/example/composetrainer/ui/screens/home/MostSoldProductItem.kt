@@ -79,7 +79,7 @@ fun MostSoldProductItem(
 
             InfoRow(
                 label = str(R.string.total_profit),
-                value = productSalesSummary.totalRevenue.amount.toString(),
+                value = productSalesSummary.getTotalProfit().amount.toString(),
                 icon = R.drawable.status_up_bulk,
                 iconDescription = str(R.string.total_profit),
                 isAmount = true
@@ -87,7 +87,7 @@ fun MostSoldProductItem(
 
             InfoRow(
                 label = str(R.string.total_amount),
-                value = productSalesSummary.totalCost.amount.toString(),
+                value = productSalesSummary.totalRevenue.amount.toString(),
                 icon = R.drawable.dollar_circle,
                 iconDescription = str(R.string.total_amount),
                 isAmount = true

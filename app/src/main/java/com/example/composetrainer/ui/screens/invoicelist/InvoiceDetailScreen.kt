@@ -376,7 +376,7 @@ private fun InvoiceDetailContent(
 
 
                     Text(
-                        text = formatPrice(invoiceProduct.calculateTotal().amount.toString()),
+                        text = formatPrice(invoiceProduct.calculateTotalRevenue().amount.toString()),
                         style = MaterialTheme.typography.bodyMedium,
                         fontWeight = FontWeight.Bold,
                         modifier = Modifier

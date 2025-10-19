@@ -36,7 +36,7 @@ fun EditableProductItem(
                 Text("Qty: ${item.quantity}", style = MaterialTheme.typography.bodySmall)
             }
             Text(
-                text = item.calculateTotal().amount.toString(),
+                text = item.calculateTotalRevenue().amount.toString(),
                 style = MaterialTheme.typography.titleMedium
             )
             IconButton(onClick = onRemove) {

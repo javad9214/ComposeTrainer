@@ -95,13 +95,18 @@ data class InvoiceProduct(
         return isBulkOrder() && !hasDiscount()
     }
 
-    fun calculateTotal(): Money {
+    // total Revenue
+    fun calculateTotalRevenue(): Money {
         val netUnitPrice = getNetUnitPrice().amount
         return Money(netUnitPrice * quantity.value)
     }
 
+    fun calculateTotalCost(): Money {
+        return Money(costPriceAtTransaction.amount * quantity.value)
+    }
+
     fun validateTotalCalculation(): Boolean {
-        return total.amount == calculateTotal().amount
+        return total.amount == calculateTotalRevenue().amount
     }
 }
 
