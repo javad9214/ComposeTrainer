@@ -14,8 +14,8 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.Divider
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.Text
 import androidx.compose.material3.OutlinedTextFieldDefaults
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -28,13 +28,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
+import com.example.composetrainer.domain.model.Barcode
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductId
-import com.example.composetrainer.domain.model.SubcategoryId
-import com.example.composetrainer.domain.model.Barcode
-import com.example.composetrainer.domain.model.type.Money
-import com.example.composetrainer.domain.model.StockQuantity
 import com.example.composetrainer.domain.model.ProductName
+import com.example.composetrainer.domain.model.StockQuantity
+import com.example.composetrainer.domain.model.SubcategoryId
+import com.example.composetrainer.domain.model.type.Money
 import com.example.composetrainer.utils.barcode.BarcodeGenerator
 import com.example.composetrainer.utils.price.ThousandSeparatorTransformation
 import java.time.LocalDateTime
@@ -42,11 +42,16 @@ import java.time.LocalDateTime
 @Composable
 fun AddProductBottomSheet(
     initialProduct: Product? = null, // Null = Add mode, Non-null = Edit mode
+    initialBarcode: String? = null,
     onSave: (Product) -> Unit,
     onDismiss: () -> Unit
 ) {
     var name by remember { mutableStateOf(initialProduct?.name?.value ?: "") }
-    var barcode by remember { mutableStateOf(initialProduct?.barcode?.value ?: "") }
+    var barcode by remember {
+        mutableStateOf(
+            initialBarcode ?: initialProduct?.barcode?.value ?: ""
+        )
+    }
     var price by remember { mutableStateOf(initialProduct?.price?.amount?.toString() ?: "") }
     var subcategoryId by remember {
         mutableStateOf(

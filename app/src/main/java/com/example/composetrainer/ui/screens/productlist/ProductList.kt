@@ -57,6 +57,7 @@ import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.MainProductsViewModel
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.viewmodels.SortOrder
+import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
 import com.example.composetrainer.utils.str
@@ -66,6 +67,7 @@ import com.example.composetrainer.utils.str
 fun ProductScreen(
     viewModel: ProductsViewModel = hiltViewModel(),
     mainProductsViewModel: MainProductsViewModel = hiltViewModel(),
+    homeViewModel: HomeViewModel = hiltViewModel(),
     navController: NavController
 ) {
     val products by viewModel.products.collectAsState()

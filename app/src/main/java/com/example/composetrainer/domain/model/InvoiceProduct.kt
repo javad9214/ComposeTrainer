@@ -119,12 +119,7 @@ value class ProductId(val value: Long) {
 }
 
 @JvmInline
-value class Quantity(val value: Int) {
-    init {
-        require(value > 0) { "Quantity must be positive" }
-        require(value <= 10000) { "Quantity cannot exceed 10,000 units" }
-    }
-}
+value class Quantity(val value: Int)
 
 // Enums for business logic
 enum class TransactionType {

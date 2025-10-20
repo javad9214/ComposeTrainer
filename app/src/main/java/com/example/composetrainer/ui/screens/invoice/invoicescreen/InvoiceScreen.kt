@@ -34,9 +34,6 @@ import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
-import com.example.composetrainer.domain.model.Barcode
-import com.example.composetrainer.domain.model.ProductFactory
-import com.example.composetrainer.domain.model.ProductName
 import com.example.composetrainer.domain.model.calculateTotalAmount
 import com.example.composetrainer.domain.model.hasProducts
 import com.example.composetrainer.ui.components.barcodescanner.BarcodeScannerView
@@ -129,14 +126,15 @@ fun InvoiceScreen(
             sheetState = addNewProductSheetState
         ) {
             AddProductBottomSheet(
-                initialProduct = null,
+               initialBarcode = scannedBarcode,
                 onSave = { product ->
                     productsViewModel.addProduct(product)
                     isAddProductSheetOpen.value = false
-
+                    homeViewModel.clearDetectedBarcode()
                 },
                 onDismiss = {
                     isAddProductSheetOpen.value = false
+                    homeViewModel.clearDetectedBarcode()
                 }
             )
         }

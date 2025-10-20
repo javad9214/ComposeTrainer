@@ -508,6 +508,7 @@ object ProductFactory {
             updatedAt = now
         )
     }
+
 }
 
 // Extension functions for updating products

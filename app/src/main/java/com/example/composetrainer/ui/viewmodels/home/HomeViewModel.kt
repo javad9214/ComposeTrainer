@@ -68,6 +68,9 @@ class HomeViewModel @Inject constructor(
 
     fun clearErrorMessage() {
         _errorMessage.value = null
+    }
+
+    fun clearDetectedBarcode() {
         _detectedBarcode.value = null
     }
 }
