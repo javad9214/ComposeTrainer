@@ -30,6 +30,7 @@ import com.example.composetrainer.ui.screens.invoicelist.InvoicesListScreen
 import com.example.composetrainer.ui.screens.productlist.ProductDetailsScreen
 import com.example.composetrainer.ui.screens.productlist.ProductScreen
 import com.example.composetrainer.ui.screens.productlist.serverlist.ServerProductListScreen
+import com.example.composetrainer.ui.screens.setting.SettingScreen
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
@@ -203,9 +204,7 @@ fun MainScreen(
                     },
                     isDarkTheme = isDarkTheme,
                     onToggleTheme = onToggleTheme,
-                    navController = navController,
-                    invoiceListViewModel = sharedInvoiceListViewModel,
-                    homeViewModel = sharedHomeViewModel
+                    onNavigateBack = { navController.popBackStack() }
                 )
             }
 

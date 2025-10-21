@@ -16,6 +16,10 @@
     <string name="most_profitable_products">پرسـودترین محصولات</string>
     <string name="running_out_products">موجودی درحال اتمام</string>
 
+    <!-- Setting -->
+    <string name="setting">تنظیمات</string>
+    <string name="select_currency">انتخاب واحد پولی</string>
+
     <!-- DATES -->
     <string name="today">امـروز</string>
     <string name="yesterday">دیروز</string>

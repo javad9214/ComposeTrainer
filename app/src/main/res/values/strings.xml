@@ -14,6 +14,10 @@
     <string name="most_profitable_products">most profitable products</string>
     <string name="running_out_products">running out_products</string>
 
+    <!-- Setting -->
+    <string name="setting">Setting</string>
+    <string name="select_currency">Choose Currency</string>
+
     <!-- DATES -->
     <string name="today">TODAY</string>
     <string name="yesterday">YESTERDAY</string>

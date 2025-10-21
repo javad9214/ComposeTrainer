@@ -297,7 +297,7 @@ fun ProductDetailsContent(
                         Icon(
                             painter = painterResource(id = R.drawable.toman),
                             contentDescription = "Price",
-                            modifier = Modifier.size(24.dp)
+                            modifier = Modifier.size(dimen(R.dimen.size_md))
                         )
                     }
                 )
