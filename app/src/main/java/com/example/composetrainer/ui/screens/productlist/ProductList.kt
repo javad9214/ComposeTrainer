@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.screens.productlist
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,6 +32,7 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -49,15 +51,16 @@ import com.example.composetrainer.domain.model.Barcode
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductFactory
 import com.example.composetrainer.domain.model.ProductName
-import com.example.composetrainer.ui.components.barcodescanner.BarcodeScanAction
-import com.example.composetrainer.ui.components.barcodescanner.ReusableBarcodeScannerView
+import com.example.composetrainer.ui.components.barcodescanner.BarcodeScannerView
 import com.example.composetrainer.ui.navigation.Screen
+import com.example.composetrainer.ui.screens.component.NoBarcodeFoundDialog
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.MainProductsViewModel
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.viewmodels.SortOrder
 import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
+import com.example.composetrainer.utils.barcode.BarcodeSoundPlayer
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
 import com.example.composetrainer.utils.str
@@ -65,28 +68,36 @@ import com.example.composetrainer.utils.str
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ProductScreen(
-    viewModel: ProductsViewModel = hiltViewModel(),
+    productsViewModel: ProductsViewModel = hiltViewModel(),
     mainProductsViewModel: MainProductsViewModel = hiltViewModel(),
     homeViewModel: HomeViewModel = hiltViewModel(),
     navController: NavController
 ) {
-    val products by viewModel.products.collectAsState()
-    val isLoading by viewModel.isLoading.collectAsState()
-    val sortOrder by viewModel.sortOrder.collectAsState()
-    val searchQuery by viewModel.searchQuery.collectAsState()
+    val products by productsViewModel.products.collectAsState()
+    val isLoading by productsViewModel.isLoading.collectAsState()
+    val sortOrder by productsViewModel.sortOrder.collectAsState()
+    val searchQuery by productsViewModel.searchQuery.collectAsState()
 
+    // Observe scanned product from HomeViewModel for barcode scanning
+    val scannedProduct by homeViewModel.scannedProduct.collectAsState()
+    val scannerIsLoading by homeViewModel.isLoading.collectAsState()
+    val scannerErrorMessage by homeViewModel.errorMessage.collectAsState()
+    val scannedBarcode by homeViewModel.detectedBarcode.collectAsState()
+    val noBarcodeFoundDialogSheetState = rememberModalBottomSheetState()
+    var showNoBarcodeFoundDialog by remember { mutableStateOf(false) }
     // Context for MediaPlayer
     val context = LocalContext.current
 
     // State for bottom sheet visibility
     val sheetState = rememberModalBottomSheetState()
+    // for add new product Bottom Sheet
+    val addNewProductSheetState = rememberModalBottomSheetState()
     val isAddProductSheetOpen = remember { mutableStateOf(false) }
     val selectedProductForEdit = remember { mutableStateOf<Product?>(null) }
 
     // Barcode scanner state
     var showBarcodeScannerView by remember { mutableStateOf(false) }
-    // Track the last scanned barcode
-    var lastScannedBarcode by remember { mutableStateOf("") }
+
 
     if (selectedProductForEdit.value != null || isAddProductSheetOpen.value) {
         ModalBottomSheet(
@@ -95,10 +106,10 @@ fun ProductScreen(
         ) {
             AddProductBottomSheet(
                 initialProduct = selectedProductForEdit.value?.copy()
-                    ?: if (lastScannedBarcode.isNotEmpty())
+                    ?: if (scannedBarcode.isNullOrEmpty().not())
                         ProductFactory.createBasic(
                             name = ProductName(""),
-                            barcode = Barcode(lastScannedBarcode),
+                            barcode = Barcode(scannedBarcode!!),
                             price = 0,
                             costPrice = 0,
                             initialStock = 0
@@ -107,43 +118,72 @@ fun ProductScreen(
                         null,
                 onSave = { product ->
                     if (selectedProductForEdit.value == null) {
-                        viewModel.addProduct(product)
+                        productsViewModel.addProduct(product)
                         mainProductsViewModel.addNewProductToRemote(product)
                     } else {
-                        viewModel.editProduct(product)
+                        productsViewModel.editProduct(product)
                     }
                     selectedProductForEdit.value = null
                     isAddProductSheetOpen.value = false
-                    lastScannedBarcode = ""
+                    homeViewModel.clearDetectedBarcode()
                 },
                 onDismiss = {
                     selectedProductForEdit.value = null
                     isAddProductSheetOpen.value = false
-                    lastScannedBarcode = ""
+                    homeViewModel.clearDetectedBarcode()
                 }
             )
         }
     }
 
-    // Show barcode scanner when activated - moved outside to fix layering
-    if (showBarcodeScannerView) {
-        ReusableBarcodeScannerView(
-            products = products,
-            onScanResult = { action ->
-                showBarcodeScannerView = false
-                when (action) {
-                    is BarcodeScanAction.ProductFound -> {
-                        viewModel.updateSearchQuery(action.barcode)
-                    }
+    // Handle when a product is found by barcode
+    LaunchedEffect(scannedProduct) {
+        scannedProduct?.let { _ ->
+            // Add product to invoice
+            productsViewModel.updateSearchQuery(scannedBarcode?:"")
+            // Clear scanned product
+            homeViewModel.clearScannedProduct()
+        }
+    }
 
-                    is BarcodeScanAction.ProductNotFound -> {
-                        isAddProductSheetOpen.value = true
-                        // You can access the barcode via action.barcode if needed
-                    }
-                }
+    LaunchedEffect(scannerErrorMessage) {
+        if (scannerErrorMessage != null && scannedBarcode != null) {
+            showNoBarcodeFoundDialog = true
+            noBarcodeFoundDialogSheetState.show()
+        }
+    }
+
+    if (showNoBarcodeFoundDialog) {
+
+        NoBarcodeFoundDialog(
+            barcode = scannedBarcode!!,
+            sheetState = noBarcodeFoundDialogSheetState,
+            onAddToNewProductClicked = {
+                showNoBarcodeFoundDialog = false
+                isAddProductSheetOpen.value = true
+            },
+            onDismiss = {
+                showNoBarcodeFoundDialog = false
+                homeViewModel.clearErrorMessage()
+            }
+        )
+
+    }
+
+    // Show barcode scanner when activated
+    if (showBarcodeScannerView) {
+        BarcodeScannerView(
+            onBarcodeDetected = { barcode ->
+                showBarcodeScannerView = false
+                Log.d("InvoiceScreen", "Barcode detected: $barcode")
+                // Play barcode success sound
+                BarcodeSoundPlayer.playBarcodeSuccessSound(context)
+
+                homeViewModel.searchProductByBarcode(barcode)
             },
             onClose = { showBarcodeScannerView = false }
         )
+
     } else {
 
         ProductScreenContent(
@@ -151,16 +191,28 @@ fun ProductScreen(
             isLoading = isLoading,
             sortOrder = sortOrder,
             searchQuery = searchQuery,
-            onSearchQueryChange = { viewModel.updateSearchQuery(it) },
-            onSortOrderSelected = { viewModel.updateSortOrder(it) },
+            onSearchQueryChange = { productsViewModel.updateSearchQuery(it) },
+            onSortOrderSelected = { productsViewModel.updateSortOrder(it) },
             onAddProduct = { isAddProductSheetOpen.value = true },
             onEditProduct = { selectedProductForEdit.value = it },
-            onDeleteProduct = { viewModel.deleteProduct(it) },
-            onIncreaseStock = { viewModel.increaseStock(it) },
-            onDecreaseStock = { viewModel.decreaseStock(it) },
+            onDeleteProduct = { productsViewModel.deleteProduct(it) },
+            onIncreaseStock = { productsViewModel.increaseStock(it) },
+            onDecreaseStock = { productsViewModel.decreaseStock(it) },
             onScanBarcode = { showBarcodeScannerView = true },
             navController = navController
         )
+    }
+
+    // Show loading indicator for barcode scanning
+    if (scannerIsLoading) {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.7f)),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
     }
 }
 
@@ -304,7 +356,6 @@ fun ProductScreenContent(
         }
 
     }
-
 
 }
 
