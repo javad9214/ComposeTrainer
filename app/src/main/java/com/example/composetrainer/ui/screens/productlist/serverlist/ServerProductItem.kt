@@ -46,6 +46,7 @@ import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.ui.screens.component.CurrencyIcon
 import com.example.composetrainer.ui.theme.BHoma
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.utils.dimen
@@ -251,9 +252,9 @@ fun ServerProductItem(
                         )
 
                         Row {
-                            Icon(
-                                painter = painterResource(id = R.drawable.toman),
-                                contentDescription = "Date",
+
+                            CurrencyIcon(
+                                contentDescription = "Rial",
                                 modifier = Modifier
                                     .size(dimen(R.dimen.size_sm))
                             )

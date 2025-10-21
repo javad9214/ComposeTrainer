@@ -20,6 +20,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
+import com.example.composetrainer.ui.screens.component.CurrencyIcon
 import com.example.composetrainer.ui.theme.BHoma
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.utils.dimen
@@ -55,9 +56,9 @@ fun BottomTotalSection(
                 ),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Icon(
-                painter = painterResource(id = R.drawable.toman),
-                contentDescription = "Date",
+
+            CurrencyIcon(
+                contentDescription = "Rial",
                 modifier = Modifier
                     .size(dimen(R.dimen.size_lg))
             )

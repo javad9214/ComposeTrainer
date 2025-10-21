@@ -51,15 +51,16 @@ import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.calculateTotalAmount
 import com.example.composetrainer.domain.model.calculateTotalCost
+import com.example.composetrainer.ui.screens.component.CurrencyIcon
 import com.example.composetrainer.ui.theme.BHoma
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
-import com.example.composetrainer.utils.price.PriceValidator.formatPrice
 import com.example.composetrainer.utils.dateandtime.FarsiDateUtil.getFormattedPersianDate
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
+import com.example.composetrainer.utils.price.PriceValidator.formatPrice
 import com.example.composetrainer.utils.str
 
 
@@ -384,9 +385,8 @@ private fun InvoiceDetailContent(
                             .wrapContentWidth(Alignment.CenterHorizontally),
                         color = MaterialTheme.colorScheme.onSurface
                     )
-                    Icon(
-                        painter = painterResource(id = R.drawable.toman),
-                        contentDescription = "toman",
+                    CurrencyIcon(
+                        contentDescription = "Rial",
                         modifier = Modifier
                             .size(dimen(R.dimen.size_sm))
                             .weight(0.3f)
@@ -429,9 +429,8 @@ private fun InvoiceDetailContent(
                             fontWeight = FontWeight.Bold,
                             color = MaterialTheme.colorScheme.onPrimaryContainer
                         )
-                        Icon(
-                            painter = painterResource(id = R.drawable.toman),
-                            contentDescription = "toman",
+                        CurrencyIcon(
+                            contentDescription = "Rial",
                             modifier = Modifier
                                 .size(dimen(R.dimen.size_sm))
                                 .padding(start = dimen(R.dimen.space_1))
@@ -475,9 +474,9 @@ private fun InfoRow(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                Icon(
-                    painter = painterResource(id = R.drawable.toman),
-                    contentDescription = "toman",
+
+                CurrencyIcon(
+                    contentDescription = "Currency Icon",
                     modifier = Modifier
                         .size(dimen(R.dimen.size_sm))
                         .padding(start = dimen(R.dimen.space_1))

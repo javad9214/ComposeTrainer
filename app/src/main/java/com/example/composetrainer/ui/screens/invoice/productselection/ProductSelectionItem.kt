@@ -24,6 +24,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.ui.screens.component.CurrencyIcon
 import com.example.composetrainer.ui.theme.BRoya
 import com.example.composetrainer.utils.price.PriceValidator
 import com.example.composetrainer.utils.dimen
@@ -75,13 +76,11 @@ fun ProductSelectionItem(
                 Row(
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    Icon(
-                        painter = painterResource(id = R.drawable.toman),
-                        contentDescription = "Date",
+                    CurrencyIcon(
+                        contentDescription = "Rial",
                         modifier = Modifier
                             .size(dimen(R.dimen.size_sm))
                     )
-
                     Text(
                         modifier = Modifier.padding(start = dimen(R.dimen.space_1)),
                         text = PriceValidator.formatPrice(product.price.amount.toString()),

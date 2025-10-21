@@ -39,6 +39,7 @@ import androidx.compose.ui.unit.sp
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.InvoiceProduct
 import com.example.composetrainer.domain.model.Product
+import com.example.composetrainer.ui.screens.component.CurrencyIcon
 import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.utils.price.PriceValidator
 import com.example.composetrainer.utils.dimen
@@ -247,9 +248,8 @@ fun InvoiceProductItem(
                                 )
                             )
 
-                            Icon(
-                                painter = painterResource(id = R.drawable.toman),
-                                contentDescription = "Date",
+                            CurrencyIcon(
+                                contentDescription = "Rial",
                                 modifier = Modifier
                                     .size(dimen(R.dimen.size_sm))
                             )
