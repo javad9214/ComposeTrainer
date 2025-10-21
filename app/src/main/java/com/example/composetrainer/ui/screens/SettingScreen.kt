@@ -173,27 +173,6 @@ fun SettingScreen(
             }
 
 
-            FloatingActionButton(
-                onClick = {
-                    throw RuntimeException("Test Crash from ACRA!")
-                },
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .padding(16.dp)
-            ) {
-                Icon(
-                    imageVector = Icons.Filled.AcUnit,
-                    contentDescription = if (isDarkTheme) "Switch to Light Mode" else "Switch to Dark Mode"
-                )
-            }
-
-            Text(
-                str(R.string.welcomeToHomeScreen),
-                fontFamily = Kamran,
-                modifier = Modifier
-                    .align(Alignment.Center)
-            )
-
 
             Column(
                 modifier = Modifier
