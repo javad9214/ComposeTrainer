@@ -23,6 +23,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.type.Money
+import com.example.composetrainer.ui.screens.component.CurrencyIcon
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.utils.price.PriceValidator
@@ -72,10 +73,11 @@ fun TotalsItem(
 
                     Spacer(modifier = Modifier.padding(dimen(R.dimen.space_1)))
 
-                    Icon(
-                        modifier = Modifier.size(dimen(R.dimen.size_lg)).padding(end = dimen(R.dimen.space_1)),
-                        painter = painterResource(id = R.drawable.toman),
-                        contentDescription = "down",
+                    CurrencyIcon(
+                        contentDescription = "Rial",
+                        modifier = Modifier
+                            .size(dimen(R.dimen.size_sm))
+                            .padding(start = dimen(R.dimen.space_1))
                     )
                 }
 
@@ -108,10 +110,10 @@ fun TotalsItem(
 
                     Spacer(modifier = Modifier.padding(dimen(R.dimen.space_1)))
 
-                    Icon(
-                        modifier = Modifier.size(dimen(R.dimen.size_md)).padding(end = dimen(R.dimen.space_1)),
-                        painter = painterResource(id = R.drawable.toman),
-                        contentDescription = "down",
+                    CurrencyIcon(
+                        contentDescription = "Rial",
+                        modifier = Modifier.size(dimen(
+                            R.dimen.size_sm)).padding(end = dimen(R.dimen.space_1))
                     )
                 }
             }

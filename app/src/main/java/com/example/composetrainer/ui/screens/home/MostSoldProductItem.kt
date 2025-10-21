@@ -31,6 +31,7 @@ import com.example.composetrainer.domain.model.ProductSalesSummaryId
 import com.example.composetrainer.domain.model.SalesQuantity
 import com.example.composetrainer.domain.model.StockQuantity
 import com.example.composetrainer.domain.model.type.Money
+import com.example.composetrainer.ui.screens.component.CurrencyIcon
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
@@ -131,9 +132,8 @@ private fun InfoRow(
                     fontWeight = FontWeight.Bold,
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
-                Icon(
-                    painter = painterResource(id = R.drawable.toman),
-                    contentDescription = "toman",
+                CurrencyIcon(
+                    contentDescription = "Rial",
                     modifier = Modifier
                         .size(dimen(R.dimen.size_sm))
                         .padding(start = dimen(R.dimen.space_1))

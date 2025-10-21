@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.screens.setting
 
+import android.content.Context
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -18,6 +19,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -26,21 +28,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import com.example.composetrainer.R
 import com.example.composetrainer.ui.theme.MRTPoster
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
 import com.example.composetrainer.utils.str
+import androidx.core.content.edit
 
 @Composable
 fun CurrencySelector() {
-    var selectedCurrency by remember { mutableStateOf("Rial") }
+    val context = LocalContext.current
+    var selectedCurrency by remember {
+        mutableStateOf(CurrencyPreferences.getCurrency(context))
+    }
 
 
+    LaunchedEffect(selectedCurrency) {
+        CurrencyPreferences.saveCurrency(context, selectedCurrency)
+    }
 
     Row(
         modifier = Modifier.fillMaxWidth(),
@@ -122,5 +130,21 @@ fun CurrencyOption(
                 )
             }
         }
+    }
+}
+
+object CurrencyPreferences {
+    private const val PREF_NAME = "currency_settings"
+    private const val KEY_SELECTED_CURRENCY = "selected_currency"
+    private const val DEFAULT_CURRENCY = "Rial"
+
+    fun saveCurrency(context: Context, currency: String) {
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        prefs.edit { putString(KEY_SELECTED_CURRENCY, currency) }
+    }
+
+    fun getCurrency(context: Context): String {
+        val prefs = context.getSharedPreferences(PREF_NAME, Context.MODE_PRIVATE)
+        return prefs.getString(KEY_SELECTED_CURRENCY, DEFAULT_CURRENCY) ?: DEFAULT_CURRENCY
     }
 }

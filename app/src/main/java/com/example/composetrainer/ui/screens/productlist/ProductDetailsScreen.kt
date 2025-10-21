@@ -51,6 +51,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.getBusinessInsight
+import com.example.composetrainer.ui.screens.component.CurrencyIcon
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.utils.dimen
@@ -294,10 +295,11 @@ fun ProductDetailsContent(
                         }
                     },
                     trailingIcon = {
-                        Icon(
-                            painter = painterResource(id = R.drawable.toman),
-                            contentDescription = "Price",
-                            modifier = Modifier.size(dimen(R.dimen.size_md))
+
+                        CurrencyIcon(
+                            contentDescription = "Rial",
+                            modifier = Modifier
+                                .size(dimen(R.dimen.size_md))
                         )
                     }
                 )

@@ -29,6 +29,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.InvoiceWithProducts
+import com.example.composetrainer.ui.screens.component.CurrencyIcon
 import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.ui.theme.BRoya
 import com.example.composetrainer.utils.price.PriceValidator
@@ -134,14 +135,12 @@ fun InvoiceItem(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         Row(verticalAlignment = Alignment.CenterVertically) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.toman),
-                                contentDescription = str(R.string.toman),
+                            CurrencyIcon(
+                                contentDescription = "Rial",
                                 modifier = Modifier
-                                    .size(dimen(R.dimen.size_md))
-                                    .padding(end = 4.dp)
+                                    .size(dimen(R.dimen.size_sm))
+                                    .padding(end = dimen(R.dimen.space_1))
                             )
-
                             Text(
                                 text = PriceValidator.formatPrice(invoice.totalAmount?.amount.toString()),
                                 style = MaterialTheme.typography.bodyLarge,

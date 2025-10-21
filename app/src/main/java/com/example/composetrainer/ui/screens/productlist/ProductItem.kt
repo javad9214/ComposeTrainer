@@ -52,6 +52,7 @@ import com.example.composetrainer.domain.model.SubcategoryId
 import com.example.composetrainer.domain.model.SupplierId
 import com.example.composetrainer.domain.model.type.Money
 import com.example.composetrainer.domain.model.ProductUnit
+import com.example.composetrainer.ui.screens.component.CurrencyIcon
 import com.example.composetrainer.ui.theme.BHoma
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
@@ -224,9 +225,8 @@ fun ProductItem(
                     verticalAlignment = Alignment.CenterVertically,
                 ) {
 
-                    Icon(
-                        painter = painterResource(id = R.drawable.toman),
-                        contentDescription = "Date",
+                    CurrencyIcon(
+                        contentDescription = "Rial",
                         modifier = Modifier
                             .size(dimen(R.dimen.size_sm))
                     )
