@@ -1,6 +1,7 @@
 package com.example.composetrainer.ui.screens.component
 
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -29,6 +30,6 @@ fun CurrencyIcon(
         painter = painterResource(id = iconId),
         contentDescription = contentDescription,
         modifier = modifier,
-        tint = tint ?: Color.Unspecified
+        tint = tint ?: MaterialTheme.colorScheme.onSurface
     )
 }

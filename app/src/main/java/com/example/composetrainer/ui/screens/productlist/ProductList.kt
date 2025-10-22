@@ -247,7 +247,7 @@ fun ProductScreenContent(
             ) {
 
                 Text(
-                    str(R.string.products),
+                    str(R.string.myProducts),
                     fontFamily = Beirut_Medium,
                     fontSize = dimenTextSize(R.dimen.text_size_xl)
                 )
