@@ -105,7 +105,7 @@
     <!-- Product Item -->
     <string name="buy">خرید</string>
     <string name="sale">فروش</string>
-
+    <string name="edit">ویرایش</string>
     <!-- Product Selection -->
     <string name="select_product">انتخاب محصول</string>
     <string name="stock">موجودی</string>
@@ -154,6 +154,7 @@
     <string name="invoice_creation">ایجاد فاکتور</string>
     <string name="customer_name">نام مشتری</string>
     <string name="save_invoice">ذخیره فاکتور</string>
+    <string name="invoice_created_successfully">فاکتور با موفقیت ثبت گردید!</string>
 
     <!-- Barcode Scanner View -->
     <string name="barcode_position">موقعیت بارکد در داخل قاب</string>

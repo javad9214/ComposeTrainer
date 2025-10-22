@@ -97,6 +97,7 @@
     <!-- Product Item -->
     <string name="buy">BUY</string>
     <string name="sale">SALE</string>
+    <string name="edit">Edit</string>
 
     <!-- Product Selection -->
     <string name="search_product">Search Product…</string>
@@ -145,6 +146,7 @@
     <string name="invoice_creation">Create Invoice</string>
     <string name="customer_name">Customer Name</string>
     <string name="save_invoice">Save Invoice</string>
+    <string name="invoice_created_successfully">invoice created successfully</string>
 
     <!-- Barcode Scanner View -->
     <string name="barcode_position">Place the product barcode inside the frame!</string>

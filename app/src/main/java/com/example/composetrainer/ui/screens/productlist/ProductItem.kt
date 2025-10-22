@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.screens.productlist
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -67,8 +68,6 @@ fun ProductItem(
     product: Product,
     onEdit: () -> Unit,
     onDelete: () -> Unit,
-    onIncreaseStock: () -> Unit,
-    onDecreaseStock: () -> Unit,
     onProductClick: () -> Unit = {}
 ) {
     var showDeleteConfirmation by remember { mutableStateOf(false) }
@@ -104,17 +103,18 @@ fun ProductItem(
 
                         DropdownMenu(
                             expanded = showMenu,
-                            onDismissRequest = { showMenu = false }
+                            onDismissRequest = { showMenu = false },
+                            modifier = Modifier.background(MaterialTheme.colorScheme.surface)
                         ) {
                             DropdownMenuItem(
-                                text = { Text("Edit") },
+                                text = { Text(text = str(R.string.edit), fontFamily = BHoma) },
                                 onClick = {
                                     showMenu = false
                                     onEdit()
                                 }
                             )
                             DropdownMenuItem(
-                                text = { Text("Delete") },
+                                text = { Text(text = str(R.string.delete), fontFamily = BHoma) },
                                 onClick = {
                                     showMenu = false
                                     onDelete()
@@ -325,8 +325,6 @@ fun ProductItemPreview() {
             product = mockProduct,
             onEdit = { /* Preview: Edit clicked */ },
             onDelete = { /* Preview: Delete clicked */ },
-            onIncreaseStock = { /* Preview: Increase stock clicked */ },
-            onDecreaseStock = { /* Preview: Decrease stock clicked */ },
             onProductClick = { /* Preview: Product clicked */ }
         )
     }
@@ -364,8 +362,6 @@ fun ProductItemWithoutBarcodePreview() {
             product = mockProductNoBarcode,
             onEdit = { },
             onDelete = { },
-            onIncreaseStock = { },
-            onDecreaseStock = { },
             onProductClick = { }
         )
     }

@@ -26,6 +26,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -36,6 +37,8 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.calculateTotalAmount
 import com.example.composetrainer.domain.model.hasProducts
+import com.example.composetrainer.ui.components.SnackyHostState
+import com.example.composetrainer.ui.components.SnackyType
 import com.example.composetrainer.ui.components.barcodescanner.BarcodeScannerView
 import com.example.composetrainer.ui.screens.component.NoBarcodeFoundDialog
 import com.example.composetrainer.ui.screens.invoice.productselection.AddProductToInvoice
@@ -48,10 +51,12 @@ import com.example.composetrainer.utils.barcode.BarcodeSoundPlayer
 import com.example.composetrainer.utils.dateandtime.FarsiDateUtil
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.str
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InvoiceScreen(
+    snackyHostState: SnackyHostState,
     onComplete: () -> Unit,
     onClose: () -> Unit,
     invoiceListViewModel: InvoiceListViewModel = hiltViewModel(),
@@ -82,6 +87,10 @@ fun InvoiceScreen(
 
     // Context for MediaPlayer
     val context = LocalContext.current
+
+    //for snackbar
+    val scope = rememberCoroutineScope()
+    val invoiceCompletedMessage = str(R.string.invoice_created_successfully)
 
     val TAG = "InvoiceScreen"
 
@@ -210,6 +219,12 @@ fun InvoiceScreen(
                 onSubmit = {
                     if (currentInvoice.isValid()) {
                         invoiceViewModel.saveInvoice()
+                        scope.launch {
+                            snackyHostState.show(
+                                message = invoiceCompletedMessage,
+                                type = SnackyType.SUCCESS
+                            )
+                        }
                         onComplete()
                     }
                 },
