@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.screens.invoice.invoicescreen
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -199,11 +200,12 @@ fun InvoiceProductItem(
                             }
                         }
 
+
                         FilledTonalIconButton(
                             onClick = {
                                 val newQuantity = productWithQuantity.quantity.value + 1
                                 val stock = product.stock.value
-                                if (newQuantity <= stock) {
+                                if (newQuantity <= stock || invoiceType == InvoiceType.PURCHASE) {
                                     onQuantityChange(newQuantity)
                                 }
                             },

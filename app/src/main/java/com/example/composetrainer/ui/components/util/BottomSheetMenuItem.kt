@@ -25,6 +25,7 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
+import com.example.composetrainer.utils.dimen
 
 // Menu Item Data Class
 data class BottomSheetMenuItem(
@@ -99,13 +100,13 @@ private fun BottomSheetMenuItemView(
                 modifier = Modifier
                     .weight(1f)
                     .fillMaxWidth(),
-                textAlign = TextAlign.Start,
+                textAlign = TextAlign.End,
                 fontFamily = fontFamily,
                 color = item.textColor ?: MaterialTheme.colorScheme.onSurface,
                 style = MaterialTheme.typography.bodyLarge
             )
 
-            Spacer(modifier = Modifier.width(16.dp))
+            Spacer(modifier = Modifier.width(dimen(R.dimen.space_4)))
 
             Icon(
                 painter = item.icon,
@@ -161,7 +162,6 @@ fun ProductMenuExample(
                 icon = painterResource(id = R.drawable.delete_24px),
                 iconTint = Color.Red,
                 textColor = Color.Red,
-                backgroundColor = Color.Red.copy(alpha = 0.1f),
                 onClick = {
                     onDismiss()
                     onDelete()

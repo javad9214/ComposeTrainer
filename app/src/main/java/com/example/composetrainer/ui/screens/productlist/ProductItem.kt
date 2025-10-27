@@ -132,7 +132,6 @@ fun ProductItem(
                                     icon = painterResource(id = R.drawable.delete_24px),
                                     iconTint = Color.Red,
                                     textColor = Color.Red,
-                                    backgroundColor = Color.Red.copy(alpha = 0.1f),
                                     onClick = {
                                         showMenu = false
                                         onDelete()
