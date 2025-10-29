@@ -1,6 +1,6 @@
 package com.example.composetrainer.ui.screens.invoice.invoicescreen
 
-import android.util.Log
+
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -125,11 +125,11 @@ fun InvoiceProductItem(
 
                     Spacer(modifier = Modifier.weight(1f))
 
-                    // Available stock indicator
                     Text(
                         text = "موجودی: ${product.stock.value}",
                         style = MaterialTheme.typography.bodyMedium.copy(
-                            color = if ((productWithQuantity.quantity.value) >= product.stock.value)
+                            color = if (invoiceType == InvoiceType.SALE &&
+                                productWithQuantity.quantity.value >= product.stock.value)
                                 MaterialTheme.colorScheme.error
                             else
                                 MaterialTheme.colorScheme.onSurfaceVariant
@@ -183,8 +183,9 @@ fun InvoiceProductItem(
                                 .padding(horizontal = 4.dp),
                             contentAlignment = Alignment.Center
                         ) {
-                            val isNearingLimit =
-                                productWithQuantity.quantity.value >= product.stock.value
+
+                            val isNearingLimit = invoiceType == InvoiceType.SALE &&
+                                    productWithQuantity.quantity.value >= product.stock.value
 
                             Row(
                                 verticalAlignment = Alignment.CenterVertically
@@ -194,7 +195,10 @@ fun InvoiceProductItem(
                                     style = MaterialTheme.typography.bodyLarge.copy(
                                         fontWeight = FontWeight.Bold,
                                         textAlign = TextAlign.Center,
-                                        color = if (isNearingLimit) MaterialTheme.colorScheme.error else MaterialTheme.colorScheme.onSurface
+                                        color = if (isNearingLimit)
+                                            MaterialTheme.colorScheme.error
+                                        else
+                                            MaterialTheme.colorScheme.onSurface
                                     )
                                 )
                             }
@@ -221,7 +225,9 @@ fun InvoiceProductItem(
                                     alpha = 0.12f
                                 )
                             ),
-                            enabled = (productWithQuantity.quantity.value < product.stock.value || invoiceType == InvoiceType.PURCHASE)
+
+                            enabled = invoiceType == InvoiceType.PURCHASE ||
+                                    productWithQuantity.quantity.value < product.stock.value
                         ) {
                             Icon(
                                 imageVector = Icons.Rounded.Add,
