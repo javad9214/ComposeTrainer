@@ -57,7 +57,6 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun InvoiceScreen(
-    snackyHostState: SnackyHostState,
     onComplete: () -> Unit,
     onClose: () -> Unit,
     invoiceListViewModel: InvoiceListViewModel = hiltViewModel(),
@@ -89,9 +88,7 @@ fun InvoiceScreen(
     // Context for MediaPlayer
     val context = LocalContext.current
 
-    //for snackbar
-    val scope = rememberCoroutineScope()
-    val invoiceCompletedMessage = str(R.string.invoice_created_successfully)
+
 
     val TAG = "InvoiceScreen"
 
@@ -221,12 +218,6 @@ fun InvoiceScreen(
                 onSubmit = {
                     if (currentInvoice.isValid()) {
                         invoiceViewModel.saveInvoice()
-                        scope.launch {
-                            snackyHostState.show(
-                                message = invoiceCompletedMessage,
-                                type = SnackyType.SUCCESS
-                            )
-                        }
                         onComplete()
                     }
                 },

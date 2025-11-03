@@ -47,7 +47,10 @@ import com.example.composetrainer.ui.theme.BKoodak
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
-import com.example.composetrainer.ui.theme.smoke_white
+import com.example.composetrainer.ui.theme.costPrice
+import com.example.composetrainer.ui.theme.costPriceBg
+import com.example.composetrainer.ui.theme.salePrice
+import com.example.composetrainer.ui.theme.salePriceBg
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
 import com.example.composetrainer.utils.str
@@ -102,18 +105,23 @@ fun HeaderSection(
                     ElevatedCard(
                         modifier = Modifier
                             .clip(RoundedCornerShape(dimen(R.dimen.radius_md)))
-                            .clickable(indication = ripple(
-                                color = MaterialTheme.colorScheme.primary,
-                                bounded = true
-                            ),
-                            interactionSource = remember { MutableInteractionSource() }
-                        ) {
-                            isSaleInvoice = !isSaleInvoice
-                            if (isSaleInvoice) onInvoiceTypeChange(InvoiceType.SALE)
-                            else onInvoiceTypeChange(InvoiceType.PURCHASE)
-                        },
+                            .clickable(
+                                indication = ripple(
+                                    color = if (isSaleInvoice) MaterialTheme.colorScheme.salePrice
+                                            else MaterialTheme.colorScheme.costPrice,
+                                    bounded = true
+                                ),
+                                interactionSource = remember { MutableInteractionSource() }
+                            ) {
+                                isSaleInvoice = !isSaleInvoice
+                                if (isSaleInvoice) onInvoiceTypeChange(InvoiceType.SALE)
+                                else onInvoiceTypeChange(InvoiceType.PURCHASE)
+                            },
                         shape = RoundedCornerShape(dimen(R.dimen.radius_md)),
-                        colors = CardDefaults.cardColors(containerColor = smoke_white),
+                        colors = CardDefaults.cardColors(
+                            containerColor = if (isSaleInvoice) MaterialTheme.colorScheme.salePriceBg
+                                             else MaterialTheme.colorScheme.costPriceBg
+                        ),
                     ) {
                         Row(
                             verticalAlignment = Alignment.CenterVertically,
@@ -128,7 +136,8 @@ fun HeaderSection(
                                         .size(dimen(R.dimen.size_xs))
                                         .rotate(90f),
                                     painter = painterResource(id = R.drawable.output_circle_24px),
-                                    contentDescription = "Sale Icon "
+                                    contentDescription = "Sale Icon ",
+                                    tint = MaterialTheme.colorScheme.salePrice
                                 )
 
                                 Text(
@@ -136,7 +145,8 @@ fun HeaderSection(
                                     text = str(R.string.sale_invoice),
                                     fontSize = dimenTextSize(R.dimen.text_size_xl),
                                     textAlign = TextAlign.Center,
-                                    fontFamily = Beirut_Medium
+                                    fontFamily = Beirut_Medium,
+                                    color = MaterialTheme.colorScheme.salePrice
                                 )
                             } else {
                                 Icon(
@@ -144,7 +154,8 @@ fun HeaderSection(
                                         .size(dimen(R.dimen.size_xs))
                                         .rotate(90f),
                                     painter = painterResource(id = R.drawable.input_circle_24px),
-                                    contentDescription = "Buy Icon"
+                                    contentDescription = "Buy Icon",
+                                    tint = MaterialTheme.colorScheme.costPrice
                                 )
 
                                 Text(
@@ -152,7 +163,8 @@ fun HeaderSection(
                                     text = str(R.string.purchase_invoice),
                                     fontSize = dimenTextSize(R.dimen.text_size_xl),
                                     textAlign = TextAlign.Center,
-                                    fontFamily = Beirut_Medium
+                                    fontFamily = Beirut_Medium,
+                                    color = MaterialTheme.colorScheme.costPrice
                                 )
                             }
 

@@ -21,10 +21,13 @@ object CustomColors {
 
     val costPriceLight = Color(0xFFFF6B6B)
     val costPriceDark = Color(0xFFFFAB91)
+    val costPriceBgLight = Color(0xFFFFEBEE)
+    val costPriceBgDark = Color(0xFF4E342E)
 
     val salePriceLight = Color(0xFF4CAF50)
     val salePriceDark = Color(0xFF81C784)
-
+    val salePriceBgLight = Color(0xFFE8F5E9)
+    val salePriceBgDark = Color(0xFF1B5E20)
 
 }
 
@@ -79,4 +82,20 @@ val ColorScheme.salePrice: Color
         CustomColors.salePriceLight
     } else {
         CustomColors.salePriceLight
+    }
+
+val ColorScheme.costPriceBg: Color
+    @Composable
+    get() = if (this.background.luminance() < 0.5) {
+        CustomColors.costPriceBgDark
+    } else {
+        CustomColors.costPriceBgLight
+    }
+
+val ColorScheme.salePriceBg: Color
+    @Composable
+    get() = if (this.background.luminance() < 0.5) {
+        CustomColors.salePriceBgDark
+    } else {
+        CustomColors.salePriceBgLight
     }

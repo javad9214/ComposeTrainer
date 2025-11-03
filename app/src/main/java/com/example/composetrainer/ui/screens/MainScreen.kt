@@ -9,6 +9,7 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
@@ -21,8 +22,10 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
+import com.example.composetrainer.R
 import com.example.composetrainer.ui.components.CustomNavigationBar
 import com.example.composetrainer.ui.components.util.SnackyHost
+import com.example.composetrainer.ui.components.util.SnackyType
 import com.example.composetrainer.ui.components.util.rememberSnackyHostState
 import com.example.composetrainer.ui.navigation.BottomNavItem
 import com.example.composetrainer.ui.navigation.Routes
@@ -38,8 +41,10 @@ import com.example.composetrainer.ui.screens.setting.SettingScreen
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
+import com.example.composetrainer.utils.str
 import com.example.login.ui.screens.LoginScreen
 import com.example.login.ui.screens.RegisterScreen
+import kotlinx.coroutines.launch
 
 @Composable
 fun MainScreen(
@@ -74,6 +79,9 @@ fun MainScreen(
         }
     }
 
+    //for snackbar
+    val scope = rememberCoroutineScope()
+    val invoiceCompletedMessage = str(R.string.invoice_created_successfully)
     val snackyHostState = rememberSnackyHostState()
 
     Scaffold(
@@ -163,8 +171,13 @@ fun MainScreen(
 
                 composable(Routes.INVOICE_CREATE) {
                     InvoiceScreen(
-                        snackyHostState = snackyHostState,
                         onComplete = {
+                            scope.launch {
+                                snackyHostState.show(
+                                    message = invoiceCompletedMessage,
+                                    type = SnackyType.SUCCESS
+                                )
+                            }
                             navController.popBackStack()
                         },
                         onClose = {
