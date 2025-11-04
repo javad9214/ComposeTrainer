@@ -1,18 +1,19 @@
 package com.example.composetrainer.ui.screens.invoice.invoicescreen
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
@@ -34,6 +35,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -60,44 +62,70 @@ fun HeaderSection(
     invoiceNumber: String,
     persianDate: String,
     currentTime: String,
-    onAddProductClick: () -> Unit,
     onClose: () -> Unit,
-    onScanBarcodeClick: () -> Unit = {},
     onInvoiceTypeChange: (InvoiceType) -> Unit = {}
 ) {
 
     var isSaleInvoice by remember { mutableStateOf(true) }
 
     CompositionLocalProvider(LocalLayoutDirection.provides(LayoutDirection.Ltr)) {
-        ElevatedCard(
-            modifier = Modifier.fillMaxWidth(),
-            shape = RoundedCornerShape(
-                bottomStart = dimen(R.dimen.radius_xl),
-                bottomEnd = dimen(R.dimen.radius_xl)
-            ),
-            colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(MaterialTheme.colorScheme.background)
         ) {
-
-            Column {
+            // Top Header Section
+            ElevatedCard(
+                modifier = Modifier.fillMaxWidth(),
+                shape = RoundedCornerShape(
+                    bottomStart = dimen(R.dimen.radius_xl),
+                    bottomEnd = dimen(R.dimen.radius_xl)
+                ),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            ) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
-                        .padding(top = dimen(R.dimen.space_1), end = dimen(R.dimen.space_2)),
+                        .padding(
+                            top = dimen(R.dimen.space_2),
+                            bottom = dimen(R.dimen.space_2),
+                            end = dimen(R.dimen.space_2)
+                        ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
-                    IconButton(onClick = onClose) {
+
+
+                    // Close button with ripple effect
+                    IconButton(
+                        onClick = onClose,
+                        modifier = Modifier
+                            .padding(dimen(R.dimen.space_2)) // Padding around the icon
+                            .size(dimen(R.dimen.size_md)) // Icon size (adjustable)
+                            .clip(CircleShape) // Circular shape
+                            .background(Color.Gray.copy(alpha = 0.2f)) // Background with some transparency
+                            .padding(dimen(R.dimen.space_2)) // Padding around the icon itself
+                    ) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close",
+                            tint = Color.Black // Change icon color
                         )
                     }
+
+                    Text(
+                        text = "#",
+                        fontFamily = BMitra,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = dimenTextSize(R.dimen.text_size_md),
+                        modifier = Modifier.padding(start = dimen(R.dimen.space_2))
+                    )
 
                     Text(
                         text = invoiceNumber,
                         fontFamily = BMitra,
                         fontWeight = FontWeight.Bold,
                         fontSize = dimenTextSize(R.dimen.text_size_md),
-                        modifier = Modifier.padding(start = dimen(R.dimen.space_2))
+                        modifier = Modifier.padding(start = dimen(R.dimen.space_1))
                     )
 
                     Spacer(modifier = Modifier.weight(1f))
@@ -108,7 +136,7 @@ fun HeaderSection(
                             .clickable(
                                 indication = ripple(
                                     color = if (isSaleInvoice) MaterialTheme.colorScheme.salePrice
-                                            else MaterialTheme.colorScheme.costPrice,
+                                    else MaterialTheme.colorScheme.costPrice,
                                     bounded = true
                                 ),
                                 interactionSource = remember { MutableInteractionSource() }
@@ -120,7 +148,7 @@ fun HeaderSection(
                         shape = RoundedCornerShape(dimen(R.dimen.radius_md)),
                         colors = CardDefaults.cardColors(
                             containerColor = if (isSaleInvoice) MaterialTheme.colorScheme.salePriceBg
-                                             else MaterialTheme.colorScheme.costPriceBg
+                            else MaterialTheme.colorScheme.costPriceBg
                         ),
                     ) {
                         Row(
@@ -173,135 +201,110 @@ fun HeaderSection(
                     }
 
                 }
-
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = dimen(R.dimen.space_4),
-                            vertical = dimen(R.dimen.space_4)
-                        )
-                        .height(IntrinsicSize.Min)
-                ) {
-                    Column {
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier.height(32.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.calendar_today_24px),
-                                contentDescription = "Date",
-                                modifier = Modifier.padding(end = dimen(R.dimen.space_1))
-                            )
-                            Text(
-                                text = persianDate,
-                                fontFamily = BMitra,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .padding(vertical = dimen(R.dimen.space_1))
-                            )
-                        }
-                        Row(
-                            verticalAlignment = Alignment.CenterVertically,
-                            modifier = Modifier
-                                .padding(top = dimen(R.dimen.space_2))
-                                .height(32.dp)
-                        ) {
-                            Icon(
-                                painter = painterResource(id = R.drawable.schedule_24px),
-                                contentDescription = "Time",
-                                modifier = Modifier.padding(end = dimen(R.dimen.space_1))
-                            )
-                            Text(
-                                text = currentTime,
-                                fontFamily = BMitra,
-                                fontWeight = FontWeight.Bold,
-                                modifier = Modifier
-                                    .fillMaxHeight()
-                                    .padding(vertical = dimen(R.dimen.space_1))
-                            )
-                        }
-                    }
-                    Spacer(modifier = Modifier.weight(1f))
-                    Row(
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Column(
-                            horizontalAlignment = Alignment.End,
-                            verticalArrangement = Arrangement.SpaceEvenly,
-                            modifier = Modifier.fillMaxHeight()
-                        ) {
-                            Text(
-                                text = if (isSaleInvoice) str(R.string.buyer) else str(R.string.seller),
-                                fontFamily = BKoodak,
-                                fontWeight = FontWeight.Bold
-                            )
-                            Text(
-                                text = str(R.string.unknown),
-                                fontFamily = BKoodak,
-                                fontWeight = FontWeight.Bold
-                            )
-                        }
-                        Icon(
-                            painter = painterResource(id = R.drawable.face_24px),
-                            contentDescription = "User",
-                            modifier = Modifier
-                                .padding(start = dimen(R.dimen.space_2))
-                                .fillMaxHeight()
-                                .aspectRatio(1f)
-                        )
-                    }
-                }
-
-                // Add product button
-                Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(
-                            horizontal = dimen(R.dimen.space_4),
-                            vertical = dimen(R.dimen.space_2)
-                        ),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
-                ) {
-                    // Add product button
-                    OutlinedButton(
-                        onClick = onAddProductClick,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(dimen(R.dimen.radius_md))
-                    ) {
-                        Text(
-                            text = str(R.string.choose_from_list),
-                            fontSize = dimenTextSize(R.dimen.text_size_xl),
-                            textAlign = TextAlign.Center,
-                            fontFamily = Beirut_Medium
-
-                        )
-                    }
-
-                    // Scan barcode button
-                    OutlinedButton(
-                        onClick = onScanBarcodeClick,
-                        modifier = Modifier.weight(1f),
-                        shape = RoundedCornerShape(dimen(R.dimen.radius_md))
-                    ) {
-                        Text(
-                            modifier = Modifier.padding(end = dimen(R.dimen.space_1)),
-                            text = str(R.string.scan_barcode),
-                            fontSize = dimenTextSize(R.dimen.text_size_xl),
-                            textAlign = TextAlign.Center,
-                            fontFamily = Beirut_Medium
-                        )
-
-                        Icon(
-                            painter = painterResource(id = R.drawable.barcode_scanner_24px),
-                            contentDescription = "Scan Barcode",
-                        )
-                    }
-
-                }
             }
+
+            Spacer(modifier = Modifier.height(dimen(R.dimen.space_2)))
+
+            // Date and Time Card
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimen(R.dimen.space_2)),
+                shape = RoundedCornerShape(dimen(R.dimen.radius_md)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            ) {
+                Row(
+                    modifier = Modifier
+                        .padding(
+                            vertical = dimen(R.dimen.space_4),
+                            horizontal = dimen(R.dimen.space_4)
+                        )
+                        .fillMaxWidth(),
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.End
+                ) {
+
+                    Text(
+                        text = currentTime,
+                        fontFamily = BMitra,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = dimenTextSize(R.dimen.text_size_lg)
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.schedule_24px),
+                        contentDescription = "Time",
+                        modifier = Modifier
+                            .padding(end = dimen(R.dimen.space_6), start = dimen(R.dimen.space_2))
+                            .size(dimen(R.dimen.size_sm))
+                    )
+                    Text(
+                        text = persianDate,
+                        fontFamily = BMitra,
+                        fontWeight = FontWeight.Bold,
+                        fontSize = dimenTextSize(R.dimen.text_size_lg),
+                    )
+                    Icon(
+                        painter = painterResource(id = R.drawable.calendar_today_24px),
+                        contentDescription = "Date",
+                        modifier = Modifier
+                            .padding(start = dimen(R.dimen.space_2))
+                            .size(dimen(R.dimen.size_sm))
+                    )
+                }
+
+
+            }
+
+            Spacer(modifier = Modifier.height(dimen(R.dimen.space_2)))
+
+            // User info card
+            ElevatedCard(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = dimen(R.dimen.space_2)),
+                shape = RoundedCornerShape(dimen(R.dimen.radius_md)),
+                colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+            ) {
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            vertical = dimen(R.dimen.space_4),
+                            horizontal = dimen(R.dimen.space_4)
+                        ),
+                    horizontalArrangement = Arrangement.End
+                ) {
+
+                    Text(
+                        text = str(R.string.unknown),
+                        fontFamily = BKoodak,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = dimen(R.dimen.space_1))
+                    )
+
+                    Text(
+                        text = if (isSaleInvoice) str(R.string.buyer) else str(R.string.seller),
+                        fontFamily = BKoodak,
+                        fontWeight = FontWeight.Bold,
+                        modifier = Modifier.padding(horizontal = dimen(R.dimen.space_1))
+                    )
+
+                    Icon(
+                        painter = painterResource(id = R.drawable.face_24px),
+                        contentDescription = "User",
+                        modifier = Modifier
+                            .padding(start = dimen(R.dimen.space_2))
+                            .size(dimen(R.dimen.size_sm))
+                    )
+                }
+
+
+            }
+
+
         }
+
     }
 }
 
@@ -317,7 +320,6 @@ fun HeaderSectionPreview() {
             invoiceNumber = "1234",
             persianDate = "1402/12/25",
             currentTime = "14:30",
-            onAddProductClick = { },
             onClose = { }
         )
     }
@@ -335,7 +337,6 @@ fun HeaderSectionNoInvoiceNumberPreview() {
             invoiceNumber = "12324",
             persianDate = "1402/12/25",
             currentTime = "14:30",
-            onAddProductClick = { },
             onClose = { }
         )
     }
