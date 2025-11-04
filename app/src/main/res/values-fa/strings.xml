@@ -19,6 +19,10 @@
     <!-- Setting -->
     <string name="setting">تنظیمات</string>
     <string name="select_currency">انتخاب واحد پولی</string>
+    <string name="select_theme">انتخاب تم برنامه</string>
+    <string name="dark">تاریک</string>
+    <string name="light">روشن</string>
+    <string name="system_default">پیش فرض سیستم</string>
 
     <!-- DATES -->
     <string name="today">امـروز</string>
@@ -158,6 +162,7 @@
     <string name="invoice_creation">ایجاد فاکتور</string>
     <string name="customer_name">نام مشتری</string>
     <string name="save_invoice">ذخیره فاکتور</string>
+    <string name="Tap_to_start_scanning">برای شروع اسکن ضربه بزنید</string>
     <string name="invoice_created_successfully">فاکتور با موفقیت ثبت گردید!</string>
 
     <!-- Barcode Scanner View -->
