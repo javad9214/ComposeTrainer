@@ -1,6 +1,9 @@
 package com.example.composetrainer.ui.screens.setting
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,14 +12,22 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.ripple.rememberRipple
 import androidx.compose.material3.Button
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -42,9 +53,6 @@ fun SettingScreen(
     settingViewModel: SettingViewModel = hiltViewModel(),
 ) {
 
-    val snackyHostState = rememberSnackyHostState()
-    val scope = rememberCoroutineScope()
-    val message = str(R.string.no_product_found_with_barcode)
     Box(
         modifier = Modifier.fillMaxSize()
     ) {
@@ -65,13 +73,29 @@ fun SettingScreen(
                     fontSize = dimenTextSize(R.dimen.text_size_xl)
                 )
 
-
-                IconButton(onClick = onNavigateBack) {
+                // close icon
+                Box(
+                    modifier = Modifier
+                        .padding(dimen(R.dimen.space_2))
+                        .size(dimen(R.dimen.size_lg))
+                        .clip(CircleShape)
+                        .background(Color.Gray.copy(alpha = 0.08f))
+                        .clickable(
+                            interactionSource = remember { MutableInteractionSource() },
+                            indication = LocalIndication.current,
+                            onClick = onNavigateBack
+                        )
+                        .padding(dimen(R.dimen.space_2))
+                ) {
                     Icon(
-                        painter = painterResource(id = R.drawable.arrow_back_ios_new_24px),
-                        contentDescription = str(R.string.back)
+                        imageVector = Icons.Default.Close,
+                        contentDescription = "Close",
+                        tint = MaterialTheme.colorScheme.onSurface ,
+                        modifier = Modifier.align(Alignment.Center)
                     )
                 }
+
+
 
 
             }
@@ -79,56 +103,14 @@ fun SettingScreen(
             Spacer(modifier = Modifier.padding(vertical = dimen(R.dimen.space_4)))
 
             CurrencySelector()
+
+            ThemeSelector(
+                isDarkTheme = isDarkTheme,
+                onToggleTheme = onToggleTheme
+            )
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxSize(),
-            contentAlignment = Alignment.Center
-        ) {
-            Column(
-                horizontalAlignment = Alignment.CenterHorizontally,
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Button(onClick = {
-                    scope.launch {
-                        snackyHostState.show(
-                            message = "Operation completed successfully!",
-                            type = SnackyType.SUCCESS
-                        )
-                    }
-                }) {
-                    Text("Show Success")
-                }
 
-                Button(onClick = {
-
-                    scope.launch {
-                        snackyHostState.show(
-                            message = message,
-                            type = SnackyType.ERROR
-                        )
-                    }
-                }) {
-                    Text("Show Error")
-                }
-
-                Button(onClick = {
-                    scope.launch {
-                        snackyHostState.show(
-                            message = "Here's some information for you",
-                            type = SnackyType.INFO,
-                            duration = 5000L
-                        )
-                    }
-                }) {
-                    Text("Show Info (5s)")
-                }
-            }
-
-            // Snackbar Host at bottom
-            SnackyHost(hostState = snackyHostState)
-        }
 
     }
 

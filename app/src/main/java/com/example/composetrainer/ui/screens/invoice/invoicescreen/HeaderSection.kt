@@ -1,18 +1,18 @@
 package com.example.composetrainer.ui.screens.invoice.invoicescreen
 
+import androidx.compose.foundation.LocalIndication
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
@@ -22,7 +22,6 @@ import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
@@ -42,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.compose.ui.unit.dp
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.InvoiceType
 import com.example.composetrainer.ui.theme.BKoodak
@@ -89,26 +87,31 @@ fun HeaderSection(
                         .padding(
                             top = dimen(R.dimen.space_2),
                             bottom = dimen(R.dimen.space_2),
-                            end = dimen(R.dimen.space_2)
+                            end = dimen(R.dimen.space_2),
+                            start = dimen(R.dimen.space_2)
                         ),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
 
-
-                    // Close button with ripple effect
-                    IconButton(
-                        onClick = onClose,
+                    // Close button
+                    Box(
                         modifier = Modifier
-                            .padding(dimen(R.dimen.space_2)) // Padding around the icon
-                            .size(dimen(R.dimen.size_md)) // Icon size (adjustable)
-                            .clip(CircleShape) // Circular shape
-                            .background(Color.Gray.copy(alpha = 0.2f)) // Background with some transparency
-                            .padding(dimen(R.dimen.space_2)) // Padding around the icon itself
+                            .padding(dimen(R.dimen.space_2))
+                            .size(dimen(R.dimen.size_lg))
+                            .clip(CircleShape)
+                            .background(Color.Gray.copy(alpha = 0.08f))
+                            .clickable(
+                                interactionSource = remember { MutableInteractionSource() },
+                                indication = LocalIndication.current,
+                                onClick = onClose
+                            )
+                            .padding(dimen(R.dimen.space_2))
                     ) {
                         Icon(
                             imageVector = Icons.Default.Close,
                             contentDescription = "Close",
-                            tint = Color.Black // Change icon color
+                            tint = MaterialTheme.colorScheme.onSurface ,
+                            modifier = Modifier.align(Alignment.Center)
                         )
                     }
 
