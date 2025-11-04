@@ -1,30 +1,34 @@
 package com.example.composetrainer.ui.screens.invoice.invoicescreen
 
-import android.app.Activity
 import android.util.Log
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material3.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
+import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -32,22 +36,21 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.unit.LayoutDirection
-import androidx.core.view.WindowCompat
+import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.InvoiceType
 import com.example.composetrainer.domain.model.calculateTotalAmount
 import com.example.composetrainer.domain.model.hasProducts
-import com.example.composetrainer.ui.components.barcodescanner.BarcodeScannerView
 import com.example.composetrainer.ui.components.barcodescanner.CompactBarcodeScanner
 import com.example.composetrainer.ui.screens.component.NoBarcodeFoundDialog
 import com.example.composetrainer.ui.screens.invoice.productselection.AddProductToInvoice
 import com.example.composetrainer.ui.screens.productlist.AddProductBottomSheet
+import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
@@ -91,10 +94,7 @@ fun InvoiceScreen(
     val context = LocalContext.current
 
 
-
     val TAG = "InvoiceScreen"
-
-
 
 
     // Handle when a product is found by barcode
@@ -138,7 +138,7 @@ fun InvoiceScreen(
             sheetState = addNewProductSheetState
         ) {
             AddProductBottomSheet(
-               initialBarcode = scannedBarcode,
+                initialBarcode = scannedBarcode,
                 onSave = { product ->
                     productsViewModel.addProduct(product)
                     isAddProductSheetOpen.value = false
@@ -166,7 +166,13 @@ fun InvoiceScreen(
                 }
             )
 
-            Box(modifier = Modifier.fillMaxWidth()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .heightIn(
+                        min = 182.dp
+                    )
+            ) {
                 CompactBarcodeScanner(
                     onBarcodeDetected = { barcode ->
 
@@ -177,20 +183,40 @@ fun InvoiceScreen(
                     },
                     startPaused = true,
                     modifier = Modifier
-                        .padding(horizontal = dimen(R.dimen.space_2), vertical = dimen(R.dimen.space_2))
-                        .align(Alignment.TopCenter)
-                    ,
+                        .padding(
+                            horizontal = dimen(R.dimen.space_2),
+                            vertical = dimen(R.dimen.space_2)
+                        )
+                        .align(Alignment.TopCenter),
                     cardRadius = dimen(R.dimen.radius_md)
                 )
 
-                // Add your button over CompactBarcodeScanner
-                Button(
-                    onClick = { /* Handle button click */ },
+                ElevatedCard(
                     modifier = Modifier
-                        .align(Alignment.BottomCenter) // Center the button over the scanner
-                        .padding(bottom = dimen(R.dimen.space_2)) // Adjust the padding to fit the UI
+                        .align(Alignment.BottomCenter)
+                        .clickable(
+                            indication = ripple(
+                                color = MaterialTheme.colorScheme.onSurface,
+                                bounded = true
+                            ),
+                            interactionSource = remember { MutableInteractionSource() }
+                        ) {
+                            /* Handle card click */
+                        },
+                    shape = RoundedCornerShape(dimen(R.dimen.radius_md)),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surface,
+                        contentColor = MaterialTheme.colorScheme.onSurface
+                    ),
                 ) {
-                    Text(text = "Your Button")
+                    Text(
+                        modifier = Modifier.padding(
+                            vertical = dimen(R.dimen.space_2),
+                            horizontal = dimen(R.dimen.space_4)
+                        ),
+                        text = str(R.string.choose_from_list),
+                        fontFamily = Beirut_Medium
+                    )
                 }
             }
 
