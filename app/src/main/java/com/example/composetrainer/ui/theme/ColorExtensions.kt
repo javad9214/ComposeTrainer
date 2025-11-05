@@ -22,7 +22,7 @@ object CustomColors {
     val costPriceLight = Color(0xFFFF6B6B)
     val costPriceDark = Color(0xFFFFAB91)
     val costPriceBgLight = Color(0xFFFFEBEE)
-    val costPriceBgDark = Color(0xFF4E342E)
+    val costPriceBgDark = Color(0xFF2C1A1A)
 
     val salePriceLight = Color(0xFF4CAF50)
     val salePriceDark = Color(0xFF81C784)

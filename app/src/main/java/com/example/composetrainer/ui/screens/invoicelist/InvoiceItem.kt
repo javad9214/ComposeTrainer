@@ -277,32 +277,6 @@ fun InvoiceItem(
                 )
             }
 
-            OutlinedButton(
-                onClick = onClick,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        horizontal = dimen(R.dimen.space_4),
-                        vertical = dimen(R.dimen.space_4)
-                    ),
-                shape = RoundedCornerShape(dimen(R.dimen.radius_md)),
-                colors = ButtonDefaults.elevatedButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surface,
-                    contentColor = MaterialTheme.colorScheme.onSurface
-                )
-            ) {
-
-                Text(
-                    text = str(R.string.show_details),
-                    fontFamily = BHoma,
-                    fontSize = dimenTextSize(R.dimen.text_size_md),
-                    modifier = Modifier.padding(
-                        vertical = dimen(R.dimen.space_1), horizontal = dimen(R.dimen.space_2)
-                    )
-                )
-
-
-            }
 
         }
     }
