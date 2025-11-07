@@ -58,10 +58,10 @@ class InsertInvoiceUseCase @Inject constructor(
 
     private suspend fun insertSaleInvoice(invoiceWithProducts: InvoiceWithProducts) {
 
-
-        invoiceWithProducts.products.forEachIndexed { index, product , invoiceProduct ->
+        // Decreasing Product Quantity
+        invoiceWithProducts.products.forEachIndexed { index, product  ->
             try {
-                decreaseStockUseCase.invoke(product)
+                decreaseStockUseCase.invoke(product, invoiceWithProducts.invoiceProducts[index].quantity.value)
             } catch (e: Exception) {
                 Log.e(
                     TAG,
@@ -111,6 +111,21 @@ class InsertInvoiceUseCase @Inject constructor(
     }
 
     private suspend fun insertPurchaseInvoice(invoiceWithProducts: InvoiceWithProducts) {
+
+        // Increasing Product Quantity
+        invoiceWithProducts.products.forEachIndexed { index, product  ->
+            try {
+                increaseStockUseCase.invoke(product, invoiceWithProducts.invoiceProducts[index].quantity.value)
+            } catch (e: Exception) {
+                Log.e(
+                    TAG,
+                    "invoke: Error processing IncreaseStockUseCase for item $index - ProductId: ${product.id}",
+                    e
+                )
+                throw e
+            }
+        }
+
         // save StockMovement
         invoiceWithProducts.invoiceProducts.forEachIndexed { index, invoiceProduct ->
             try {

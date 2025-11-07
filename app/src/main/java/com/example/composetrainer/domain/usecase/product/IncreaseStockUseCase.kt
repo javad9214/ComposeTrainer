@@ -9,7 +9,7 @@ import javax.inject.Inject
 class IncreaseStockUseCase @Inject constructor(
     private val repository: ProductRepository
 ) {
-    suspend operator fun invoke(product: Product){
-        repository.updateProduct(product.addStock(1))
+    suspend operator fun invoke(product: Product, quantity: Int = 1){
+        repository.updateProduct(product.addStock(quantity))
     }
 }
