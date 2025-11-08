@@ -6,8 +6,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -21,12 +19,8 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.Favorite
-import androidx.compose.material3.ButtonColors
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.ElevatedCard
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -34,7 +28,6 @@ import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.OutlinedButton
 import androidx.compose.material3.Text
 import androidx.compose.material3.rememberModalBottomSheetState
-import androidx.compose.material3.ripple
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -45,7 +38,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.unit.LayoutDirection
@@ -58,7 +50,7 @@ import com.example.composetrainer.domain.model.hasProducts
 import com.example.composetrainer.ui.components.barcodescanner.CompactBarcodeScanner
 import com.example.composetrainer.ui.screens.component.NoBarcodeFoundDialog
 import com.example.composetrainer.ui.screens.invoice.productselection.AddProductToInvoice
-import com.example.composetrainer.ui.screens.productlist.AddProductBottomSheet
+import com.example.composetrainer.ui.screens.productlist.AddProduct
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.ui.viewmodels.InvoiceViewModel
@@ -147,14 +139,14 @@ fun InvoiceScreen(
             onDismissRequest = { isAddProductSheetOpen.value = false },
             sheetState = addNewProductSheetState
         ) {
-            AddProductBottomSheet(
+            AddProduct(
                 initialBarcode = scannedBarcode,
                 onSave = { product ->
                     productsViewModel.addProduct(product)
                     isAddProductSheetOpen.value = false
                     homeViewModel.clearDetectedBarcode()
                 },
-                onDismiss = {
+                onNavigateBack = {
                     isAddProductSheetOpen.value = false
                     homeViewModel.clearDetectedBarcode()
                 }

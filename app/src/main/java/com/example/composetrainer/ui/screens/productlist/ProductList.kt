@@ -26,7 +26,6 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -109,49 +108,14 @@ fun ProductScreen(
 
     var productToDelete by remember { mutableStateOf<Product?>(null) }
 
-    if (selectedProductForEdit.value != null || isAddProductSheetOpen.value) {
-        ModalBottomSheet(
-            onDismissRequest = { isAddProductSheetOpen.value = false },
-            containerColor = MaterialTheme.colorScheme.background,
-            sheetState = sheetState
-        ) {
-            AddProductBottomSheet(
-                initialProduct = selectedProductForEdit.value?.copy()
-                    ?: if (scannedBarcode.isNullOrEmpty().not())
-                        ProductFactory.createBasic(
-                            name = ProductName(""),
-                            barcode = Barcode(scannedBarcode!!),
-                            price = 0,
-                            costPrice = 0,
-                            initialStock = 0
-                        )
-                    else
-                        null,
-                onSave = { product ->
-                    if (selectedProductForEdit.value == null) {
-                        productsViewModel.addProduct(product)
-                        mainProductsViewModel.addNewProductToRemote(product)
-                    } else {
-                        productsViewModel.editProduct(product)
-                    }
-                    selectedProductForEdit.value = null
-                    isAddProductSheetOpen.value = false
-                    homeViewModel.clearDetectedBarcode()
-                },
-                onDismiss = {
-                    selectedProductForEdit.value = null
-                    isAddProductSheetOpen.value = false
-                    homeViewModel.clearDetectedBarcode()
-                }
-            )
-        }
-    }
+
+
 
     // Handle when a product is found by barcode
     LaunchedEffect(scannedProduct) {
         scannedProduct?.let { _ ->
             // Add product to invoice
-            productsViewModel.updateSearchQuery(scannedBarcode?:"")
+            productsViewModel.updateSearchQuery(scannedBarcode ?: "")
             // Clear scanned product
             homeViewModel.clearScannedProduct()
         }
@@ -204,9 +168,17 @@ fun ProductScreen(
             searchQuery = searchQuery,
             onSearchQueryChange = { productsViewModel.updateSearchQuery(it) },
             onSortOrderSelected = { productsViewModel.updateSortOrder(it) },
-            onAddProduct = { isAddProductSheetOpen.value = true },
-            onEditProduct = { selectedProductForEdit.value = it },
-            onDisableProduct = {  }, // TODO: Implement disable product functionality
+            onAddProduct = {
+                // Navigate to Add Product screen and provide scanned barcode via savedStateHandle
+                navController.currentBackStackEntry?.savedStateHandle?.set("barcode", scannedBarcode)
+                navController.navigate(Screen.ProductCreate.route)
+            },
+            onEditProduct = { product ->
+                // Provide productId via savedStateHandle then navigate to edit screen
+                navController.currentBackStackEntry?.savedStateHandle?.set("productId", product.id.value)
+                navController.navigate(Screen.ProductCreate.route)
+            },
+            onDisableProduct = { }, // TODO: Implement disable product functionality
             onDeleteProduct = { productToDelete = it },
             onIncreaseStock = { productsViewModel.increaseStock(it) },
             onDecreaseStock = { productsViewModel.decreaseStock(it) },
@@ -237,12 +209,13 @@ fun ProductScreen(
     }
 
 }
+
 @Composable
 fun ShowConfirmy(
     productsViewModel: ProductsViewModel,
     product: Product,
     onFinish: () -> Unit
-){
+) {
     val confirmyHostState = rememberConfirmyHostState()
     val snackyHostState = rememberSnackyHostState()
     val scope = rememberCoroutineScope()
@@ -268,7 +241,7 @@ fun ShowConfirmy(
         },
         onCancel = {
             onFinish()
-           // nothing happen
+            // nothing happen
         }
     )
 
@@ -321,7 +294,8 @@ fun ProductScreenContent(
                         )
                     }
 
-                    IconButton(onClick = onAddProduct) {
+                    // Add Product Button - trigger the provided onAddProduct lambda (the caller will set savedState and navigate)
+                    IconButton(onClick = { onAddProduct() }) {
                         Icon(Icons.Default.Add, contentDescription = "Add Product")
                     }
 
@@ -407,7 +381,7 @@ fun ProductScreenContent(
                         onDisable = { onDisableProduct(product) },
                         onDelete = { onDeleteProduct(product) },
                         onProductClick = {
-                           // navController.navigate(Screen.ProductDetails.createRoute(product.id.value))
+                            // navController.navigate(Screen.ProductDetails.createRoute(product.id.value))
                         }
                     )
                 }

@@ -34,12 +34,14 @@ import com.example.composetrainer.ui.screens.home.HomeScreen
 import com.example.composetrainer.ui.screens.invoice.invoicescreen.InvoiceScreen
 import com.example.composetrainer.ui.screens.invoicelist.InvoiceDetailScreen
 import com.example.composetrainer.ui.screens.invoicelist.InvoicesListScreen
+import com.example.composetrainer.ui.screens.productlist.AddProduct
 import com.example.composetrainer.ui.screens.productlist.ProductDetailsScreen
 import com.example.composetrainer.ui.screens.productlist.ProductScreen
 import com.example.composetrainer.ui.screens.productlist.serverlist.ServerProductListScreen
 import com.example.composetrainer.ui.screens.setting.SettingScreen
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
+import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.utils.str
 import com.example.login.ui.screens.LoginScreen
@@ -57,6 +59,8 @@ fun MainScreen(
 
     // Create a shared HomeViewModel instance for barcode scanning
     val sharedHomeViewModel: HomeViewModel = hiltViewModel()
+
+    val productsViewModel: ProductsViewModel = hiltViewModel()
 
     val bottomNavItems = listOf(
         BottomNavItem("Invoices", Routes.INVOICES_LIST),
@@ -136,6 +140,30 @@ fun MainScreen(
 
                 composable(Routes.PRODUCTS_LIST) {
                     ProductScreen(navController = navController)
+                }
+
+                composable(Routes.PRODUCT_CREATE){ backStackEntry ->
+                    // Read optional params passed via savedStateHandle from Product list screen
+                    val barcodeFromPrevious = navController.previousBackStackEntry?.savedStateHandle?.get<String>("barcode")
+                    val productIdFromPrevious = navController.previousBackStackEntry?.savedStateHandle?.get<Long>("productId")
+
+                    // Provide ProductsViewModel via hilt inside AddProduct as needed (AddEditProduct resolves it),
+                    // here just wire navigation callbacks.
+                    AddProduct(
+                        initialBarcode = barcodeFromPrevious,
+                        productId = productIdFromPrevious,
+                        onSave = { product ->
+                            // After save, navigate back to product list
+                            productsViewModel.addProduct(product)
+                            navController.popBackStack()
+                        },
+                        onNavigateBack = {
+                            navController.popBackStack()
+                        }
+                    )
+                    // Clear savedState to avoid reusing stale values on next navigation
+                    navController.previousBackStackEntry?.savedStateHandle?.remove<String>("barcode")
+                    navController.previousBackStackEntry?.savedStateHandle?.remove<Long>("productId")
                 }
 
                 composable(Routes.HOME) {

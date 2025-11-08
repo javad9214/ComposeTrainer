@@ -1,6 +1,5 @@
 package com.example.composetrainer.ui.viewmodels
 
-import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Product
@@ -29,7 +28,8 @@ class ProductsViewModel @Inject constructor(
     private val deleteProductUseCase: DeleteProductUseCase,
     private val editProductUseCase: EditProductUseCase,
     private val increaseStockUseCase: IncreaseStockUseCase,
-    private val decreaseStockUseCase: DecreaseStockUseCase
+    private val decreaseStockUseCase: DecreaseStockUseCase,
+    private val getProductByIdUseCase: GetProductByQueryUseCase
 ) : ViewModel() {
     private val _products = MutableStateFlow<List<Product>>(emptyList())
     val products: StateFlow<List<Product>> get() = _products
@@ -53,23 +53,6 @@ class ProductsViewModel @Inject constructor(
     private val _selectedProduct = MutableStateFlow<Product?>(null)
     val selectedProduct: StateFlow<Product?> get() = _selectedProduct
 
-    private val _priceUpdateComplete = MutableStateFlow<String?>(null)
-    val priceUpdateComplete: StateFlow<String?> get() = _priceUpdateComplete
-
-    private val _priceUpdateProgress = MutableStateFlow(0)
-    val priceUpdateProgress: StateFlow<Int> get() = _priceUpdateProgress
-
-    private val _stockUpdateProgress = MutableStateFlow(0)
-    val stockUpdateProgress: StateFlow<Int> get() = _stockUpdateProgress
-
-    private val _stockUpdateComplete = MutableStateFlow<String?>(null)
-    val stockUpdateComplete: StateFlow<String?> get() = _stockUpdateComplete
-
-    private val _invoiceCreationProgress = MutableStateFlow(0)
-    val invoiceCreationProgress: StateFlow<Int> get() = _invoiceCreationProgress
-
-    private val _invoiceCreationComplete = MutableStateFlow<String?>(null)
-    val invoiceCreationComplete: StateFlow<String?> get() = _invoiceCreationComplete
 
     private val TAG = "ProductsViewModel"
 
@@ -105,7 +88,7 @@ class ProductsViewModel @Inject constructor(
 
     fun addProduct(product: Product) {
         viewModelScope.launch {
-            addProductUseCase(product)
+            addProductUseCase.invoke(product)
         }
     }
 
@@ -168,28 +151,9 @@ class ProductsViewModel @Inject constructor(
         }
     }
 
-    fun updateProductStock(productId: Long, newStock: Int) {
-        viewModelScope.launch {
-            val product = _selectedProduct.value?.copy(stock = StockQuantity(newStock))
-            product?.let {
-                editProductUseCase(it)
-                _selectedProduct.value = it
-                loadProducts() // Refresh the list if it's visible
-            }
-        }
+    private fun cleanUpSelectedProduct() {
+        _selectedProduct.value = null
     }
-
-    fun updateProductPrice(productId: Long, newPrice: Long) {
-        viewModelScope.launch {
-            val product = _selectedProduct.value?.copy(price = Money(newPrice))
-            product?.let {
-                editProductUseCase(it)
-                _selectedProduct.value = it
-                loadProducts() // Refresh the list if it's visible
-            }
-        }
-    }
-
 }
 
 enum class SortOrder {

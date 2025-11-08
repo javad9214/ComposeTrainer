@@ -5,6 +5,7 @@ sealed class Screen(val route: String) {
     object Register : Screen(Routes.REGISTER)
     object Home : Screen(Routes.HOME)
     object Products : Screen(Routes.PRODUCTS_LIST)
+    object ProductCreate : Screen(Routes.PRODUCT_CREATE)
     object Invoice : Screen(Routes.INVOICE_CREATE)
     object InvoicesList : Screen(Routes.INVOICES_LIST)
     object InvoiceDetails : Screen(Routes.INVOICE_DETAILS) {
