@@ -454,6 +454,7 @@ object ProductFactory {
     }
 
     fun createComplete(
+        id: Long = 0,
         name: String,
         barcode: String,
         price: Long,
@@ -469,7 +470,7 @@ object ProductFactory {
     ): Product {
         val now = LocalDateTime.now()
         return Product(
-            id = ProductId(0),
+            id = ProductId(id),
             name = ProductName(name),
             barcode = Barcode(barcode),
             price = Money(price),

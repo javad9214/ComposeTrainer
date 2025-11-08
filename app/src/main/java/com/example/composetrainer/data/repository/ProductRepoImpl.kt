@@ -1,5 +1,6 @@
 package com.example.composetrainer.data.repository
 
+import android.util.Log
 import com.example.composetrainer.data.local.dao.ProductDao
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.toDomain

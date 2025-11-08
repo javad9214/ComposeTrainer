@@ -1,6 +1,7 @@
 package com.example.composetrainer.domain.usecase.product
 
 
+import android.util.Log
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.repository.ProductRepository
 import javax.inject.Inject

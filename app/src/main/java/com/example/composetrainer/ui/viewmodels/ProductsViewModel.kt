@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.viewmodels
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.domain.model.Product
@@ -127,8 +128,12 @@ class ProductsViewModel @Inject constructor(
 
     fun editProduct(product: Product) {
         viewModelScope.launch {
-            editProductUseCase(product)
-            loadProducts()
+            try {
+                editProductUseCase.invoke(product)
+                loadProducts()
+            } catch (e: Exception) {
+                e.printStackTrace()
+            }
         }
     }
 

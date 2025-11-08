@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.screens.productlist
 
+import android.util.Log
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -71,6 +72,7 @@ fun AddProductBottomSheet(
             initialProduct?.subcategoryId?.value?.toString() ?: ""
         )
     }
+
 
     Card(
         modifier = Modifier.fillMaxWidth(),
@@ -313,6 +315,7 @@ fun AddProductBottomSheet(
             Button(
                 onClick = {
                     val newProduct = ProductFactory.createComplete(
+                        id = initialProduct?.id?.value ?: 0,
                         name = name,
                         barcode = barcode.ifEmpty { BarcodeGenerator.generateBarcodeNumber() },
                         price = salePrice.toLongOrNull() ?: 0,
