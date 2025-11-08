@@ -9,6 +9,8 @@ import com.example.composetrainer.domain.model.updateInvoiceId
 import com.example.composetrainer.domain.repository.InvoiceProductRepository
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.StockMovementRepository
+import com.example.composetrainer.domain.usecase.product.DecreaseStockUseCase
+import com.example.composetrainer.domain.usecase.product.IncreaseStockUseCase
 import com.example.composetrainer.domain.usecase.sales.SaveProductSaleSummeryUseCase
 import javax.inject.Inject
 
@@ -18,7 +20,9 @@ class InsertInvoiceUseCase @Inject constructor(
     private val invoiceRepository: InvoiceRepository,
     private val stockMovementRepository: StockMovementRepository,
     private val invoiceProductRepository: InvoiceProductRepository,
-    private val saveProductSaleSummeryUseCase: SaveProductSaleSummeryUseCase
+    private val saveProductSaleSummeryUseCase: SaveProductSaleSummeryUseCase,
+    private val increaseStockUseCase: IncreaseStockUseCase,
+    private val decreaseStockUseCase: DecreaseStockUseCase
 ) {
     suspend operator fun invoke(invoiceWithProducts: InvoiceWithProducts) {
 
@@ -53,6 +57,21 @@ class InsertInvoiceUseCase @Inject constructor(
     }
 
     private suspend fun insertSaleInvoice(invoiceWithProducts: InvoiceWithProducts) {
+
+        // Decreasing Product Quantity
+        invoiceWithProducts.products.forEachIndexed { index, product  ->
+            try {
+                decreaseStockUseCase.invoke(product, invoiceWithProducts.invoiceProducts[index].quantity.value)
+            } catch (e: Exception) {
+                Log.e(
+                    TAG,
+                    "invoke: Error processing DecreaseStockUseCase for item $index - ProductId: ${product.id}",
+                    e
+                )
+                throw e
+            }
+        }
+
         // save ProductSalesSummary
         invoiceWithProducts.invoiceProducts.forEachIndexed { index, invoiceProduct ->
             try {
@@ -92,6 +111,21 @@ class InsertInvoiceUseCase @Inject constructor(
     }
 
     private suspend fun insertPurchaseInvoice(invoiceWithProducts: InvoiceWithProducts) {
+
+        // Increasing Product Quantity
+        invoiceWithProducts.products.forEachIndexed { index, product  ->
+            try {
+                increaseStockUseCase.invoke(product, invoiceWithProducts.invoiceProducts[index].quantity.value)
+            } catch (e: Exception) {
+                Log.e(
+                    TAG,
+                    "invoke: Error processing IncreaseStockUseCase for item $index - ProductId: ${product.id}",
+                    e
+                )
+                throw e
+            }
+        }
+
         // save StockMovement
         invoiceWithProducts.invoiceProducts.forEachIndexed { index, invoiceProduct ->
             try {

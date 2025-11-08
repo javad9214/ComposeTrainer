@@ -10,6 +10,8 @@ import com.example.composetrainer.domain.usecase.invoice.GetInvoiceNumberUseCase
 import com.example.composetrainer.domain.usecase.invoice.GetInvoiceWithDetailsUseCase
 import com.example.composetrainer.domain.usecase.invoice.InitInvoiceWithProductsUseCase
 import com.example.composetrainer.domain.usecase.invoice.InsertInvoiceUseCase
+import com.example.composetrainer.domain.usecase.product.DecreaseStockUseCase
+import com.example.composetrainer.domain.usecase.product.IncreaseStockUseCase
 import com.example.composetrainer.domain.usecase.sales.SaveProductSaleSummeryUseCase
 import dagger.Module
 import dagger.Provides
@@ -54,12 +56,16 @@ object InvoiceUseCaseModule {
         invoiceRepository: InvoiceRepository,
         stockMovementRepository: StockMovementRepository,
         invoiceProductRepository: InvoiceProductRepository,
-        saveProductSaleSummeryUseCase: SaveProductSaleSummeryUseCase
+        saveProductSaleSummeryUseCase: SaveProductSaleSummeryUseCase,
+        increaseStockUseCase: IncreaseStockUseCase,
+        decreaseStockUseCase: DecreaseStockUseCase
     ): InsertInvoiceUseCase = InsertInvoiceUseCase(
         invoiceRepository,
         stockMovementRepository,
         invoiceProductRepository,
-        saveProductSaleSummeryUseCase
+        saveProductSaleSummeryUseCase,
+        increaseStockUseCase,
+        decreaseStockUseCase
     )
 
     @Provides
