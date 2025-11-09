@@ -21,6 +21,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -45,6 +47,9 @@ fun SettingScreen(
     onNavigateBack: () -> Unit,
     settingViewModel: SettingViewModel = hiltViewModel(),
 ) {
+
+
+    val limit by settingViewModel.stockRunoutLimit.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -100,6 +105,11 @@ fun SettingScreen(
             ThemeSelector(
                 isDarkTheme = isDarkTheme,
                 onToggleTheme = onToggleTheme
+            )
+
+            StockRunoutLimitSelector(
+                limit = limit,
+                onLimitChange = { settingViewModel.saveStockRunoutLimit(it) }
             )
         }
 

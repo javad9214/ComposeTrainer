@@ -23,6 +23,8 @@
     <string name="dark">Dark</string>
     <string name="light">Light</string>
     <string name="system_default">System Default</string>
+    <string name="stock_runout_limit">Stock runout alert limit</string>
+
     <!-- DATES -->
     <string name="today">TODAY</string>
     <string name="yesterday">YESTERDAY</string>

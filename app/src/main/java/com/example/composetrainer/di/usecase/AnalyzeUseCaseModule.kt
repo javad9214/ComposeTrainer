@@ -1,4 +1,4 @@
-package com.example.composetrainer.di
+package com.example.composetrainer.di.usecase
 
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.ProductSalesSummaryRepository

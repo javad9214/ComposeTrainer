@@ -25,6 +25,8 @@
     <string name="dark">تاریک</string>
     <string name="light">روشن</string>
     <string name="system_default">پیش فرض سیستم</string>
+    <string name="stock_runout_limit">حد هشدار اتمام موجودی</string>
+
 
     <!-- DATES -->
     <string name="today">امـروز</string>

@@ -1,4 +1,4 @@
-package com.example.composetrainer.di
+package com.example.composetrainer.di.usecase
 
 import com.example.composetrainer.domain.repository.ProductRepository
 import com.example.composetrainer.domain.repository.ServerMainProductRepository
@@ -15,7 +15,6 @@ import com.example.composetrainer.domain.usecase.product.IncreaseStockUseCase
 import com.example.composetrainer.domain.usecase.servermainproduct.AddNewProductToMainServerUseCase
 import com.example.composetrainer.domain.usecase.servermainproduct.GetAllMainProductsUseCase
 import com.example.composetrainer.domain.usecase.servermainproduct.GetSearchedMainProductsUseCase
-import com.example.composetrainer.ui.viewmodels.MainProductsViewModel
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn

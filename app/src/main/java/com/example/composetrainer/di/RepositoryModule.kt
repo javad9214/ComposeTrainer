@@ -7,12 +7,14 @@ import com.example.composetrainer.data.repository.ProductRepoImpl
 import com.example.composetrainer.data.repository.ProductSalesSummaryRepoImpl
 import com.example.composetrainer.data.repository.ServerMainProductRepoImpl
 import com.example.composetrainer.data.repository.StockMovementRepoImpl
+import com.example.composetrainer.data.repository.UserPreferencesRepositoryImpl
 import com.example.composetrainer.domain.repository.InvoiceProductRepository
 import com.example.composetrainer.domain.repository.InvoiceRepository
 import com.example.composetrainer.domain.repository.ProductRepository
 import com.example.composetrainer.domain.repository.ProductSalesSummaryRepository
 import com.example.composetrainer.domain.repository.ServerMainProductRepository
 import com.example.composetrainer.domain.repository.StockMovementRepository
+import com.example.composetrainer.domain.repository.UserPreferencesRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -60,4 +62,10 @@ object RepositoryModule {
     ): ServerMainProductRepository {
         return ServerMainProductRepoImpl(apiServiceMainProduct = apiServiceMainProduct)
     }
+
+    @Provides
+    @Singleton
+    fun provideUserPreferencesRepository(
+        repoImpl: UserPreferencesRepositoryImpl
+    ): UserPreferencesRepository = repoImpl
 }
