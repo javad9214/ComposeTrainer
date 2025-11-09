@@ -20,4 +20,6 @@ interface ProductRepository {
     suspend fun getProductById(id: Long): Product?
 
     suspend fun getProductsByIds(ids: List<Long>): List<Product>
+
+    fun getProductsLowStock(stockLimit: Int): Flow<List<Product>>
 }

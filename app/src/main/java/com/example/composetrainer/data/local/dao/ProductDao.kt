@@ -32,4 +32,7 @@ interface ProductDao {
     @Query("SELECT * FROM products WHERE id IN (:productIds)")
     suspend fun getProductsByIds(productIds: List<Long>): List<ProductEntity>
 
+    @Query("SELECT * FROM products WHERE stock <= :inputStock ORDER BY stock ASC")
+    fun getProductsByStock(inputStock: Int): Flow<List<ProductEntity>>
+
 }

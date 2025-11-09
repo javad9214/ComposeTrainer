@@ -1,6 +1,5 @@
 package com.example.composetrainer.data.repository
 
-import android.util.Log
 import com.example.composetrainer.data.local.dao.ProductDao
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.toDomain
@@ -12,7 +11,7 @@ import javax.inject.Inject
 
 class ProductRepoImpl @Inject constructor(
     private val productDao: ProductDao
-): ProductRepository {
+) : ProductRepository {
 
     override suspend fun addProduct(product: Product) {
         val entity = product.toEntity()
@@ -22,8 +21,8 @@ class ProductRepoImpl @Inject constructor(
     override fun getAllProducts(): Flow<List<Product>> {
         return productDao.getAllProducts()
             .map { entityList ->
-                entityList.map {
-                    entity -> entity.toDomain()
+                entityList.map { entity ->
+                    entity.toDomain()
                 }
             }
     }
@@ -52,6 +51,12 @@ class ProductRepoImpl @Inject constructor(
 
     override suspend fun getProductsByIds(ids: List<Long>): List<Product> {
         return productDao.getProductsByIds(productIds = ids).map { it.toDomain() }
+    }
+
+    override fun getProductsLowStock(stockLimit: Int): Flow<List<Product>> {
+        return productDao.getProductsByStock(stockLimit).map { entities ->
+            entities.map { it.toDomain() }
+        }
     }
 
 }
