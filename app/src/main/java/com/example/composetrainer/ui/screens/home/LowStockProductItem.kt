@@ -54,8 +54,10 @@ fun LowStockProductItem(
     val (urgencyColor, urgencyLabel) = when (stockStatus) {
         StockStatus.OUT_OF_STOCK ->
             MaterialTheme.colorScheme.error to str(R.string.out_of_stock)
+
         StockStatus.LOW_STOCK ->
             MaterialTheme.colorScheme.tertiary to str(R.string.critical)
+
         else ->
             MaterialTheme.colorScheme.secondary to str(R.string.low)
     }
@@ -67,14 +69,8 @@ fun LowStockProductItem(
             .wrapContentHeight(),
         shape = RoundedCornerShape(dimen(R.dimen.radius_lg)),
         colors = CardDefaults.cardColors(
-            containerColor = when (stockStatus) {
-                StockStatus.OUT_OF_STOCK ->
-                    MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.3f)
-                StockStatus.LOW_STOCK ->
-                    MaterialTheme.colorScheme.tertiaryContainer.copy(alpha = 0.4f)
-                else ->
-                    MaterialTheme.colorScheme.surface
-            }
+            containerColor =
+                MaterialTheme.colorScheme.surface
         )
     ) {
         Column(modifier = Modifier.padding(dimen(R.dimen.space_2))) {
@@ -139,7 +135,7 @@ fun LowStockProductItem(
 
             // Recommended reorder using domain method
             recommendedQuantity?.let { quantity ->
-                product.costPrice?.let { cost ->
+                product.costPrice.let { cost ->
                     val reorderValue = cost.amount * quantity.value
                     StockInfoRow(
                         label = str(R.string.reorder_cost),

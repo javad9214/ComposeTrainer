@@ -210,12 +210,6 @@ fun MainScreen(
                 composable(Routes.INVOICE_CREATE) {
                     InvoiceScreen(
                         onComplete = {
-                            scope.launch {
-                                snackyHostState.show(
-                                    message = invoiceCompletedMessage,
-                                    type = SnackyType.SUCCESS
-                                )
-                            }
                             navController.popBackStack()
                         },
                         onClose = {

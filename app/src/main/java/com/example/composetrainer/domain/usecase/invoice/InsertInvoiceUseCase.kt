@@ -5,9 +5,11 @@ import com.example.composetrainer.domain.model.InvoiceId
 import com.example.composetrainer.domain.model.InvoiceType
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.StockMovementFactory
+import com.example.composetrainer.domain.model.recordSale
 import com.example.composetrainer.domain.model.updateInvoiceId
 import com.example.composetrainer.domain.repository.InvoiceProductRepository
 import com.example.composetrainer.domain.repository.InvoiceRepository
+import com.example.composetrainer.domain.repository.ProductRepository
 import com.example.composetrainer.domain.repository.StockMovementRepository
 import com.example.composetrainer.domain.usecase.product.DecreaseStockUseCase
 import com.example.composetrainer.domain.usecase.product.IncreaseStockUseCase
@@ -19,6 +21,7 @@ const val TAG = "InsertInvoiceUseCase"
 class InsertInvoiceUseCase @Inject constructor(
     private val invoiceRepository: InvoiceRepository,
     private val stockMovementRepository: StockMovementRepository,
+    private val productRepository: ProductRepository,
     private val invoiceProductRepository: InvoiceProductRepository,
     private val saveProductSaleSummeryUseCase: SaveProductSaleSummeryUseCase,
     private val increaseStockUseCase: IncreaseStockUseCase,
@@ -57,6 +60,12 @@ class InsertInvoiceUseCase @Inject constructor(
     }
 
     private suspend fun insertSaleInvoice(invoiceWithProducts: InvoiceWithProducts) {
+
+        // update product LastSaleDate
+        invoiceWithProducts.products.forEach { product ->
+            productRepository.updateProduct(product.recordSale())
+        }
+
 
         // Decreasing Product Quantity
         invoiceWithProducts.products.forEachIndexed { index, product  ->

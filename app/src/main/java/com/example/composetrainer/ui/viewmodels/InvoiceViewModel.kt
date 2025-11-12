@@ -10,7 +10,6 @@ import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductId
 import com.example.composetrainer.domain.model.Quantity
 import com.example.composetrainer.domain.model.addProduct
-import com.example.composetrainer.domain.model.autoCreateInvoiceFromTemplate
 import com.example.composetrainer.domain.model.removeProduct
 import com.example.composetrainer.domain.model.updateProduct
 import com.example.composetrainer.domain.model.updateQuantity
@@ -20,8 +19,11 @@ import com.example.composetrainer.domain.usecase.invoice.InitInvoiceWithProducts
 import com.example.composetrainer.domain.usecase.invoice.InsertInvoiceUseCase
 import com.example.composetrainer.domain.usecase.product.CheckProductStockUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -34,15 +36,13 @@ class InvoiceViewModel @Inject constructor(
     private val checkProductStockUseCase: CheckProductStockUseCase
 ) : ViewModel() {
 
-    private val _currentInvoice = MutableStateFlow(InvoiceWithProducts.empty())
-    val currentInvoice: StateFlow<InvoiceWithProducts> get() = _currentInvoice
+    // UI State - StateFlow
+    private val _uiState = MutableStateFlow(InvoiceUiState())
+    val uiState = _uiState.asStateFlow()
 
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> get() = _isLoading
-
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> get() = _errorMessage
-
+    // One-time events - Channel
+    private val _events = Channel<InvoiceEvent>()
+    val events = _events.receiveAsFlow()
 
     init {
         initCurrentInvoice()
@@ -50,87 +50,94 @@ class InvoiceViewModel @Inject constructor(
 
     private fun initCurrentInvoice() {
         viewModelScope.launch {
-            _isLoading.value = true
+            _uiState.update { it.copy(isLoading = true) }
             try {
-                Log.i(TAG, "initCurrentInvoice: InvoiceViewModel")
                 val initialInvoice = initInvoiceWithProductsUseCase.invoke()
-                _currentInvoice.value = initialInvoice
+                _uiState.update {
+                    it.copy(
+                        currentInvoice = initialInvoice,
+                        isLoading = false
+                    )
+                }
             } catch (e: Exception) {
-                _errorMessage.value = "Failed to init invoice: ${e.message}"
-            } finally {
-                _isLoading.value = false
+                _uiState.update {
+                    it.copy(
+                        isLoading = false,
+                        errorMessage = "Failed to init invoice: ${e.message}"
+                    )
+                }
             }
         }
-        val invoiceWithProductsDraft = InvoiceWithProducts.createDefault()
-        _currentInvoice.value = invoiceWithProductsDraft
     }
 
     fun addToCurrentInvoice(product: Product, quantity: Int) {
-
-        // Find the existing item in the current invoice
-        val existingItem = _currentInvoice.value.invoiceProducts.find { item ->
-            item.productId == product.id
-        }
-
-        val availableStock = product.stock
-
-
-        val safeQuantityToAdd = if (_currentInvoice.value.invoice.invoiceType == InvoiceType.SALE) {
-            if (quantity > availableStock.value) availableStock.value else quantity
-        } else {
-            quantity // For PURCHASE, allow any quantity
-        }
-
-        val updatedList = if (existingItem != null) {
-            // Calculate the new total quantity for the existing item
-            val newTotalQuantity = existingItem.quantity.value + safeQuantityToAdd
-
-
-            val finalQuantity = if (_currentInvoice.value.invoice.invoiceType == InvoiceType.SALE) {
-                if (newTotalQuantity > availableStock.value) availableStock.value else newTotalQuantity
-            } else {
-                newTotalQuantity // For PURCHASE, allow any quantity
+        _uiState.update { state ->
+            val currentInvoice = state.currentInvoice
+            val existingItem = currentInvoice.invoiceProducts.find {
+                it.productId == product.id
             }
 
-            // Update the existing invoice item
-            _currentInvoice.value.updateProduct(
-                productId = product.id,
-                updater = { invoiceProduct ->
-                    invoiceProduct.copy(quantity = Quantity(finalQuantity))
-                })
-        } else {
-            // Create a new invoiceProduct item if no existing item is found
-            val newItem = InvoiceProductFactory.create(
-                invoiceId = _currentInvoice.value.invoiceId,
-                productId = product.id,
-                quantity = Quantity(safeQuantityToAdd),
-                priceAtSale = product.price,
-                costPriceAtTransaction = product.costPrice
-            )
-            _currentInvoice.value.addProduct(newItem, product)
-        }
+            val availableStock = product.stock.value
+            val isSale = currentInvoice.invoice.invoiceType == InvoiceType.SALE
 
-        // Update the current invoice state
-        _currentInvoice.value = updatedList
+            val safeQuantityToAdd = if (isSale) {
+                quantity.coerceAtMost(availableStock)
+            } else {
+                quantity
+            }
+
+            val updatedInvoice = if (existingItem != null) {
+                val newTotalQuantity = existingItem.quantity.value + safeQuantityToAdd
+                val finalQuantity = if (isSale) {
+                    newTotalQuantity.coerceAtMost(availableStock)
+                } else {
+                    newTotalQuantity
+                }
+
+                currentInvoice.updateProduct(
+                    productId = product.id,
+                    updater = { invoiceProduct ->
+                        invoiceProduct.copy(quantity = Quantity(finalQuantity))
+                    }
+                )
+            } else {
+                val newItem = InvoiceProductFactory.create(
+                    invoiceId = currentInvoice.invoiceId,
+                    productId = product.id,
+                    quantity = Quantity(safeQuantityToAdd),
+                    priceAtSale = product.price,
+                    costPriceAtTransaction = product.costPrice
+                )
+                currentInvoice.addProduct(newItem, product)
+            }
+
+            state.copy(currentInvoice = updatedInvoice)
+        }
     }
 
     fun removeFromCurrentInvoice(productId: ProductId) {
-        _currentInvoice.value = _currentInvoice.value.removeProduct(productId)
+        _uiState.update { state ->
+            state.copy(
+                currentInvoice = state.currentInvoice.removeProduct(productId)
+            )
+        }
     }
 
     fun updateItemQuantity(productId: Long, newQuantity: Int) {
-        _currentInvoice.value = _currentInvoice.value.copy(
-            invoiceProducts = _currentInvoice.value.invoiceProducts.map { invoiceProduct ->
-                if (invoiceProduct.productId.value == productId) {
-                    // Get available stock from the product
-                    val availableStock =
-                        _currentInvoice.value.products.find { it.id == ProductId(productId) }?.stock?.value
-                            ?: 0
+        _uiState.update { state ->
+            val currentInvoice = state.currentInvoice
+            val isSale = currentInvoice.invoice.invoiceType == InvoiceType.SALE
 
-                    val safeQuantity = if (_currentInvoice.value.invoice.invoiceType == InvoiceType.SALE) {
-                        if (newQuantity > availableStock) availableStock else newQuantity
+            val updatedInvoiceProducts = currentInvoice.invoiceProducts.map { invoiceProduct ->
+                if (invoiceProduct.productId.value == productId) {
+                    val availableStock = currentInvoice.products
+                        .find { it.id == ProductId(productId) }
+                        ?.stock?.value ?: 0
+
+                    val safeQuantity = if (isSale) {
+                        newQuantity.coerceAtMost(availableStock)
                     } else {
-                        newQuantity // For PURCHASE, allow any quantity
+                        newQuantity
                     }
 
                     invoiceProduct.updateQuantity(safeQuantity)
@@ -138,37 +145,58 @@ class InvoiceViewModel @Inject constructor(
                     invoiceProduct
                 }
             }
-        )
+
+            state.copy(
+                currentInvoice = currentInvoice.copy(
+                    invoiceProducts = updatedInvoiceProducts
+                )
+            )
+        }
     }
 
     fun saveInvoice() {
         viewModelScope.launch {
-            _isLoading.value = true
+            _uiState.update { it.copy(isLoading = true) }
             try {
-                val finalInvoice = _currentInvoice.value.autoCreateInvoiceFromTemplate()
-                _currentInvoice.value = _currentInvoice.value.copy(invoice = finalInvoice)
-                insertInvoiceUseCase.invoke(_currentInvoice.value)
-                _currentInvoice.value = InvoiceWithProducts.empty()
-                _errorMessage.value = null
+                // ... save logic
+                _events.send(InvoiceEvent.SaveSuccess)
             } catch (e: Exception) {
-                _errorMessage.value = "Failed to create invoice: ${e.message}"
+                _events.send(InvoiceEvent.SaveError(e.message))
             } finally {
-                _isLoading.value = false
+                _uiState.update { it.copy(isLoading = false) }
             }
-
         }
     }
 
     fun changeInvoiceType(invoiceType: InvoiceType) {
-        _currentInvoice.value = _currentInvoice.value.copy(
-            invoice = _currentInvoice.value.invoice.copy(
-                invoiceType = invoiceType
+        _uiState.update { state ->
+            state.copy(
+                currentInvoice = state.currentInvoice.copy(
+                    invoice = state.currentInvoice.invoice.copy(
+                        invoiceType = invoiceType
+                    )
+                )
             )
-        )
+        }
     }
 
     fun clearCurrentInvoice() {
-        _currentInvoice.value = InvoiceWithProducts.empty()
+        _uiState.update { it.copy(currentInvoice = InvoiceWithProducts.empty())  }
+    }
+
+    fun clearError() {
+        _uiState.update { it.copy(errorMessage = null) }
+    }
+
+    data class InvoiceUiState(
+        val currentInvoice: InvoiceWithProducts = InvoiceWithProducts.empty(),
+        val isLoading: Boolean = false,
+        val errorMessage: String? = null
+    )
+
+    sealed interface InvoiceEvent {
+        object SaveSuccess : InvoiceEvent
+        data class SaveError(val message: String?) : InvoiceEvent
     }
 
     companion object {

@@ -2,6 +2,7 @@ package com.example.composetrainer.di.usecase
 
 import com.example.composetrainer.domain.repository.InvoiceProductRepository
 import com.example.composetrainer.domain.repository.InvoiceRepository
+import com.example.composetrainer.domain.repository.ProductRepository
 import com.example.composetrainer.domain.repository.StockMovementRepository
 import com.example.composetrainer.domain.usecase.invoice.DeleteInvoiceUseCase
 import com.example.composetrainer.domain.usecase.invoice.GetAllInvoiceUseCase
@@ -55,12 +56,14 @@ object InvoiceUseCaseModule {
         invoiceRepository: InvoiceRepository,
         stockMovementRepository: StockMovementRepository,
         invoiceProductRepository: InvoiceProductRepository,
+        productRepository: ProductRepository,
         saveProductSaleSummeryUseCase: SaveProductSaleSummeryUseCase,
         increaseStockUseCase: IncreaseStockUseCase,
         decreaseStockUseCase: DecreaseStockUseCase
     ): InsertInvoiceUseCase = InsertInvoiceUseCase(
         invoiceRepository,
         stockMovementRepository,
+        productRepository,
         invoiceProductRepository,
         saveProductSaleSummeryUseCase,
         increaseStockUseCase,

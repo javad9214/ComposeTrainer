@@ -24,10 +24,6 @@ class GetTopSellingProductsUseCase @Inject constructor(
         val summariesFlow = productSalesSummaryRepository.getTopSellingProductsBetween(startTime, endTime)
 
         return summariesFlow.map { summaries ->
-            Log.d("UseCase", "Raw summaries: ${summaries.size}")
-            summaries.forEach { s ->
-                Log.d("UseCase", "productId=${s.productId.value}, totalSold=${s.totalSold.value}, date=${s.date}")
-            }
 
             // Group by productId and sum the values
             val aggregatedSummaries = summaries
@@ -54,10 +50,6 @@ class GetTopSellingProductsUseCase @Inject constructor(
                 }
                 .sortedByDescending { it.totalSold.value }
 
-            Log.d("UseCase", "Aggregated & sorted summaries:")
-            aggregatedSummaries.forEach { s ->
-                Log.d("UseCase", "productId=${s.productId.value}, totalSold=${s.totalSold.value}")
-            }
 
             // Fetch product details for these IDs (one-shot suspend)
             val productIds = getProductsByIDsUseCase.invoke(aggregatedSummaries.map { it.productId.value })

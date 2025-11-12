@@ -7,8 +7,6 @@ import javax.inject.Inject
 
 class AddProductUseCase @Inject constructor(private val productRepository: ProductRepository) {
     suspend operator fun invoke(product: Product){
-        Log.i(TAG, "invoke: ${product.id.value}")
-        Log.i(TAG, "invoke: ${product.name.value}")
         productRepository.addProduct(product)
     }
 

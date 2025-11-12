@@ -78,7 +78,7 @@ fun InvoiceScreen(
     val currentTime = remember { FarsiDateUtil.getCurrentTimeFormatted() }
     var showProductSelection by remember { mutableStateOf(false) }
     val products by productsViewModel.products.collectAsState()
-    val currentInvoice by invoiceViewModel.currentInvoice.collectAsState()
+    val uiState by invoiceViewModel.uiState.collectAsState()
     val isLoading by invoiceListViewModel.isLoading.collectAsState()
 
     // Observe scanned product from HomeViewModel for barcode scanning
@@ -112,6 +112,17 @@ fun InvoiceScreen(
         if (scannerErrorMessage != null && scannedBarcode != null) {
             showNoBarcodeFoundDialog = true
             noBarcodeFoundDialogSheetState.show()
+        }
+    }
+
+    LaunchedEffect(Unit) {
+        invoiceViewModel.events.collect { event ->
+            when (event) {
+                is InvoiceViewModel.InvoiceEvent.SaveSuccess -> onComplete()
+                is InvoiceViewModel.InvoiceEvent.SaveError -> {
+                    // Optionally show a toast or snackbar
+                }
+            }
         }
     }
 
@@ -251,15 +262,13 @@ fun InvoiceScreen(
         }
 
         CompositionLocalProvider(LocalLayoutDirection provides LayoutDirection.Ltr) {
-            // Bottom total section
             BottomTotalSection(
-                totalPrice = totalPrice.amount,
-                isLoading = isLoading,
-                hasItems = currentInvoice.products.isNotEmpty(),
+                totalPrice = uiState.currentInvoice.invoiceProducts.totalPrice.amount,
+                isLoading = uiState.isLoading,
+                hasItems = uiState.currentInvoice.products.isNotEmpty(),
                 onSubmit = {
-                    if (currentInvoice.isValid()) {
+                    if (uiState.currentInvoice.isValid()) {
                         invoiceViewModel.saveInvoice()
-                        onComplete()
                     }
                 },
                 modifier = Modifier.align(Alignment.BottomCenter)

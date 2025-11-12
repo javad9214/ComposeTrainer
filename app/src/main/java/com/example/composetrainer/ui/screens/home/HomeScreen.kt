@@ -39,6 +39,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -78,6 +79,9 @@ fun HomeScreen(
     // most Profitable Products Details
     val mostProfitableProducts by homeTotalItemsViewModel.mostProfitableProducts.collectAsState()
     val mostProfitableProductsSummery by homeTotalItemsViewModel.topProfitableProductList.collectAsState()
+
+    // low Stock Products Details
+    val lowStockProducts by homeTotalItemsViewModel.lowStockProducts.collectAsState()
 
     // total Items Details
     val totalInvoiceCount by homeTotalItemsViewModel.totalInvoiceCount.collectAsState()
@@ -289,6 +293,19 @@ fun HomeScreen(
                             ?: return@items,
                         productSalesSummary = mostProfitableProductsSummeryItem,
                         rank = mostProfitableProductsSummery.indexOf(mostProfitableProductsSummeryItem) + 1
+                    )
+                }
+            }
+
+            Spacer(modifier = Modifier.height(dimen(R.dimen.space_8)))
+
+            // Low Stock Products
+            LazyRow {
+                items(
+                    lowStockProducts,
+                    key = { it.id.value }) { product ->
+                    LowStockProductItem(
+                        product = product
                     )
                 }
             }

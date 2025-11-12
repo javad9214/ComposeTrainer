@@ -7,10 +7,12 @@ import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.ProductSalesSummary
 import com.example.composetrainer.domain.model.type.Money
 import com.example.composetrainer.domain.usecase.analytics.GetInvoiceReportCountUseCase
+import com.example.composetrainer.domain.usecase.analytics.GetLowStockProductsUseCase
 import com.example.composetrainer.domain.usecase.analytics.GetTotalProfitPriceUseCase
 import com.example.composetrainer.domain.usecase.analytics.GetTotalSoldPriceUseCase
 import com.example.composetrainer.domain.usecase.sales.GetTopProfitableProductsUseCase
 import com.example.composetrainer.domain.usecase.sales.GetTopSellingProductsUseCase
+import com.example.composetrainer.domain.usecase.userpreferences.GetStockRunoutLimitUseCase
 import com.example.composetrainer.utils.dateandtime.TimeRange
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,7 +26,9 @@ class HomeTotalItemsViewModel @Inject constructor(
     private val getTotalSoldPriceUseCase: GetTotalSoldPriceUseCase,
     private val getTotalProfitPriceUseCase: GetTotalProfitPriceUseCase,
     private val getTopSellingProductsUseCase: GetTopSellingProductsUseCase,
-    private val getTopProfitableProductsUseCase: GetTopProfitableProductsUseCase
+    private val getTopProfitableProductsUseCase: GetTopProfitableProductsUseCase,
+    private val getLowStockProductsUseCase: GetLowStockProductsUseCase,
+    private val getStockRunoutLimitUseCase: GetStockRunoutLimitUseCase
 ) : ViewModel() {
 
     private val _totalInvoiceCount = MutableStateFlow(0)
@@ -49,6 +53,12 @@ class HomeTotalItemsViewModel @Inject constructor(
     private val _mostProfitableProducts = MutableStateFlow<List<Product>>(emptyList())
     val mostProfitableProducts: StateFlow<List<Product>> get() = _mostProfitableProducts
 
+    private val _lowStockProducts = MutableStateFlow<List<Product>>(emptyList())
+    val lowStockProducts: StateFlow<List<Product>> get() = _lowStockProducts
+
+    private val _stockRunoutLimit = MutableStateFlow(0)
+    val stockRunoutLimit: StateFlow<Int> get() = _stockRunoutLimit
+
     private val _isLoading = MutableStateFlow(false)
     val isLoading: StateFlow<Boolean> get() = _isLoading
 
@@ -58,6 +68,7 @@ class HomeTotalItemsViewModel @Inject constructor(
     init {
         loadAnalyticsData(TimeRange.TODAY)
         loadProductSalesSummary(TimeRange.TODAY)
+        loadStockLimit()
     }
 
     private fun loadAnalyticsData(timeRange: TimeRange) {
@@ -99,6 +110,7 @@ class HomeTotalItemsViewModel @Inject constructor(
                         .collect { (productsSaleSummeryList, products) ->
                             _topSellingProductList.value = productsSaleSummeryList
                             _mostSoldProducts.value = products
+                            Log.i(TAG, "loadProductSalesSummary: ${productsSaleSummeryList.size} and ${products.size}")
                         }
                 }
 
@@ -116,6 +128,30 @@ class HomeTotalItemsViewModel @Inject constructor(
             } catch (e: Exception) {
                 _errorMessage.value = e.message
                 _isLoading.value = false
+            } finally {
+                _isLoading.value = false
+            }
+        }
+    }
+
+    private fun loadStockLimit(){
+        viewModelScope.launch {
+            getStockRunoutLimitUseCase.invoke().collect { stockLimit ->
+                _stockRunoutLimit.value = stockLimit
+                loadLowStockProducts(stockLimit)
+            }
+        }
+    }
+
+    private fun loadLowStockProducts(stockLimit: Int) {
+        viewModelScope.launch {
+            _isLoading.value = true
+            try {
+                getLowStockProductsUseCase.invoke(stockLimit).collect { products ->
+                    _lowStockProducts.value = products
+                }
+            } catch (e: Exception) {
+                _errorMessage.value = e.message
             } finally {
                 _isLoading.value = false
             }

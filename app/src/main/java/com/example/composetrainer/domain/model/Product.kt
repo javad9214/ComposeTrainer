@@ -606,7 +606,7 @@ fun List<Product>.getDeadStockProducts(): List<Product> {
 fun List<Product>.getTotalStockValue(): Money {
     return Money(
         filter { it.hasCompletePricing() }
-            .sumOf { it.costPrice!!.amount * it.stock.value }
+            .sumOf { it.costPrice.amount * it.stock.value }
     )
 }
 
