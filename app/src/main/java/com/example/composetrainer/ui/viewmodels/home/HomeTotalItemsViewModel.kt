@@ -17,8 +17,36 @@ import com.example.composetrainer.utils.dateandtime.TimeRange
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
+// Data classes for combined UI state
+data class ProductWithSummary(
+    val product: Product,
+    val summary: ProductSalesSummary,
+    val rank: Int
+)
+
+data class HomeAnalyticsState(
+    val totalInvoiceCount: Int = 0,
+    val totalSales: Money = Money(0),
+    val totalProfit: Money = Money(0)
+)
+
+data class HomeProductsState(
+    val topSellingProducts: List<ProductWithSummary> = emptyList(),
+    val topProfitableProducts: List<ProductWithSummary> = emptyList(),
+    val lowStockProducts: List<Product> = emptyList()
+)
+
+data class HomeScreenState(
+    val analytics: HomeAnalyticsState = HomeAnalyticsState(),
+    val products: HomeProductsState = HomeProductsState(),
+    val isLoading: Boolean = false,
+    val errorMessage: String? = null
+)
 
 @HiltViewModel
 class HomeTotalItemsViewModel @Inject constructor(
@@ -31,39 +59,11 @@ class HomeTotalItemsViewModel @Inject constructor(
     private val getStockRunoutLimitUseCase: GetStockRunoutLimitUseCase
 ) : ViewModel() {
 
-    private val _totalInvoiceCount = MutableStateFlow(0)
-    val totalInvoiceCount: StateFlow<Int> get() = _totalInvoiceCount
-
-    private val _totalSoldPrice = MutableStateFlow(Money(0))
-    val totalSoldPrice: StateFlow<Money> get() = _totalSoldPrice
-
-    private val _totalProfitPrice = MutableStateFlow(Money(0))
-    val totalProfitPrice: StateFlow<Money> get() = _totalProfitPrice
-
-    private val _topSellingProductList = MutableStateFlow<List<ProductSalesSummary>>(emptyList())
-    val topSellingProductList: StateFlow<List<ProductSalesSummary>> get() = _topSellingProductList
-
-    private val _topProfitableProductList = MutableStateFlow<List<ProductSalesSummary>>(emptyList())
-    val topProfitableProductList: StateFlow<List<ProductSalesSummary>> get() = _topProfitableProductList
-
-    private val _mostSoldProducts = MutableStateFlow<List<Product>>(emptyList())
-    val mostSoldProducts: StateFlow<List<Product>> get() = _mostSoldProducts
-
-
-    private val _mostProfitableProducts = MutableStateFlow<List<Product>>(emptyList())
-    val mostProfitableProducts: StateFlow<List<Product>> get() = _mostProfitableProducts
-
-    private val _lowStockProducts = MutableStateFlow<List<Product>>(emptyList())
-    val lowStockProducts: StateFlow<List<Product>> get() = _lowStockProducts
+    private val _uiState = MutableStateFlow(HomeScreenState())
+    val uiState: StateFlow<HomeScreenState> = _uiState.asStateFlow()
 
     private val _stockRunoutLimit = MutableStateFlow(0)
-    val stockRunoutLimit: StateFlow<Int> get() = _stockRunoutLimit
-
-    private val _isLoading = MutableStateFlow(false)
-    val isLoading: StateFlow<Boolean> get() = _isLoading
-
-    private val _errorMessage = MutableStateFlow<String?>(null)
-    val errorMessage: StateFlow<String?> get() = _errorMessage
+    val stockRunoutLimit: StateFlow<Int> = _stockRunoutLimit.asStateFlow()
 
     init {
         loadAnalyticsData(TimeRange.TODAY)
@@ -73,68 +73,76 @@ class HomeTotalItemsViewModel @Inject constructor(
 
     private fun loadAnalyticsData(timeRange: TimeRange) {
         viewModelScope.launch {
-            _isLoading.value = true
+            setLoading(true)
             try {
-                launch {
-                    getInvoiceReportCountUseCase.invoke(timeRange).collect {
-                        _totalInvoiceCount.value = it
-                    }
+                // Combine all analytics flows
+                combine(
+                    getInvoiceReportCountUseCase.invoke(timeRange),
+                    getTotalSoldPriceUseCase.invoke(timeRange),
+                    getTotalProfitPriceUseCase.invoke(timeRange)
+                ) { invoiceCount, soldPrice, profitPrice ->
+                    HomeAnalyticsState(
+                        totalInvoiceCount = invoiceCount,
+                        totalSales = Money(soldPrice),
+                        totalProfit = Money(profitPrice)
+                    )
+                }.collect { analyticsState ->
+                    _uiState.value = _uiState.value.copy(analytics = analyticsState)
                 }
-                launch {
-                    getTotalSoldPriceUseCase.invoke(timeRange).collect {
-                        _totalSoldPrice.value = Money(it)
-                    }
-                }
-                launch {
-                    getTotalProfitPriceUseCase.invoke(timeRange).collect {
-                        _totalProfitPrice.value = Money(it)
-                    }
-                }
-
-
             } catch (e: Exception) {
-                _errorMessage.value = e.message
+                _uiState.value = _uiState.value.copy(errorMessage = e.message)
             } finally {
-                _isLoading.value = false
+                setLoading(false)
             }
         }
     }
 
     private fun loadProductSalesSummary(timeRange: TimeRange) {
         viewModelScope.launch {
-            _isLoading.value = true
+            setLoading(true)
             try {
-
-                launch {
+                // Launch both separately but update state atomically
+                val topSellingJob = launch {
                     getTopSellingProductsUseCase.invoke(timeRange)
-                        .collect { (productsSaleSummeryList, products) ->
-                            _topSellingProductList.value = productsSaleSummeryList
-                            _mostSoldProducts.value = products
-                            Log.i(TAG, "loadProductSalesSummary: ${productsSaleSummeryList.size} and ${products.size}")
+                        .collect { (summaryList, products) ->
+                            val combined = combineProductsWithSummary(summaryList, products)
+                            Log.i(TAG, "Top selling products: ${combined.size}")
+
+                            _uiState.value = _uiState.value.copy(
+                                products = _uiState.value.products.copy(
+                                    topSellingProducts = combined
+                                )
+                            )
                         }
                 }
 
-
-                launch {
+                val topProfitableJob = launch {
                     getTopProfitableProductsUseCase.invoke(timeRange)
-                        .collect { (productsSaleSummeryList, products) ->
-                            Log.d(TAG, "loadProductSalesSummary: $productsSaleSummeryList")
-                            _topProfitableProductList.value = productsSaleSummeryList
-                            _mostProfitableProducts.value = products
+                        .collect { (summaryList, products) ->
+                            val combined = combineProductsWithSummary(summaryList, products)
+                            Log.d(TAG, "Top profitable products: ${combined.size}")
+
+                            _uiState.value = _uiState.value.copy(
+                                products = _uiState.value.products.copy(
+                                    topProfitableProducts = combined
+                                )
+                            )
                         }
                 }
 
+                // Wait for both to complete
+                topSellingJob.join()
+                topProfitableJob.join()
 
             } catch (e: Exception) {
-                _errorMessage.value = e.message
-                _isLoading.value = false
+                _uiState.value = _uiState.value.copy(errorMessage = e.message)
             } finally {
-                _isLoading.value = false
+                setLoading(false)
             }
         }
     }
 
-    private fun loadStockLimit(){
+    private fun loadStockLimit() {
         viewModelScope.launch {
             getStockRunoutLimitUseCase.invoke().collect { stockLimit ->
                 _stockRunoutLimit.value = stockLimit
@@ -145,15 +153,19 @@ class HomeTotalItemsViewModel @Inject constructor(
 
     private fun loadLowStockProducts(stockLimit: Int) {
         viewModelScope.launch {
-            _isLoading.value = true
+            setLoading(true)
             try {
                 getLowStockProductsUseCase.invoke(stockLimit).collect { products ->
-                    _lowStockProducts.value = products
+                    _uiState.value = _uiState.value.copy(
+                        products = _uiState.value.products.copy(
+                            lowStockProducts = products
+                        )
+                    )
                 }
             } catch (e: Exception) {
-                _errorMessage.value = e.message
+                _uiState.value = _uiState.value.copy(errorMessage = e.message)
             } finally {
-                _isLoading.value = false
+                setLoading(false)
             }
         }
     }
@@ -161,6 +173,29 @@ class HomeTotalItemsViewModel @Inject constructor(
     fun reLoadProductSaleSummary(timeRange: TimeRange) {
         loadProductSalesSummary(timeRange)
         loadAnalyticsData(timeRange)
+    }
+
+    private fun setLoading(isLoading: Boolean) {
+        _uiState.value = _uiState.value.copy(isLoading = isLoading)
+    }
+
+    // Helper function to combine products with their summaries efficiently
+    private fun combineProductsWithSummary(
+        summaryList: List<ProductSalesSummary>,
+        products: List<Product>
+    ): List<ProductWithSummary> {
+        // Create a map for O(1) lookup instead of O(n) find()
+        val productMap = products.associateBy { it.id }
+
+        return summaryList.mapIndexedNotNull { index, summary ->
+            productMap[summary.productId]?.let { product ->
+                ProductWithSummary(
+                    product = product,
+                    summary = summary,
+                    rank = index + 1
+                )
+            }
+        }
     }
 
     companion object {

@@ -63,7 +63,10 @@ class InsertInvoiceUseCase @Inject constructor(
 
         // update product LastSaleDate
         invoiceWithProducts.products.forEach { product ->
-            productRepository.updateProduct(product.recordSale())
+            Log.i(TAG, "insertSaleInvoice: ${product.lastSoldDate}")
+            val row = productRepository.updateProduct(product.copy(lastSoldDate = product.recordSale().lastSoldDate))
+            Log.i(TAG, "after insertSaleInvoice: ${product.recordSale().lastSoldDate}")
+            Log.i(TAG, "after insertSaleInvoice: row is  $row")
         }
 
 

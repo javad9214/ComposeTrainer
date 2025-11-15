@@ -39,7 +39,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.input.pointer.motionEventSpy
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.navigation.compose.hiltViewModel
@@ -72,21 +71,8 @@ fun HomeScreen(
     homeTotalItemsViewModel: HomeTotalItemsViewModel = hiltViewModel()
 ) {
 
-    // most Sold Product Details
-    val mostSoldProducts by homeTotalItemsViewModel.mostSoldProducts.collectAsState()
-    val mostSoldProductsSummery by homeTotalItemsViewModel.topSellingProductList.collectAsState()
-
-    // most Profitable Products Details
-    val mostProfitableProducts by homeTotalItemsViewModel.mostProfitableProducts.collectAsState()
-    val mostProfitableProductsSummery by homeTotalItemsViewModel.topProfitableProductList.collectAsState()
-
-    // low Stock Products Details
-    val lowStockProducts by homeTotalItemsViewModel.lowStockProducts.collectAsState()
-
-    // total Items Details
-    val totalInvoiceCount by homeTotalItemsViewModel.totalInvoiceCount.collectAsState()
-    val totalSales by homeTotalItemsViewModel.totalSoldPrice.collectAsState()
-    val totalProfit by homeTotalItemsViewModel.totalProfitPrice.collectAsState()
+    // Single state collection - much cleaner!
+    val uiState by homeTotalItemsViewModel.uiState.collectAsState()
 
     val persianDate = remember { FarsiDateUtil.getTodayFormatted() }
 
@@ -97,25 +83,15 @@ fun HomeScreen(
     // Observe scanned product
     val scannedProduct by homeViewModel.scannedProduct.collectAsState()
 
-
     // Handle navigation when product is found
     LaunchedEffect(scannedProduct) {
         scannedProduct?.let { product ->
-            // Add debug log to verify product is found and being added
             Log.d(TAG, "Product found: ${product.name}, ID: ${product.id}, adding to invoice")
-
-            // Add product to current invoice
             invoiceViewModel.addToCurrentInvoice(product, 1)
-
-
-            // Navigate to invoice screen
             navController.navigate(Screen.Invoice.route)
-
-            // Clear the scanned product
             homeViewModel.clearScannedProduct()
         }
     }
-
 
     Column(modifier = Modifier.fillMaxWidth()) {
         Row(
@@ -126,7 +102,6 @@ fun HomeScreen(
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-
             Text(
                 text = persianDate,
                 fontFamily = Beirut_Medium,
@@ -134,7 +109,6 @@ fun HomeScreen(
             )
 
             Row {
-
                 IconButton(onClick = { navController.navigate(Screen.Settings.route) }) {
                     Icon(
                         painter = painterResource(id = R.drawable.settings_24px),
@@ -143,7 +117,6 @@ fun HomeScreen(
                 }
 
                 IconButton(onClick = onAlertClick) {
-
                     Icon(
                         painter = painterResource(id = R.drawable.notifications_24px),
                         contentDescription = "Notifications"
@@ -151,21 +124,21 @@ fun HomeScreen(
                 }
 
                 IconButton(onClick = onAlertClick) {
-
                     Icon(
                         painter = painterResource(id = R.drawable.account_circle_24px),
                         contentDescription = "Notifications"
                     )
                 }
             }
-
         }
 
         Spacer(modifier = Modifier.height(dimen(R.dimen.space_5)))
 
-        Column(modifier = Modifier
-            .fillMaxSize()
-            .verticalScroll(rememberScrollState())) {
+        Column(
+            modifier = Modifier
+                .fillMaxSize()
+                .verticalScroll(rememberScrollState())
+        ) {
             ElevatedCard(
                 modifier = Modifier
                     .height(dimen(R.dimen.size_lg))
@@ -175,10 +148,8 @@ fun HomeScreen(
                 colors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
                 onClick = { showDatePickerBottomSheet = true }
             ) {
-
                 Row(
-                    modifier = Modifier
-                        .padding(dimen(R.dimen.space_1)),
+                    modifier = Modifier.padding(dimen(R.dimen.space_1)),
                     verticalAlignment = Alignment.CenterVertically
                 ) {
                     Box(
@@ -202,7 +173,6 @@ fun HomeScreen(
                         painter = painterResource(id = R.drawable.keyboard_arrow_down_24px),
                         contentDescription = "down",
                     )
-
                 }
             }
 
@@ -230,11 +200,12 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
 
+            // Analytics section - using combined state
             TotalsItem(
                 modifier = Modifier,
-                totalInvoiceCount = totalInvoiceCount,
-                totalSales = totalSales,
-                totalProfit = totalProfit
+                totalInvoiceCount = uiState.analytics.totalInvoiceCount,
+                totalSales = uiState.analytics.totalSales,
+                totalProfit = uiState.analytics.totalProfit
             )
 
             Spacer(modifier = Modifier.height(dimen(R.dimen.space_4)))
@@ -249,19 +220,19 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(dimen(R.dimen.space_2)))
 
-            // Most Sold Products
+            // Most Sold Products - NO MORE .find()!
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = dimen(R.dimen.space_1))
             ) {
                 items(
-                    mostSoldProductsSummery,
-                    key = { it.id.value }) { mostSoldProductsSummeryItem ->
+                    items = uiState.products.topSellingProducts,
+                    key = { it.summary.id.value }
+                ) { productWithSummary ->
                     MostSoldProductItem(
-                        product = mostSoldProducts.find { it.id == mostSoldProductsSummeryItem.productId }
-                            ?: return@items,
-                        productSalesSummary = mostSoldProductsSummeryItem,
-                        rank = mostSoldProductsSummery.indexOf(mostSoldProductsSummeryItem) + 1
+                        product = productWithSummary.product,
+                        productSalesSummary = productWithSummary.summary,
+                        rank = productWithSummary.rank
                     )
                 }
             }
@@ -278,19 +249,19 @@ fun HomeScreen(
 
             Spacer(modifier = Modifier.height(dimen(R.dimen.space_2)))
 
-            // Most Profitable Products
+            // Most Profitable Products - NO MORE .find() or .indexOf()!
             LazyRow(
                 modifier = Modifier.fillMaxWidth(),
                 contentPadding = PaddingValues(horizontal = dimen(R.dimen.space_1))
             ) {
                 items(
-                    mostProfitableProductsSummery,
-                    key = { it.id.value }) { mostProfitableProductsSummeryItem ->
+                    items = uiState.products.topProfitableProducts,
+                    key = { it.summary.id.value }
+                ) { productWithSummary ->
                     MostSoldProductItem(
-                        product = mostProfitableProducts.find { it.id == mostProfitableProductsSummeryItem.productId }
-                            ?: return@items,
-                        productSalesSummary = mostProfitableProductsSummeryItem,
-                        rank = mostProfitableProductsSummery.indexOf(mostProfitableProductsSummeryItem) + 1
+                        product = productWithSummary.product,
+                        productSalesSummary = productWithSummary.summary,
+                        rank = productWithSummary.rank
                     )
                 }
             }
@@ -300,18 +271,16 @@ fun HomeScreen(
             // Low Stock Products
             LazyRow {
                 items(
-                    lowStockProducts,
-                    key = { it.id.value }) { product ->
-                    LowStockProductItem(
-                        product = product
-                    )
+                    items = uiState.products.lowStockProducts,
+                    key = { it.id.value }
+                ) { product ->
+                    LowStockProductItem(product = product)
                 }
             }
 
             Spacer(modifier = Modifier.height(dimen(R.dimen.space_8)))
         }
     }
-
 }
 
 const val TAG = "HomeScreen"
@@ -319,6 +288,5 @@ const val TAG = "HomeScreen"
 @Preview(showBackground = true)
 @Composable
 fun HomeScreenPreview() {
-    // We can't provide real viewmodel in preview, so we'll skip it
-    // This preview is primarily to check the UI layout
+    // Preview for UI layout
 }
