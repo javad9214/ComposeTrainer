@@ -35,9 +35,9 @@ import com.example.composetrainer.ui.screens.component.CurrencyIcon
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.Beirut_Medium
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
-import com.example.composetrainer.utils.price.PriceValidator.formatPrice
 import com.example.composetrainer.utils.dimen
 import com.example.composetrainer.utils.dimenTextSize
+import com.example.composetrainer.utils.price.PriceValidator.formatPrice
 import com.example.composetrainer.utils.str
 import java.time.LocalDateTime
 
@@ -51,8 +51,10 @@ fun LowStockProductItem(
     val needsRestock = product.needsRestock()
     val recommendedQuantity = product.getRecommendedOrderQuantity()
     val daysSinceLastSold = product.getDaysSinceLastSold()
+    Log.i(TAG, "LowStockProductItem: name ${product.name.value}")
     Log.i(TAG, "LowStockProductItem: daysSinceLastSold $daysSinceLastSold")
     Log.i(TAG, "LowStockProductItem: lastSold ${product.lastSoldDate}")
+
 
     val (urgencyColor, urgencyLabel) = when (stockStatus) {
         StockStatus.OUT_OF_STOCK ->
@@ -151,37 +153,38 @@ fun LowStockProductItem(
                 }
             }
 
-            // Days since last sold using domain method
             daysSinceLastSold?.let { days ->
-                if (days > 0) {
-                    val daysText = if (days == 1L)
-                        str(R.string.yesterday)
-                    else
-                        "$days ${str(R.string.days_ago)}"
+                val daysText = when (days) {
+                    0L -> str(R.string.today)
+                    1L -> str(R.string.yesterday)
+                    else -> "$days ${str(R.string.days_ago)}"
+                }
 
-                    StockInfoRow(
-                        label = str(R.string.last_sold),
-                        value = daysText,
-                        icon = R.drawable.clock,
-                        iconDescription = str(R.string.last_sold),
-                        textColor = if (days > 30)
+                StockInfoRow(
+                    label = str(R.string.last_sold),
+                    value = daysText,
+                    icon = R.drawable.clock,
+                    iconDescription = str(R.string.last_sold),
+                    textColor =
+                        if (days > 30)
                             MaterialTheme.colorScheme.error.copy(alpha = 0.7f)
                         else
                             MaterialTheme.colorScheme.onPrimaryContainer
-                    )
-                }
-            } ?: run {
-                // Product has never been sold
-                if (product.getProductAge() > 7) {
-                    StockInfoRow(
-                        label = str(R.string.last_sold),
-                        value = str(R.string.never_sold),
-                        icon = R.drawable.clock,
-                        iconDescription = str(R.string.last_sold),
-                        textColor = MaterialTheme.colorScheme.error
-                    )
-                }
+                )
             }
+                ?: run {
+                    // Product has never been sold
+                    if (product.getProductAge() > 7) {
+                        StockInfoRow(
+                            label = str(R.string.last_sold),
+                            value = str(R.string.never_sold),
+                            icon = R.drawable.clock,
+                            iconDescription = str(R.string.last_sold),
+                            textColor = MaterialTheme.colorScheme.error
+                        )
+                    }
+                }
+
 
             // Show if product is dead stock
             if (product.isDeadStock()) {

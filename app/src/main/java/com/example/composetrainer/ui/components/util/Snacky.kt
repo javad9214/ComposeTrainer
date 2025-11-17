@@ -59,7 +59,7 @@ import kotlinx.coroutines.launch
 
 // Snackbar Duration
 enum class SnackyDuration(val milliseconds: Long) {
-    SHORT(2000L),
+    SHORT(700L),
     LONG(5000L),
     INFINITE(Long.MAX_VALUE)
 }

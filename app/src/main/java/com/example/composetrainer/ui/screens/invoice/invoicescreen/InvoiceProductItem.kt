@@ -91,7 +91,6 @@ fun InvoiceProductItem(
                         modifier = Modifier
                             .size(32.dp)
                             .clip(CircleShape)
-                            .background(MaterialTheme.colorScheme.errorContainer.copy(alpha = 0.08f))
                     ) {
                         Icon(
                             painter = painterResource(R.drawable.delete_24px),
