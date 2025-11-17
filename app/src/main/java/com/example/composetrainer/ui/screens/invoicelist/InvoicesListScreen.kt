@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.screens.invoicelist
 
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -65,6 +66,8 @@ fun InvoicesListScreen(
     val context = LocalContext.current
     val snackbarHostState = remember { SnackbarHostState() }
 
+    val TAG = "InvoicesListScreen"
+
     // Show error messages as Snackbar (better UX than Toast)
     LaunchedEffect(uiState.errorMessage) {
         uiState.errorMessage?.let { error ->
@@ -115,6 +118,7 @@ fun InvoicesListScreen(
                                             InvoiceListEvent.ToggleInvoiceSelection(invoiceId)
                                         )
                                     } else {
+                                        Log.i(TAG, "InvoicesListScreen: onInvoiceClick: $invoiceId")
                                         onInvoiceClick(invoiceId)
                                     }
                                 },
@@ -430,3 +434,4 @@ private fun InvoicesLazyList(
         }
     }
 }
+

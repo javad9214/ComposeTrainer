@@ -13,6 +13,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
@@ -26,6 +27,8 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedButton
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -47,6 +50,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.composetrainer.R
 import com.example.composetrainer.domain.model.InvoiceWithProducts
 import com.example.composetrainer.domain.model.calculateTotalAmount
@@ -56,6 +60,7 @@ import com.example.composetrainer.ui.theme.BHoma
 import com.example.composetrainer.ui.theme.BMitra
 import com.example.composetrainer.ui.theme.BNazanin
 import com.example.composetrainer.ui.theme.Beirut_Medium
+import com.example.composetrainer.ui.viewmodels.InvoiceListEvent
 import com.example.composetrainer.ui.viewmodels.InvoiceListViewModel
 import com.example.composetrainer.utils.dateandtime.FarsiDateUtil.getFormattedPersianDate
 import com.example.composetrainer.utils.dimen

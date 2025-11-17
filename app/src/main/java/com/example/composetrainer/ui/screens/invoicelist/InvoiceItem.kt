@@ -56,6 +56,7 @@ fun InvoiceItem(
     val formattedDate: String = getFormattedPersianDate(invoice.invoiceDate)
 
     ElevatedCard(
+        onClick = onClick,
         modifier = Modifier.padding(
             vertical = dimen(R.dimen.space_2),
             horizontal = dimen(R.dimen.space_4)
