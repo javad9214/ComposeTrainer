@@ -1,7 +1,7 @@
 package com.example.composetrainer.data.remote.api
 
-import com.example.composetrainer.data.remote.dto.ApiResponseDto
-import com.example.composetrainer.data.remote.dto.PagedResponseDto
+import com.example.composetrainer.data.remote.dto.response.ApiResponseDto
+import com.example.composetrainer.data.remote.dto.response.PagedResponseDto
 import com.example.composetrainer.data.remote.dto.ProductDto
 import com.skydoves.sandwich.ApiResponse
 import retrofit2.http.Body

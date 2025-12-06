@@ -2,6 +2,7 @@ package com.example.composetrainer.di
 
 import com.example.composetrainer.data.remote.api.ApiConstants
 import com.example.composetrainer.data.remote.api.ApiServiceMainProduct
+import com.example.composetrainer.data.remote.api.ApiServiceVersion
 import com.skydoves.sandwich.retrofit.adapters.ApiResponseCallAdapterFactory
 import dagger.Module
 import dagger.Provides
@@ -43,5 +44,17 @@ object NetworkModule {
             .client(okHttpClient)
             .build()
             .create(ApiServiceMainProduct::class.java)
+    }
+
+    @Singleton
+    @Provides
+    fun provideApiServiceVersion(okHttpClient: OkHttpClient): ApiServiceVersion {
+        return Retrofit.Builder()
+            .baseUrl(ApiConstants.BASE_URL)
+            .addConverterFactory(GsonConverterFactory.create())
+            .addCallAdapterFactory(ApiResponseCallAdapterFactory.create())
+            .client(okHttpClient)
+            .build()
+            .create(ApiServiceVersion::class.java)
     }
 }

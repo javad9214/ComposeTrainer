@@ -1,7 +1,7 @@
 package com.example.composetrainer.data.repository
 
 import com.example.composetrainer.data.remote.api.ApiServiceMainProduct
-import com.example.composetrainer.data.remote.dto.PagedResponseDto
+import com.example.composetrainer.data.remote.dto.response.PagedResponseDto
 import com.example.composetrainer.data.remote.util.ApiResponseHandler
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.model.toDomain

@@ -42,9 +42,11 @@ import com.example.composetrainer.ui.screens.productlist.ProductDetailsScreen
 import com.example.composetrainer.ui.screens.productlist.ProductScreen
 import com.example.composetrainer.ui.screens.productlist.serverlist.ServerProductListScreen
 import com.example.composetrainer.ui.screens.setting.SettingScreen
+import com.example.composetrainer.ui.screens.versionupdate.UpdateDialogContainer
 import com.example.composetrainer.ui.theme.ComposeTrainerTheme
 import com.example.composetrainer.ui.viewmodels.ProductsViewModel
 import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
+import com.example.composetrainer.ui.viewmodels.versionupdate.VersionViewModel
 import com.example.composetrainer.utils.str
 import com.example.login.ui.screens.LoginScreen
 import com.example.login.ui.screens.RegisterScreen
@@ -60,7 +62,7 @@ fun MainScreen(
     // Create a shared HomeViewModel instance for barcode scanning
     val sharedHomeViewModel: HomeViewModel = hiltViewModel()
     val productsViewModel: ProductsViewModel = hiltViewModel()
-
+    val versionViewModel: VersionViewModel = hiltViewModel()
     val authViewModel: AuthViewModel = hiltViewModel()
     // Check login status
     var isLoggedIn by remember { mutableStateOf<Boolean?>(null) }
@@ -79,6 +81,16 @@ fun MainScreen(
             CircularProgressIndicator()
         }
         return
+    }
+
+    // Auto check for updates when user is logged in
+    LaunchedEffect(isLoggedIn) {
+        if (isLoggedIn == true) {
+            // Check only if it's been 24 hours since last check
+            if (versionViewModel.shouldCheckForUpdates()) {
+                versionViewModel.checkForUpdates(showDialogOnUpdate = true)
+            }
+        }
     }
 
     // Determine start destination based on login status
@@ -283,6 +295,14 @@ fun MainScreen(
 
             // Global SnackyHost - NOW it's outside NavHost but inside the Box!
             SnackyHost(hostState = snackyHostState)
+
+            // Version Update Dialog - Shows automatically when update is available
+            if (isLoggedIn == true) {
+                UpdateDialogContainer(
+                    viewModel = versionViewModel,
+                    useCompactDialog = false // Set to true for compact dialog
+                )
+            }
         }
     }
 }

@@ -1,4 +1,4 @@
-package com.example.composetrainer.data.remote.dto
+package com.example.composetrainer.data.remote.dto.response
 
 data class PagedResponseDto<T>(
     val content: List<T>,

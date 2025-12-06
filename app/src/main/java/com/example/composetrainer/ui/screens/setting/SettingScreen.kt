@@ -111,10 +111,12 @@ fun SettingScreen(
                 limit = limit,
                 onLimitChange = { settingViewModel.saveStockRunoutLimit(it) }
             )
+
+            SettingsVersionSection()
         }
 
         Text(
-            text = "Version: ${BuildConfig.VERSION_NAME}",
+            text = "App Version: ${BuildConfig.VERSION_NAME}",
             fontFamily = FontFamily.SansSerif,
             fontSize = dimenTextSize(R.dimen.text_size_sm),
             color = MaterialTheme.colorScheme.onSurface,

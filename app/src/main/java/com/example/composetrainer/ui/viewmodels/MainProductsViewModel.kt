@@ -2,7 +2,7 @@ package com.example.composetrainer.ui.viewmodels
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.composetrainer.data.remote.dto.PagedResponseDto
+import com.example.composetrainer.data.remote.dto.response.PagedResponseDto
 import com.example.composetrainer.domain.model.Product
 import com.example.composetrainer.domain.usecase.product.AddProductUseCase
 import com.example.composetrainer.domain.usecase.servermainproduct.AddNewProductToMainServerUseCase
