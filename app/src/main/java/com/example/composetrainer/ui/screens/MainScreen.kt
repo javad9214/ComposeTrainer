@@ -3,13 +3,18 @@ package com.example.composetrainer.ui.screens
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.tooling.preview.Preview
@@ -26,7 +31,6 @@ import com.example.composetrainer.R
 import com.example.composetrainer.ui.components.CustomNavigationBar
 import com.example.composetrainer.ui.components.util.SnackyHost
 import com.example.composetrainer.ui.components.util.rememberSnackyHostState
-import com.example.composetrainer.ui.navigation.BottomNavItem
 import com.example.composetrainer.ui.navigation.Routes
 import com.example.composetrainer.ui.navigation.Screen
 import com.example.composetrainer.ui.screens.home.HomeScreen
@@ -44,6 +48,7 @@ import com.example.composetrainer.ui.viewmodels.home.HomeViewModel
 import com.example.composetrainer.utils.str
 import com.example.login.ui.screens.LoginScreen
 import com.example.login.ui.screens.RegisterScreen
+import com.example.login.ui.viewmodels.AuthViewModel
 
 @Composable
 fun MainScreen(
@@ -54,15 +59,30 @@ fun MainScreen(
 
     // Create a shared HomeViewModel instance for barcode scanning
     val sharedHomeViewModel: HomeViewModel = hiltViewModel()
-
     val productsViewModel: ProductsViewModel = hiltViewModel()
 
-    val bottomNavItems = listOf(
-        BottomNavItem("Invoices", Routes.INVOICES_LIST),
-        BottomNavItem("Analyze", Routes.ANALYZE),
-        BottomNavItem("Products", Routes.PRODUCTS_LIST),
-        BottomNavItem("Home", Routes.HOME)
-    )
+    val authViewModel: AuthViewModel = hiltViewModel()
+    // Check login status
+    var isLoggedIn by remember { mutableStateOf<Boolean?>(null) }
+
+
+    LaunchedEffect(Unit) {
+        isLoggedIn = authViewModel.isLoggedIn()
+    }
+
+    // Show loading until we know the login status
+    if (isLoggedIn == null) {
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator()
+        }
+        return
+    }
+
+    // Determine start destination based on login status
+    val startDestination = if (isLoggedIn == true) Routes.HOME else Routes.LOGIN
 
     // Observe the current back stack entry
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -106,7 +126,7 @@ fun MainScreen(
         Box(modifier = Modifier.fillMaxSize()) {
             NavHost(
                 navController = navController,
-                startDestination = Routes.LOGIN,
+                startDestination = startDestination,
                 modifier = Modifier
                     .padding(innerPadding)
             ) {

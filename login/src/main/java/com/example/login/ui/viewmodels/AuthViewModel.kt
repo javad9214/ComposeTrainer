@@ -6,6 +6,7 @@ import com.example.login.data.remote.dto.request.LoginRequest
 import com.example.login.data.remote.dto.request.RegisterRequest
 import com.example.login.domain.model.AuthUiState
 import com.example.login.domain.model.Result
+import com.example.login.domain.repository.AuthRepository
 import com.example.login.domain.usecase.LoginUseCase
 import com.example.login.domain.usecase.RegisterUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -18,7 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class AuthViewModel @Inject constructor(
     private val loginUseCase: LoginUseCase,
-    private val registerUseCase: RegisterUseCase
+    private val registerUseCase: RegisterUseCase,
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
     private val _uiState = MutableStateFlow(AuthUiState())
@@ -64,5 +66,9 @@ class AuthViewModel @Inject constructor(
                 }
             }
         }
+    }
+
+    suspend fun isLoggedIn(): Boolean {
+        return authRepository.isLoggedIn()
     }
 }
