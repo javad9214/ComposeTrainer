@@ -2,6 +2,7 @@ package com.example.composetrainer.ui.viewmodels.versionupdate
 
 
 import android.content.Context
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.composetrainer.data.remote.dto.response.UpdateStatus
@@ -10,12 +11,10 @@ import com.example.composetrainer.utils.VersionUtils
 import com.example.login.domain.util.Resource
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.collectLatest
-import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -32,8 +31,6 @@ class VersionViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(VersionUiState())
     val uiState: StateFlow<VersionUiState> = _uiState.asStateFlow()
 
-    private val _events = Channel<VersionEvent>()
-    val events = _events.receiveAsFlow()
 
     init {
         // Get current version info
@@ -53,10 +50,12 @@ class VersionViewModel @Inject constructor(
      * @param showDialogOnUpdate If true, shows dialog when update is available
      */
     fun checkForUpdates(showDialogOnUpdate: Boolean = true) {
+        Log.i(TAG, "checkForUpdates: called")
         viewModelScope.launch {
-            _events.send(VersionEvent.UpdateCheckStarted)
 
             _uiState.update { it.copy(isLoading = true, errorMessage = null) }
+
+            Log.i(TAG, "checkForUpdates: currentVersionCode: ${_uiState.value.currentVersionCode}")
 
             checkAppVersionUseCase(
                 currentVersionCode = _uiState.value.currentVersionCode
@@ -81,11 +80,6 @@ class VersionViewModel @Inject constructor(
                             )
                         }
 
-                        _events.send(VersionEvent.UpdateCheckCompleted)
-
-                        if (_uiState.value.showUpdateDialog) {
-                            _events.send(VersionEvent.DialogShown)
-                        }
                     }
 
                     is Resource.Error -> {
@@ -95,7 +89,6 @@ class VersionViewModel @Inject constructor(
                                 errorMessage = result.message
                             )
                         }
-                        _events.send(VersionEvent.UpdateCheckFailed(result.message))
                     }
                 }
             }
@@ -115,9 +108,7 @@ class VersionViewModel @Inject constructor(
      */
     fun showUpdateDialog() {
         _uiState.update { it.copy(showUpdateDialog = true) }
-        viewModelScope.launch {
-            _events.send(VersionEvent.DialogShown)
-        }
+
     }
 
     /**
@@ -127,9 +118,7 @@ class VersionViewModel @Inject constructor(
     fun dismissUpdateDialog() {
         if (!_uiState.value.isUpdateRequired) {
             _uiState.update { it.copy(showUpdateDialog = false) }
-            viewModelScope.launch {
-                _events.send(VersionEvent.DialogDismissed)
-            }
+
         }
     }
 
@@ -137,9 +126,7 @@ class VersionViewModel @Inject constructor(
      * User clicked the update button
      */
     fun onUpdateClicked() {
-        viewModelScope.launch {
-            _events.send(VersionEvent.UpdateClicked)
-        }
+        Log.i(TAG, "onUpdateClicked: User clicked update")
     }
 
     /**
@@ -148,9 +135,7 @@ class VersionViewModel @Inject constructor(
     fun onSkipUpdate() {
         if (_uiState.value.canSkipUpdate) {
             dismissUpdateDialog()
-            viewModelScope.launch {
-                _events.send(VersionEvent.SkipClicked)
-            }
+
         }
     }
 
@@ -176,5 +161,9 @@ class VersionViewModel @Inject constructor(
         // TODO: Implement logic based on last check time
         // For now, always return true
         return true
+    }
+
+    companion object{
+        const val TAG = "UpdateViewModel"
     }
 }

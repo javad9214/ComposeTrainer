@@ -9,9 +9,6 @@ import com.example.login.domain.util.Resource
 import kotlinx.coroutines.flow.Flow
 import javax.inject.Inject
 
-/**
- * Use case for checking app version and updates
- */
 class CheckAppVersionUseCase @Inject constructor(
     private val repository: VersionRepository
 ) {
@@ -20,7 +17,6 @@ class CheckAppVersionUseCase @Inject constructor(
      * Check if an update is available for the current app version
      *
      * @param currentVersionCode Current version code of the app
-     * @return Flow of Resource containing version info and update status
      */
     suspend operator fun invoke(
         currentVersionCode: Int
@@ -46,3 +42,4 @@ data class VersionCheckResult(
     val shouldShowDialog: Boolean
         get() = isUpdateRequired || isUpdateAvailable
 }
+

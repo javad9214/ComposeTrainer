@@ -1,5 +1,6 @@
 package com.example.composetrainer.ui.screens.setting
 
+import android.util.Log
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -31,6 +32,7 @@ import com.example.composetrainer.R
 import com.example.composetrainer.data.remote.dto.response.UpdateStatus
 import com.example.composetrainer.ui.viewmodels.versionupdate.VersionViewModel
 import com.example.composetrainer.utils.VersionUtils
+import com.example.composetrainer.utils.dimen
 
 /**
  * Version section for Settings screen
@@ -43,13 +45,15 @@ fun SettingsVersionSection(
     val uiState by viewModel.uiState.collectAsState()
     val context = LocalContext.current
 
+    val TAG = "SettingsVersionSection"
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 8.dp),
+            .padding(horizontal = dimen(R.dimen.space_2), vertical = 8.dp),
         shape = RoundedCornerShape(16.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MaterialTheme.colorScheme.surfaceVariant
+            containerColor = MaterialTheme.colorScheme.surface
         ),
         elevation = CardDefaults.cardElevation(2.dp)
     ) {
@@ -150,6 +154,7 @@ fun SettingsVersionSection(
                 modifier = Modifier
                     .fillMaxWidth()
                     .clickable(enabled = !uiState.isLoading) {
+                        Log.i(TAG, "SettingsVersionSection: Check for updates clicked")
                         viewModel.checkForUpdates(showDialogOnUpdate = true)
                     }
                     .padding(vertical = 8.dp),

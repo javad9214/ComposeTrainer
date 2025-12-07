@@ -12,17 +12,11 @@ import dagger.hilt.InstallIn
 import dagger.hilt.components.SingletonComponent
 import javax.inject.Singleton
 
-/**
- * Dagger Hilt module for version checking dependencies
- */
 @Module
 @InstallIn(SingletonComponent::class)
 object VersionModule {
 
 
-    /**
-     * Provides VersionRemoteDataSource
-     */
     @Provides
     @Singleton
     fun provideVersionRemoteDataSource(
@@ -31,9 +25,7 @@ object VersionModule {
         return VersionRemoteDataSource(apiService)
     }
 
-    /**
-     * Provides VersionRepository
-     */
+
     @Provides
     @Singleton
     fun provideVersionRepository(
