@@ -33,8 +33,8 @@ object NetworkModule {
             .connectTimeout(300, TimeUnit.SECONDS)  // Connection timeout
             .readTimeout(300, TimeUnit.SECONDS)     // Read timeout
             .writeTimeout(300, TimeUnit.SECONDS)    // Write timeout
-            .addInterceptor(loggingInterceptor)
             .addInterceptor(authInterceptor)
+            .addInterceptor(loggingInterceptor)
             .build()
     }
 
