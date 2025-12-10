@@ -1,6 +1,7 @@
 package com.example.login.data.remote.api
 
 import com.example.login.data.remote.dto.request.LoginRequest
+import com.example.login.data.remote.dto.request.RefreshTokenRequest
 import com.example.login.data.remote.dto.request.RegisterRequest
 import com.example.login.data.remote.dto.response.AuthResponseDTO
 import retrofit2.Response
@@ -17,5 +18,10 @@ interface ApiAuthService {
     @POST("api/auth/login")
     suspend fun login(
         @Body request: LoginRequest
+    ): Response<AuthResponseDTO>
+
+    @POST("api/auth/refresh")
+    suspend fun refreshToken(
+        @Body request: RefreshTokenRequest
     ): Response<AuthResponseDTO>
 }

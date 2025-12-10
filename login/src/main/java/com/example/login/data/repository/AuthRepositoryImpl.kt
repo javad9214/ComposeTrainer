@@ -2,6 +2,7 @@ package com.example.login.data.repository
 
 import com.example.login.data.remote.api.ApiAuthService
 import com.example.login.data.remote.dto.request.LoginRequest
+import com.example.login.data.remote.dto.request.RefreshTokenRequest
 import com.example.login.data.remote.dto.request.RegisterRequest
 import com.example.login.data.remote.dto.response.AuthResponseDTO
 import com.example.login.domain.model.AuthResult
@@ -38,29 +39,47 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun saveToken(token: String) {
-        tokenManager.saveToken(token)
+    override suspend fun refreshToken(): Flow<Result<AuthResult>> = flow {
+        emit(Result.Loading)
+        try {
+            val refreshToken = tokenManager.getRefreshToken()
+            if (refreshToken == null) {
+                emit(Result.Error("No refresh token available"))
+                return@flow
+            }
+
+            val response = apiService.refreshToken(RefreshTokenRequest(refreshToken))
+            emit(handleAuthResponse(response))
+        } catch (e: Exception) {
+            emit(Result.Error(e.message ?: "Token refresh failed"))
+        }
     }
 
-    override suspend fun getToken(): String? {
-        return tokenManager.getToken()
+    override suspend fun saveTokens(accessToken: String, refreshToken: String) {
+        tokenManager.saveTokens(accessToken, refreshToken)
     }
 
-    override suspend fun clearToken() {
-        tokenManager.clearToken()
+    override suspend fun getAccessToken(): String? {
+        return tokenManager.getAccessToken()
+    }
+
+    override suspend fun getRefreshToken(): String? {
+        return tokenManager.getRefreshToken()
+    }
+
+    override suspend fun clearTokens() {
+        tokenManager.clearTokens()
     }
 
     override suspend fun isLoggedIn(): Boolean {
-        return tokenManager.getToken() != null
+        return tokenManager.getAccessToken() != null
     }
 
     private suspend fun handleAuthResponse(response: Response<AuthResponseDTO>): Result<AuthResult> {
         return if (response.isSuccessful) {
             val body = response.body()
             if (body != null) {
-
-                // Save token automatically
-                saveToken(body.token)
+                saveTokens(body.token, body.refreshToken)
 
                 Result.Success(
                     AuthResult(
@@ -79,23 +98,18 @@ class AuthRepositoryImpl @Inject constructor(
                 Result.Error("Empty response body")
             }
         } else {
-            // Extract server error message from response.errorBody()
             val errorBody = response.errorBody()?.string()
-
-            val serverMessage =
-                try {
-                    val json = org.json.JSONObject(errorBody ?: "")
-                    json.optString("message", "")
-                } catch (e: Exception) {
-                    ""
-                }
-
+            val serverMessage = try {
+                val json = org.json.JSONObject(errorBody ?: "")
+                json.optString("message", "")
+            } catch (e: Exception) {
+                ""
+            }
 
             Result.Error(
-                message = serverMessage ?: "Unknown error",
+                message = serverMessage.ifEmpty { "Unknown error" },
                 code = response.code()
             )
         }
     }
-
 }

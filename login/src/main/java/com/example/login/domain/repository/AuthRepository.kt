@@ -9,8 +9,10 @@ import kotlinx.coroutines.flow.Flow
 interface AuthRepository {
     suspend fun register(request: RegisterRequest): Flow<Result<AuthResult>>
     suspend fun login(request: LoginRequest): Flow<Result<AuthResult>>
-    suspend fun saveToken(token: String)
-    suspend fun getToken(): String?
-    suspend fun clearToken()
+    suspend fun refreshToken(): Flow<Result<AuthResult>>
+    suspend fun saveTokens(accessToken: String, refreshToken: String)
+    suspend fun getAccessToken(): String?
+    suspend fun getRefreshToken(): String?
+    suspend fun clearTokens()
     suspend fun isLoggedIn(): Boolean
 }

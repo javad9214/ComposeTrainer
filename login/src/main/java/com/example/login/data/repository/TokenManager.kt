@@ -19,24 +19,43 @@ class TokenManager @Inject constructor(
     @ApplicationContext private val context: Context
 ) {
     private companion object {
-        val TOKEN_KEY = stringPreferencesKey("auth_token")
+        val ACCESS_TOKEN_KEY = stringPreferencesKey("access_token")
+        val REFRESH_TOKEN_KEY = stringPreferencesKey("refresh_token")
     }
 
-    suspend fun saveToken(token: String) {
+    suspend fun saveTokens(accessToken: String, refreshToken: String) {
         context.dataStore.edit { preferences ->
-            preferences[TOKEN_KEY] = token
+            preferences[ACCESS_TOKEN_KEY] = accessToken
+            preferences[REFRESH_TOKEN_KEY] = refreshToken
         }
     }
 
-    suspend fun getToken(): String? {
+    suspend fun getAccessToken(): String? {
         return context.dataStore.data.map { preferences ->
-            preferences[TOKEN_KEY]
+            preferences[ACCESS_TOKEN_KEY]
         }.first()
     }
 
-    suspend fun clearToken() {
+    suspend fun getRefreshToken(): String? {
+        return context.dataStore.data.map { preferences ->
+            preferences[REFRESH_TOKEN_KEY]
+        }.first()
+    }
+
+    suspend fun clearTokens() {
         context.dataStore.edit { preferences ->
-            preferences.remove(TOKEN_KEY)
+            preferences.remove(ACCESS_TOKEN_KEY)
+            preferences.remove(REFRESH_TOKEN_KEY)
         }
     }
+    // Legacy support
+    suspend fun saveToken(token: String) {
+        context.dataStore.edit { preferences ->
+            preferences[ACCESS_TOKEN_KEY] = token
+        }
+    }
+
+    suspend fun getToken(): String? = getAccessToken()
+
+    suspend fun clearToken() = clearTokens()
 }
