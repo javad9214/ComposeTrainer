@@ -16,13 +16,13 @@ val localProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.example.composetrainer"
+    namespace = "ir.yar.anbar"
     compileSdk = 36
 
 
 
     defaultConfig {
-        applicationId = "com.example.composetrainer"
+        applicationId = "ir.yar.anbar"
         minSdk = 26
         targetSdk = 36
         versionCode = 16

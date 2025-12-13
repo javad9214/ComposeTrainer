@@ -14,7 +14,7 @@ val localProperties = Properties().apply {
 }
 
 android {
-    namespace = "com.example.login"
+    namespace = "ir.yar.anbar.login"
     compileSdk = 36
 
     defaultConfig {
